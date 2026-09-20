@@ -1447,11 +1447,7 @@ function initVisualAdminModule() {
       }
 
       const configPwd = (typeof WEDDING_CONFIG !== 'undefined' && WEDDING_CONFIG.adminPassword) ? String(WEDDING_CONFIG.adminPassword).trim() : '';
-      const validHash = localStorage.getItem('wedding_admin_pwd_hash') || DEFAULT_PWD_HASH;
-
-      const isMatch = (configPwd && enteredPwd === configPwd) || 
-                      hashHex === validHash || 
-                      enteredPwd === 'hoanthinh2026';
+      const isMatch = configPwd ? (enteredPwd === configPwd) : (enteredPwd === 'hoanthinh2026');
 
       if (isMatch) {
         // Đăng nhập thành công
@@ -1611,7 +1607,7 @@ function initVisualAdminModule() {
   }
 
   if (ghSaveBtn) {
-    ghSaveBtn.addEventListener('click', async () => {
+    ghSaveBtn.addEventListener('click', () => {
       const repo = ghRepoInput?.value.trim() || '';
       const token = ghTokenInput?.value.trim() || '';
       const branch = ghBranchInput?.value.trim() || 'main';
@@ -1622,30 +1618,8 @@ function initVisualAdminModule() {
       }
 
       localStorage.setItem('wedding_admin_gh', JSON.stringify({ repo, token, branch }));
-
-      const newPwdInput = document.getElementById('admin-new-password');
-      const newPwd = newPwdInput ? newPwdInput.value.trim() : '';
-      if (newPwd) {
-        let newHash = '';
-        try {
-          const encoder = new TextEncoder();
-          const data = encoder.encode(newPwd);
-          const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-          newHash = Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
-        } catch (e) {
-          newHash = newPwd;
-        }
-        localStorage.setItem('wedding_admin_pwd_hash', newHash);
-        if (typeof WEDDING_CONFIG !== 'undefined') {
-          WEDDING_CONFIG.adminPassword = newPwd;
-        }
-        newPwdInput.value = '';
-        showAdminToast('✓ Đã cập nhật mật khẩu mới & Cấu hình GitHub!');
-      } else {
-        showAdminToast('Đã lưu cấu hình GitHub Token!');
-      }
-
       closeModal(ghModal);
+      showAdminToast('Đã lưu cấu hình GitHub Token!');
     });
   }
 
