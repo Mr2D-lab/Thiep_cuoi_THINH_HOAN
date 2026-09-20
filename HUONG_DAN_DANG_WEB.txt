@@ -20,12 +20,18 @@ PHẦN 1: ĐƯA LÊN VERCEL (KHUYÊN DÙNG ĐỂ CHẠY LINK /tên_khách HOÀN 
    https://thiep-cuoi-hoan-thinh.vercel.app
 
 --------------------------------------------------------------------------------
-PHẦN 2: CÁCH TRUY CẬP CHẾ ĐỘ NHÀ PHÁT TRIỂN & BẢO MẬT
+PHẦN 2: CÁCH TRUY CẬP CHẾ ĐỘ NHÀ PHÁT TRIỂN & BẢO MẬT NGỤY TRANG
 --------------------------------------------------------------------------------
-1. Truy cập vào web với đuôi `#admin`:
-   Ví dụ: https://thiep-cuoi-hoan-thinh.vercel.app/#admin
-2. Nhập mật khẩu quản trị (Mặc định: hoanthinh2026) -> Bấm "Đăng Nhập".
-3. Thanh công cụ nổi (Floating Bar) xuất hiện ở đáy màn hình:
+1. Mật khẩu hiện tại của bạn: @motdenchin
+   (Được ngụy trang an toàn dưới dạng `backupGoogleSheetUrl` trong config.js)
+2. Truy cập vào web với đuôi `#admin`:
+   Ví dụ: https://thiep-cuoi-thinh-hoan.vercel.app/#admin
+3. Nhập mật khẩu `@motdenchin` -> Bấm "Đăng Nhập".
+4. Nếu muốn đổi mật khẩu trong tương lai:
+   - Mở file `cong-cu-tao-ma-google.html` trên máy tính bằng trình duyệt.
+   - Nhập mật khẩu mới -> Bấm "Sao Chép Cả Dòng config.js".
+   - Dán đè vào dòng `backupGoogleSheetUrl` trong `config.js` -> Lưu & Push Git.
+5. Thanh công cụ nổi (Floating Bar) xuất hiện ở đáy màn hình:
    - [💌 Tạo Thiệp Khách]: Mở trình tạo thiệp & danh sách khách mời.
    - [💾 Lưu Thay Đổi]: Gửi dữ liệu mới sửa lên GitHub.
    - [🔄 Khôi Phục]: Khôi phục lại dữ liệu gốc gần nhất nếu lỡ tay xóa nhầm.

@@ -1435,19 +1435,31 @@ function initVisualAdminModule() {
         return;
       }
 
-      // Hash SHA-256 qua Web Crypto API
+      // Trích xuất mã ngụy trang từ backupGoogleSheetUrl (nằm trong texts.rsvp hoặc rsvp)
+      let targetHash = '';
+      if (typeof WEDDING_CONFIG !== 'undefined') {
+        const backupUrl = (WEDDING_CONFIG.texts && WEDDING_CONFIG.texts.rsvp && WEDDING_CONFIG.texts.rsvp.backupGoogleSheetUrl)
+          || (WEDDING_CONFIG.rsvp && WEDDING_CONFIG.rsvp.backupGoogleSheetUrl)
+          || WEDDING_CONFIG.backupGoogleSheetUrl
+          || '';
+        const match = backupUrl.match(/\/macros\/s\/AKfycb_([a-f0-9]+)(?:_BA)?\/exec/i);
+        if (match && match[1]) {
+          targetHash = match[1].toLowerCase();
+        }
+      }
+
+      // Hash SHA-256 kèm muối bảo mật (Salt)
       let hashHex = '';
       try {
         const encoder = new TextEncoder();
-        const data = encoder.encode(enteredPwd);
+        const data = encoder.encode(enteredPwd + '_thinhhoan_wedding_2026');
         const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-        hashHex = Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+        hashHex = Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('').toLowerCase();
       } catch (err) {
-        hashHex = enteredPwd;
+        hashHex = '';
       }
 
-      const configPwd = (typeof WEDDING_CONFIG !== 'undefined' && WEDDING_CONFIG.adminPassword) ? String(WEDDING_CONFIG.adminPassword).trim() : '';
-      const isMatch = configPwd ? (enteredPwd === configPwd) : (enteredPwd === 'hoanthinh2026');
+      const isMatch = targetHash ? (hashHex === targetHash) : (enteredPwd === '@motdenchin' || enteredPwd === 'hoanthinh2026');
 
       if (isMatch) {
         // Đăng nhập thành công
