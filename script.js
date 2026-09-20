@@ -676,6 +676,13 @@ function initMusicPlayer() {
   const audio = new Audio(audioUrl);
   audio.loop = true;
 
+  // Kiểm tra xem có đang ở chế độ chỉnh sửa / admin hay không
+  function isEditingMode() {
+    return document.body.classList.contains('admin-mode-active')
+      || window.location.hash === '#admin'
+      || sessionStorage.getItem('wedding_admin_auth') === 'true';
+  }
+
   audio.addEventListener('error', (e) => {
     console.warn('Không thể tải file âm thanh:', e);
     musicBtn.classList.remove('is-playing');
@@ -683,6 +690,14 @@ function initMusicPlayer() {
   });
 
   function toggleMusic(forcePlay = null) {
+    // Nếu đang ở chế độ chỉnh sửa: Tuyệt đối không bật nhạc, dừng ngay lập tức
+    if (isEditingMode()) {
+      audio.pause();
+      isPlaying = false;
+      musicBtn.classList.remove('is-playing');
+      return;
+    }
+
     const shouldPlay = forcePlay !== null ? forcePlay : !isPlaying;
     if (shouldPlay) {
       audio.play().then(() => {
@@ -701,17 +716,29 @@ function initMusicPlayer() {
   }
 
   musicBtn.addEventListener('click', () => {
+    if (isEditingMode()) {
+      showToast('🔇 Chế độ chỉnh sửa: Đã tắt nhạc nền');
+      return;
+    }
     toggleMusic();
   });
 
-  // Tự động phát khi tương tác lần đầu với trang
+  // Tự động phát khi tương tác lần đầu với trang (chỉ phát cho khách, không phát khi đang chỉnh sửa)
   const unlockAudio = () => {
+    if (isEditingMode()) return;
     if (!isPlaying) {
       toggleMusic(true);
       document.removeEventListener('click', unlockAudio);
     }
   };
   document.addEventListener('click', unlockAudio, { once: true });
+
+  // Hàm toàn cục để các thao tác admin dừng nhạc ngay tức thì
+  window.__stopWeddingMusic = () => {
+    audio.pause();
+    isPlaying = false;
+    musicBtn.classList.remove('is-playing');
+  };
 }
 
 /* =====================================================
@@ -1105,8 +1132,12 @@ function initOpeningScreen() {
     const centerY = rect.top + rect.height / 2;
     triggerConfettiBurst(centerX, centerY);
 
-    // 3. Tự động phát nhạc nền đám cưới qua cử chỉ tương tác hợp lệ của người dùng
-    if (musicBtn && !musicBtn.classList.contains('is-playing')) {
+    // 3. Tự động phát nhạc nền đám cưới qua cử chỉ tương tác (chỉ áp dụng cho khách, không bật khi ở chế độ sửa)
+    const isEditingMode = document.body.classList.contains('admin-mode-active')
+      || window.location.hash === '#admin'
+      || sessionStorage.getItem('wedding_admin_auth') === 'true';
+
+    if (!isEditingMode && musicBtn && !musicBtn.classList.contains('is-playing')) {
       try {
         musicBtn.click();
       } catch (err) {
@@ -1386,6 +1417,9 @@ function initVisualAdminModule() {
   // 3. Xử lý Hash URL #admin
   function handleRoute() {
     if (window.location.hash === '#admin') {
+      if (typeof window.__stopWeddingMusic === 'function') {
+        window.__stopWeddingMusic();
+      }
       const isAuthed = sessionStorage.getItem('wedding_admin_auth') === 'true';
       if (isAuthed) {
         activateAdminMode();
@@ -1490,6 +1524,9 @@ function initVisualAdminModule() {
 
   // 5. Kích Hoạt Chế Độ Nhà Phát Triển (Visual Click-to-Edit)
   function activateAdminMode() {
+    if (typeof window.__stopWeddingMusic === 'function') {
+      window.__stopWeddingMusic();
+    }
     document.body.classList.add('admin-mode-active');
     if (toolbar) toolbar.style.display = 'flex';
 

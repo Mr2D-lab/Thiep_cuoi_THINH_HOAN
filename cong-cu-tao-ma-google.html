@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -17,12 +18,14 @@
       --code-text: #38bdf8;
       --success: #10b981;
     }
+
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
+
     body {
       background-color: var(--bg);
       color: var(--text);
@@ -32,19 +35,22 @@
       min-height: 100vh;
       padding: 20px;
     }
+
     .card {
       background: var(--card-bg);
       width: 100%;
       max-width: 680px;
       border-radius: 16px;
-      box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05), 0 8px 10px -6px rgba(0,0,0,0.05);
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
       border: 1px solid var(--border);
       padding: 32px;
     }
+
     .header {
       text-align: center;
       margin-bottom: 28px;
     }
+
     .badge {
       display: inline-block;
       background: #fee2e2;
@@ -55,29 +61,35 @@
       border-radius: 20px;
       margin-bottom: 12px;
     }
+
     h1 {
       font-size: 22px;
       font-weight: 700;
       color: var(--text);
       margin-bottom: 8px;
     }
+
     p.desc {
       color: var(--muted);
       font-size: 14px;
       line-height: 1.5;
     }
+
     .form-group {
       margin-bottom: 20px;
     }
+
     label {
       display: block;
       font-size: 14px;
       font-weight: 600;
       margin-bottom: 8px;
     }
+
     .input-wrapper {
       position: relative;
     }
+
     input[type="text"] {
       width: 100%;
       padding: 12px 16px;
@@ -87,10 +99,12 @@
       outline: none;
       transition: border-color 0.2s;
     }
+
     input[type="text"]:focus {
       border-color: var(--primary);
       box-shadow: 0 0 0 3px rgba(201, 76, 76, 0.15);
     }
+
     .result-section {
       margin-top: 24px;
       background: #f1f5f9;
@@ -98,6 +112,7 @@
       padding: 20px;
       border: 1px solid #cbd5e1;
     }
+
     .result-title {
       font-size: 13px;
       font-weight: 600;
@@ -106,6 +121,7 @@
       letter-spacing: 0.5px;
       margin-bottom: 8px;
     }
+
     .code-box {
       background: var(--code-bg);
       color: var(--code-text);
@@ -118,10 +134,12 @@
       user-select: all;
       margin-bottom: 12px;
     }
+
     .btn-row {
       display: flex;
       gap: 10px;
     }
+
     button {
       flex: 1;
       background: var(--primary);
@@ -138,25 +156,30 @@
       gap: 8px;
       transition: background 0.2s;
     }
+
     button:hover {
       background: var(--primary-hover);
     }
+
     .instructions {
       margin-top: 28px;
       padding-top: 20px;
       border-top: 1px dashed var(--border);
     }
+
     .instructions h3 {
       font-size: 15px;
       font-weight: 700;
       margin-bottom: 10px;
     }
+
     .instructions ol {
       padding-left: 20px;
       font-size: 13px;
       color: var(--muted);
       line-height: 1.8;
     }
+
     .toast {
       position: fixed;
       bottom: 24px;
@@ -169,27 +192,30 @@
       font-size: 14px;
       opacity: 0;
       transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-      box-shadow: 0 10px 15px -3px rgba(0,0,0,0.2);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
     }
+
     .toast.show {
       transform: translateX(-50%) translateY(0);
       opacity: 1;
     }
   </style>
 </head>
+
 <body>
 
   <div class="card">
     <div class="header">
       <span class="badge">🔒 BẢO MẬT TUYỆT ĐỐI</span>
       <h1>Công Cụ Tạo Link Ngụy Trang Google Sheet</h1>
-      <p class="desc">Chuyển đổi mật khẩu thành đường link Google Apps Script dự phòng hoàn toàn hợp lệ để lưu vào <code>config.js</code>.</p>
+      <p class="desc">Chuyển đổi mật khẩu thành đường link Google Apps Script dự phòng hoàn toàn hợp lệ để lưu vào
+        <code>config.js</code>.</p>
     </div>
 
     <div class="form-group">
       <label for="pwd-input">Mật khẩu bạn muốn đặt:</label>
       <div class="input-wrapper">
-        <input type="text" id="pwd-input" value="@motdenchin" placeholder="Nhập mật khẩu mới..." autocomplete="off">
+        <input type="text" id="pwd-input" value="@thiepmoi2026" placeholder="Nhập mật khẩu mới..." autocomplete="off">
       </div>
     </div>
 
@@ -213,11 +239,12 @@
     <div class="instructions">
       <h3>📖 Hướng dẫn cách đổi mật khẩu:</h3>
       <ol>
-        <li>Gõ mật khẩu mới bạn muốn vào ô trên (ví dụ: <code>@motdenchin</code>).</li>
+        <li>Gõ mật khẩu mới bạn muốn vào ô trên (ví dụ: <code>@thiepmoi2026</code>).</li>
         <li>Bấm nút <strong>"Sao Chép Cả Dòng config.js"</strong>.</li>
         <li>Mở file <code>config.js</code> bằng VS Code hoặc Notepad.</li>
         <li>Tìm đến dòng <code>"backupGoogleSheetUrl": ...</code> và dán đè dòng vừa copy vào.</li>
-        <li>Lưu file và đẩy lên GitHub. Khi đăng nhập <code>#admin</code> trên web, bạn gõ đúng mật khẩu mới là vào được!</li>
+        <li>Lưu file và đẩy lên GitHub. Khi đăng nhập <code>#admin</code> trên web, bạn gõ đúng mật khẩu mới là vào
+          được!</li>
       </ol>
     </div>
   </div>
@@ -244,7 +271,7 @@
       const hashBuffer = await crypto.subtle.digest('SHA-256', data);
       const hashHex = Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
       const fullUrl = `https://script.google.com/macros/s/AKfycb_${hashHex}_BA/exec`;
-      
+
       urlOutput.innerText = fullUrl;
       configLineOutput.innerText = `      "backupGoogleSheetUrl": "${fullUrl}",`;
     }
@@ -275,4 +302,5 @@
     computeUrl(input.value.trim());
   </script>
 </body>
+
 </html>
