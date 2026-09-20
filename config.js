@@ -3,7 +3,7 @@
    ========================================================================== */
 
 const WEDDING_CONFIG = {
-  "adminPassword": "hoanthinh2026",
+  "adminPassword": "@motdenchin",
   "openingScreen": {
     "enabled": true,
     "title": "WEDDING INVITATION",
