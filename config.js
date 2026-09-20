@@ -123,7 +123,7 @@ const WEDDING_CONFIG = {
         "placeholder": "Nhập họ và tên của bạn"
       },
       "attendanceField": {
-        "label": "Xác nhận tham gia",
+        "label": "Xác nhận tham gia *",
         "yesOption": "tôi sẽ đến chung vui 😊",
         "noOption": "Rất tiếc, tôi không thể tham dự 😢"
       },
