@@ -1,4 +1,5 @@
 window.WEDDING_CONFIG = {
+  "adminPassword": "hoanthinh2026",
   "openingScreen": {
     "enabled": true,
     "title": "WEDDING INVITATION",
