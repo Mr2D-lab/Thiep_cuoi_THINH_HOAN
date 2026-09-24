@@ -1,12 +1,12 @@
 /* ==========================================================================
-   BẢNG CẤU HÌNH THIỆP CƯỚI 2026 (Cập nhật từ Tool)
+   BẢNG CẤU HÌNH THIỆP CƯỚI 2026 (Cập nhật từ Web Admin)
    ========================================================================== */
 
 const WEDDING_CONFIG = {
   "openingScreen": {
     "enabled": true,
     "title": "WEDDING INVITATION",
-    "subtitle": "Trân trọng kính mời Quý khách cùng gia đình",
+    "subtitle": "TRÂN TRỌNG KÍNH MỜI QUÝ KHÁCH CÙNG GIA ĐÌNH",
     "coupleImage": "images/ảnh cô dâu chú rể xóa nền.png",
     "buttonText": "Mở Thiệp Cưới",
     "hintText": "Chạm để mở thiệp & lắng nghe giai điệu ♪"
@@ -45,7 +45,7 @@ const WEDDING_CONFIG = {
   },
   "texts": {
     "hero": {
-      "subtitle": "We're getting married"
+      "subtitle": "WE'RE GETTING MARRIED"
     },
     "invitation": {
       "groomFamilyTitle": "Nhà Trai",
@@ -58,14 +58,14 @@ const WEDDING_CONFIG = {
     },
     "poem": "Tình yêu không cần hoàn hảo,\nchỉ cần chân thành.\nChúng tôi đã tìm thấy nhau\ngiữa muôn vàn người,\nvà hôm nay xin được chia sẻ\nniềm hạnh phúc này cùng bạn.",
     "couple": {
-      "subtitle": "The Couple",
+      "subtitle": "THE COUPLE",
       "heading": "Cô Dâu & Chú Rể",
-      "groomRole": "Chú Rể",
-      "brideRole": "Cô Dâu"
+      "groomRole": "CHÚ RỂ",
+      "brideRole": "CÔ DÂU"
     },
     "quote": {
       "text": "\"Hạnh phúc là khi tìm được người\nkhiến trái tim mình muốn gọi là nhà.\"",
-      "author": "— Khuyết danh —"
+      "author": "— KHUYẾT DANH —"
     },
     "gallery": {
       "subtitle": "Gallery",
@@ -165,7 +165,7 @@ const WEDDING_CONFIG = {
   "rsvpDaysBefore": 7,
   "bankAccount": {
     "bankName": "BIDV",
-    "accountNumber": "8823968172",
+    "accountNumber": "8823 9681 72",
     "accountHolder": "Đăng Thịnh",
     "qrCodeUrl": "images/qr LEDANGTHINH.jpg"
   },
@@ -173,9 +173,13 @@ const WEDDING_CONFIG = {
     "audioUrl": "audio/nhac_dam_cuoi.mp3"
   },
   "githubSync": {
-    "enabled": false,
-    "encrypted": null,
-    "updatedAt": null
+    "enabled": true,
+    "encrypted": {
+      "salt": "w8oISBUKnpkQyT8LVjzTrQ==",
+      "iv": "ImTQTl6pk7QrWrlo",
+      "ciphertext": "vuL6jH9ROQWBpxQ6jiUs1/LyvdXAZZD5L0LJDkt6rzKaFCghrAI5GqcJS3/W8YSGdqeQYfIZbE9giCxBpPY4hBiyY+YhmuGW4vYRYhzo/q7l9Oq17VoHT/ixBh/fx08wShUVmaiIPLDfzYe5TGRHdyIZBobmBVHOdwmMvQ=="
+    },
+    "updatedAt": "21:24:10 24/9/2026"
   }
 };
 
