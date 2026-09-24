@@ -976,36 +976,37 @@ function initAnimations() {
    ===================================================== */
 function applyToastCenterStyles(toast, isShow) {
   if (!toast) return;
+  if (!isShow) {
+    toast.style.setProperty('display', 'none', 'important');
+    toast.style.setProperty('opacity', '0', 'important');
+    toast.style.setProperty('pointer-events', 'none', 'important');
+    return;
+  }
+  toast.style.setProperty('display', 'flex', 'important');
   toast.style.setProperty('position', 'fixed', 'important');
   toast.style.setProperty('top', '50%', 'important');
   toast.style.setProperty('left', '50%', 'important');
   toast.style.setProperty('bottom', 'auto', 'important');
   toast.style.setProperty('right', 'auto', 'important');
+  toast.style.setProperty('transform', 'translate(-50%, -50%) scale(1)', 'important');
   toast.style.setProperty('z-index', '2147483647', 'important');
   toast.style.setProperty('background', 'rgba(28, 18, 22, 0.96)', 'important');
   toast.style.setProperty('color', '#FFFFFF', 'important');
-  toast.style.setProperty('padding', '18px 30px', 'important');
-  toast.style.setProperty('border-radius', '20px', 'important');
-  toast.style.setProperty('box-shadow', '0 25px 60px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.22)', 'important');
-  toast.style.setProperty('max-width', 'min(90vw, 480px)', 'important');
+  toast.style.setProperty('padding', '16px 28px', 'important');
+  toast.style.setProperty('border-radius', '18px', 'important');
+  toast.style.setProperty('box-shadow', '0 20px 50px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.22)', 'important');
+  toast.style.setProperty('backdrop-filter', 'blur(16px)', 'important');
+  toast.style.setProperty('-webkit-backdrop-filter', 'blur(16px)', 'important');
+  toast.style.setProperty('max-width', 'min(90vw, 460px)', 'important');
   toast.style.setProperty('text-align', 'center', 'important');
-  toast.style.setProperty('line-height', '1.55', 'important');
-  toast.style.setProperty('font-size', '14.5px', 'important');
+  toast.style.setProperty('line-height', '1.5', 'important');
+  toast.style.setProperty('font-size', '14px', 'important');
   toast.style.setProperty('font-weight', '500', 'important');
-  toast.style.setProperty('display', 'flex', 'important');
   toast.style.setProperty('align-items', 'center', 'important');
   toast.style.setProperty('justify-content', 'center', 'important');
+  toast.style.setProperty('opacity', '1', 'important');
+  toast.style.setProperty('pointer-events', 'none', 'important');
   toast.style.setProperty('transition', 'opacity 0.25s ease, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1)', 'important');
-
-  if (isShow) {
-    toast.style.setProperty('opacity', '1', 'important');
-    toast.style.setProperty('pointer-events', 'auto', 'important');
-    toast.style.setProperty('transform', 'translate(-50%, -50%) scale(1)', 'important');
-  } else {
-    toast.style.setProperty('opacity', '0', 'important');
-    toast.style.setProperty('pointer-events', 'none', 'important');
-    toast.style.setProperty('transform', 'translate(-50%, -50%) scale(0.85)', 'important');
-  }
 }
 
 let toastTimeout = null;
@@ -1548,7 +1549,7 @@ function initVisualAdminModule() {
         if (isGithubRoute) {
           openGitHubSettingsModal();
         } else {
-          activateAdminMode();
+          activateAdminMode(false);
         }
       } else {
         openModal(loginModal);
@@ -1651,7 +1652,7 @@ function initVisualAdminModule() {
         if (isGithubRoute) {
           openGitHubSettingsModal();
         } else {
-          activateAdminMode();
+          activateAdminMode(true);
         }
       } else {
         // Mật khẩu sai -> Tính số lần nhập
@@ -1673,7 +1674,7 @@ function initVisualAdminModule() {
   }
 
   // 5. Kích Hoạt Chế Độ Nhà Phát Triển (Visual Click-to-Edit)
-  function activateAdminMode() {
+  function activateAdminMode(showWelcomeToast = false) {
     if (typeof window.__stopWeddingMusic === 'function') {
       window.__stopWeddingMusic();
     }
@@ -1696,7 +1697,9 @@ function initVisualAdminModule() {
       img.addEventListener('click', handleImgClick);
     });
 
-    showAdminToast('🛠️ Đã bật Chế độ Nhà Phát Triển! Nhấp trực tiếp vào chữ hoặc ảnh để sửa.');
+    if (showWelcomeToast) {
+      showAdminToast('🛠️ Đã bật Chế độ Sửa Trực Quan! Nhấp trực tiếp vào chữ hoặc ảnh để sửa.');
+    }
   }
 
   function handleImgClick(e) {
