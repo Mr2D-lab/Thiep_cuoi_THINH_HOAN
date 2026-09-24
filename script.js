@@ -2072,8 +2072,8 @@ function initVisualAdminModule() {
     btnSave.addEventListener('click', async () => {
       const ghSettings = loadGitHubSettings();
       if (!ghSettings.repo || !ghSettings.token) {
-        openModal(ghModal);
-        alert('Vui lòng điền thông tin GitHub Repository và Token trước khi lưu tự động!');
+        alert('Chưa có cấu hình kết nối GitHub! Vui lòng truy cập trang /#github để thiết lập kết nối trước.');
+        window.location.hash = '#github';
         return;
       }
 

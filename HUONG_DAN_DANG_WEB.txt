@@ -35,9 +35,9 @@ PHẦN 2: CÁCH TRUY CẬP CHẾ ĐỘ NHÀ PHÁT TRIỂN & BẢO MẬT NGỤY T
    - [💌 Tạo Thiệp Khách]: Mở trình tạo thiệp & danh sách khách mời.
    - [💾 Lưu Thay Đổi]: Gửi dữ liệu mới sửa lên GitHub.
    - [🔄 Khôi Phục]: Khôi phục lại dữ liệu gốc gần nhất nếu lỡ tay xóa nhầm.
-   - [⚙️ GitHub]: Mở bảng cấu hình GitHub đồng bộ đa thiết bị.
    - [📥 Tải File]: Tải file config.js dự phòng về máy tính.
    - [👁️ Thoát]: Trở về giao diện người xem thông thường.
+   (Lưu ý: Để vào Cấu hình GitHub, bạn truy cập đường link riêng /#github bên dưới).
 
 --------------------------------------------------------------------------------
 PHẦN 2.1: TRANG CẤU HÌNH GITHUB ĐỒNG BỘ RIÊNG BIỆT (/#github) & MÃ HÓA AES-256
