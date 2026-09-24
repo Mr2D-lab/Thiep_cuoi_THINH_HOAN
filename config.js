@@ -171,6 +171,11 @@ const WEDDING_CONFIG = {
   },
   "music": {
     "audioUrl": "audio/nhac_dam_cuoi.mp3"
+  },
+  "githubSync": {
+    "enabled": false,
+    "encrypted": null,
+    "updatedAt": null
   }
 };
 

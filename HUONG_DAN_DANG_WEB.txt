@@ -35,9 +35,23 @@ PHẦN 2: CÁCH TRUY CẬP CHẾ ĐỘ NHÀ PHÁT TRIỂN & BẢO MẬT NGỤY T
    - [💌 Tạo Thiệp Khách]: Mở trình tạo thiệp & danh sách khách mời.
    - [💾 Lưu Thay Đổi]: Gửi dữ liệu mới sửa lên GitHub.
    - [🔄 Khôi Phục]: Khôi phục lại dữ liệu gốc gần nhất nếu lỡ tay xóa nhầm.
-   - [⚙️ GitHub]: Điền Token & Tên Repo để lưu dữ liệu vĩnh viễn.
+   - [⚙️ GitHub]: Mở bảng cấu hình GitHub đồng bộ đa thiết bị.
    - [📥 Tải File]: Tải file config.js dự phòng về máy tính.
    - [👁️ Thoát]: Trở về giao diện người xem thông thường.
+
+--------------------------------------------------------------------------------
+PHẦN 2.1: TRANG CẤU HÌNH GITHUB ĐỒNG BỘ RIÊNG BIỆT (/#github) & MÃ HÓA AES-256
+--------------------------------------------------------------------------------
+1. Truy cập trực tiếp qua đường dẫn:
+   Ví dụ: https://thiep-cuoi-thinh-hoan.vercel.app/#github
+2. Nhập mật khẩu quản trị `@motdenchin` -> Bảng Cấu hình GitHub chuyên dụng mở ra:
+   - Repo: Mr2D-lab/Thiep_cuoi_THINH_HOAN
+   - Token: Dán token ghp_...
+   - Nút [🧪 Kiểm Tra]: Test ngay xem token có quyền ghi vào repo không.
+   - ☑️ Mã hóa AES-256 & Tự động đồng bộ đa thiết bị: Tự động khóa token bằng mật khẩu Admin.
+3. Bấm [Lưu Cấu Hình]: Dữ liệu mã hóa sẽ được lưu vĩnh viễn lên GitHub.
+   👉 Sang máy tính khác hoặc điện thoại mới, bạn CHỈ CẦN VÀO #admin VÀ NHẬP MẬT KHẨU
+      là web tự động nhận diện token, sẵn sàng chỉnh sửa và tạo thiệp khách mời ngay!
 
 --------------------------------------------------------------------------------
 PHẦN 3: CÁCH TẠO THIỆP GỬI RIÊNG CHO TỪNG KHÁCH MỜI

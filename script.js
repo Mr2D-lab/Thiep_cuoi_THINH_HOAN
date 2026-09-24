@@ -1210,9 +1210,9 @@ function initPersonalizedGuestLink() {
 
   // 2. Kiểm tra Hash (ví dụ: #/Thiep_cuoi_gui_chi_lan)
   if (!slug && window.location.hash) {
-    const hashVal = window.location.hash.replace(/^#\/?/, '').trim();
-    if (hashVal && hashVal !== 'admin' && !hashVal.startsWith('admin_')) {
-      slug = hashVal;
+    const hashVal = window.location.hash.replace(/^#\/?/, '').trim().toLowerCase();
+    if (hashVal && hashVal !== 'admin' && !hashVal.startsWith('admin_') && hashVal !== 'github') {
+      slug = window.location.hash.replace(/^#\/?/, '').trim();
     }
   }
 
@@ -1222,7 +1222,7 @@ function initPersonalizedGuestLink() {
     if (segments.length > 0) {
       const lastSegment = decodeURIComponent(segments[segments.length - 1]).trim();
       const hasFileExt = /\.[a-z0-9]{2,5}$/i.test(lastSegment);
-      const isSystemPath = hasFileExt || lastSegment.includes(':') || lastSegment.toLowerCase() === 'admin';
+      const isSystemPath = hasFileExt || lastSegment.includes(':') || lastSegment.toLowerCase() === 'admin' || lastSegment.toLowerCase() === 'github';
       
       if (!isSystemPath) {
         let isKnownGuest = false;
@@ -1342,6 +1342,11 @@ function initVisualAdminModule() {
   const ghBranchInput = document.getElementById('admin-gh-branch');
   const ghSaveBtn = document.getElementById('admin-gh-save');
   const ghCloseBtn = document.getElementById('admin-gh-close');
+  const ghTestBtn = document.getElementById('admin-gh-test');
+  const ghTokenToggleBtn = document.getElementById('admin-gh-token-toggle');
+  const ghEncryptSyncCheckbox = document.getElementById('admin-gh-encrypt-sync');
+  const ghStatusBadge = document.getElementById('admin-gh-status-badge');
+  const ghTestAlert = document.getElementById('admin-gh-test-alert');
 
   const imgModal = document.getElementById('admin-image-modal');
   const imgPreview = document.getElementById('admin-image-preview');
@@ -1414,15 +1419,101 @@ function initVisualAdminModule() {
     if (modal) modal.style.display = 'none';
   }
 
-  // 3. Xử lý Hash URL #admin
+  // === MODULE MÃ HÓA AES-256-GCM + PBKDF2 CHO GITHUB SYNC ===
+  async function deriveEncryptionKey(password, saltUint8) {
+    const enc = new TextEncoder();
+    const keyMaterial = await crypto.subtle.importKey(
+      'raw',
+      enc.encode(password),
+      'PBKDF2',
+      false,
+      ['deriveKey']
+    );
+    return crypto.subtle.deriveKey(
+      {
+        name: 'PBKDF2',
+        salt: saltUint8,
+        iterations: 100000,
+        hash: 'SHA-256'
+      },
+      keyMaterial,
+      { name: 'AES-GCM', length: 256 },
+      false,
+      ['encrypt', 'decrypt']
+    );
+  }
+
+  function bufToBase64(buffer) {
+    let binary = '';
+    const bytes = new Uint8Array(buffer);
+    for (let i = 0; i < bytes.byteLength; i++) {
+      binary += String.fromCharCode(bytes[i]);
+    }
+    return btoa(binary);
+  }
+
+  function base64ToBuf(base64) {
+    const binary = atob(base64);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) {
+      bytes[i] = binary.charCodeAt(i);
+    }
+    return bytes.buffer;
+  }
+
+  async function encryptGitHubPayload(payloadObj, password) {
+    const enc = new TextEncoder();
+    const salt = crypto.getRandomValues(new Uint8Array(16));
+    const iv = crypto.getRandomValues(new Uint8Array(12));
+    const key = await deriveEncryptionKey(password, salt);
+    const data = enc.encode(JSON.stringify(payloadObj));
+    const ciphertext = await crypto.subtle.encrypt(
+      { name: 'AES-GCM', iv },
+      key,
+      data
+    );
+
+    return {
+      salt: bufToBase64(salt),
+      iv: bufToBase64(iv),
+      ciphertext: bufToBase64(ciphertext)
+    };
+  }
+
+  async function decryptGitHubPayload(encryptedObj, password) {
+    if (!encryptedObj || !encryptedObj.salt || !encryptedObj.iv || !encryptedObj.ciphertext) {
+      throw new Error('Dữ liệu mã hóa không đầy đủ');
+    }
+    const salt = new Uint8Array(base64ToBuf(encryptedObj.salt));
+    const iv = new Uint8Array(base64ToBuf(encryptedObj.iv));
+    const ciphertext = base64ToBuf(encryptedObj.ciphertext);
+    const key = await deriveEncryptionKey(password, salt);
+    const decrypted = await crypto.subtle.decrypt(
+      { name: 'AES-GCM', iv },
+      key,
+      ciphertext
+    );
+    const dec = new TextDecoder();
+    return JSON.parse(dec.decode(decrypted));
+  }
+
+  // 3. Xử lý Hash URL #admin và #github
   function handleRoute() {
-    if (window.location.hash === '#admin') {
+    const hash = window.location.hash.toLowerCase();
+    const isGithubRoute = hash === '#github' || window.location.pathname.endsWith('/github');
+    const isAdminRoute = hash === '#admin';
+
+    if (isGithubRoute || isAdminRoute) {
       if (typeof window.__stopWeddingMusic === 'function') {
         window.__stopWeddingMusic();
       }
       const isAuthed = sessionStorage.getItem('wedding_admin_auth') === 'true';
       if (isAuthed) {
-        activateAdminMode();
+        if (isGithubRoute) {
+          openGitHubSettingsModal();
+        } else {
+          activateAdminMode();
+        }
       } else {
         openModal(loginModal);
         checkLockoutStatus();
@@ -1440,7 +1531,8 @@ function initVisualAdminModule() {
   if (cancelBtn) {
     cancelBtn.addEventListener('click', () => {
       closeModal(loginModal);
-      if (window.location.hash === '#admin') {
+      const hash = window.location.hash.toLowerCase();
+      if (hash === '#admin' || hash === '#github') {
         history.replaceState(null, null, window.location.pathname + window.location.search);
       }
     });
@@ -1499,10 +1591,32 @@ function initVisualAdminModule() {
         // Đăng nhập thành công
         localStorage.removeItem('admin_failed_attempts');
         sessionStorage.setItem('wedding_admin_auth', 'true');
+        sessionStorage.setItem('wedding_admin_pwd_tmp', enteredPwd);
+        window.__currentAdminPwd = enteredPwd;
         closeModal(loginModal);
         if (pwdInput) pwdInput.value = '';
         if (errorEl) errorEl.style.display = 'none';
-        activateAdminMode();
+
+        // Tự động giải mã cấu hình GitHub nếu có trong config.js
+        if (typeof WEDDING_CONFIG !== 'undefined' && WEDDING_CONFIG.githubSync && WEDDING_CONFIG.githubSync.encrypted) {
+          try {
+            const decrypted = await decryptGitHubPayload(WEDDING_CONFIG.githubSync.encrypted, enteredPwd);
+            if (decrypted && decrypted.repo && decrypted.token) {
+              localStorage.setItem('wedding_admin_gh', JSON.stringify(decrypted));
+              showAdminToast('🔑 Đã tự động kích hoạt kết nối GitHub cho thiết bị này!');
+            }
+          } catch (err) {
+            console.warn('Không thể giải mã cấu hình GitHub bằng mật khẩu vừa nhập:', err);
+          }
+        }
+
+        const hash = window.location.hash.toLowerCase();
+        const isGithubRoute = hash === '#github' || window.location.pathname.endsWith('/github');
+        if (isGithubRoute) {
+          openGitHubSettingsModal();
+        } else {
+          activateAdminMode();
+        }
       } else {
         // Mật khẩu sai -> Tính số lần nhập
         let failed = parseInt(localStorage.getItem('admin_failed_attempts') || '0', 10) + 1;
@@ -1631,44 +1745,217 @@ function initVisualAdminModule() {
     });
   }
 
-  // 8. Cấu Hình GitHub Modal
+  // 8. Cấu Hình GitHub Modal & Trang /#github
+  function showGhAlert(type, message) {
+    if (!ghTestAlert) return;
+    ghTestAlert.className = `admin-gh-test-alert ${type}`;
+    ghTestAlert.innerHTML = message;
+    ghTestAlert.style.display = 'block';
+  }
+
+  function hideGhAlert() {
+    if (ghTestAlert) ghTestAlert.style.display = 'none';
+  }
+
+  function updateGitHubStatusBadge() {
+    if (!ghStatusBadge) return;
+    const saved = JSON.parse(localStorage.getItem('wedding_admin_gh') || '{}');
+    const isEncrypted = Boolean(typeof WEDDING_CONFIG !== 'undefined' && WEDDING_CONFIG.githubSync && WEDDING_CONFIG.githubSync.encrypted);
+
+    if (isEncrypted) {
+      const syncTime = WEDDING_CONFIG.githubSync.updatedAt ? ` (Cập nhật: ${WEDDING_CONFIG.githubSync.updatedAt})` : '';
+      ghStatusBadge.className = 'admin-gh-status-badge connected';
+      ghStatusBadge.innerHTML = `<span class="status-dot">🟢</span> <span class="status-text">Đã đồng bộ mã hóa AES-256${syncTime}</span>`;
+    } else if (saved.token && saved.repo) {
+      ghStatusBadge.className = 'admin-gh-status-badge connected';
+      ghStatusBadge.innerHTML = `<span class="status-dot">🟢</span> <span class="status-text">Đã kết nối: ${saved.repo} (Bộ nhớ máy này)</span>`;
+    } else {
+      ghStatusBadge.className = 'admin-gh-status-badge disconnected';
+      ghStatusBadge.innerHTML = `<span class="status-dot">⚪</span> <span class="status-text">Chưa kết nối GitHub</span>`;
+    }
+  }
+
   function loadGitHubSettings() {
     try {
       const saved = JSON.parse(localStorage.getItem('wedding_admin_gh') || '{}');
-      if (ghRepoInput && saved.repo) ghRepoInput.value = saved.repo;
+      if (ghRepoInput) ghRepoInput.value = saved.repo || 'Mr2D-lab/Thiep_cuoi_THINH_HOAN';
       if (ghTokenInput && saved.token) ghTokenInput.value = saved.token;
-      if (ghBranchInput && saved.branch) ghBranchInput.value = saved.branch || 'main';
+      if (ghBranchInput) ghBranchInput.value = saved.branch || 'main';
+      updateGitHubStatusBadge();
       return saved;
     } catch (e) {
       return {};
     }
   }
 
+  function openGitHubSettingsModal() {
+    loadGitHubSettings();
+    hideGhAlert();
+    openModal(ghModal);
+  }
+
   if (btnGithub) {
     btnGithub.addEventListener('click', () => {
-      loadGitHubSettings();
-      openModal(ghModal);
+      openGitHubSettingsModal();
+    });
+  }
+
+  if (ghTokenToggleBtn && ghTokenInput) {
+    ghTokenToggleBtn.addEventListener('click', () => {
+      if (ghTokenInput.type === 'password') {
+        ghTokenInput.type = 'text';
+        ghTokenToggleBtn.innerText = '🙈';
+      } else {
+        ghTokenInput.type = 'password';
+        ghTokenToggleBtn.innerText = '👁️';
+      }
     });
   }
 
   if (ghCloseBtn) {
-    ghCloseBtn.addEventListener('click', () => closeModal(ghModal));
+    ghCloseBtn.addEventListener('click', () => {
+      closeModal(ghModal);
+      const hash = window.location.hash.toLowerCase();
+      if (hash === '#github') {
+        history.replaceState(null, null, window.location.pathname + window.location.search);
+      }
+    });
   }
 
-  if (ghSaveBtn) {
-    ghSaveBtn.addEventListener('click', () => {
+  // Nút Kiểm Tra Kết Nối (Test Connection)
+  if (ghTestBtn) {
+    ghTestBtn.addEventListener('click', async () => {
       const repo = ghRepoInput?.value.trim() || '';
       const token = ghTokenInput?.value.trim() || '';
-      const branch = ghBranchInput?.value.trim() || 'main';
 
       if (!repo || !token) {
-        alert('Vui lòng nhập cả Tên Repository và GitHub Token!');
+        showGhAlert('error', '⚠️ Vui lòng nhập cả Tên Repository và GitHub Token trước khi kiểm tra!');
         return;
       }
 
-      localStorage.setItem('wedding_admin_gh', JSON.stringify({ repo, token, branch }));
-      closeModal(ghModal);
-      showAdminToast('Đã lưu cấu hình GitHub Token!');
+      showGhAlert('loading', '⏳ Đang kiểm tra kết nối với GitHub API...');
+      ghTestBtn.disabled = true;
+
+      try {
+        const res = await fetch(`https://api.github.com/repos/${repo}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/vnd.github+json'
+          }
+        });
+
+        if (res.ok) {
+          const repoData = await res.json();
+          const canPush = repoData.permissions ? repoData.permissions.push : true;
+          if (canPush) {
+            showGhAlert('success', `✓ <b>Kết nối thành công!</b> Token có toàn quyền ghi vào repository <b>${repoData.full_name}</b>.`);
+          } else {
+            showGhAlert('error', `⚠️ Token hợp lệ nhưng chưa có quyền ghi (push) vào repository ${repoData.full_name}. Vui lòng tạo token có quyền <b>repo</b>.`);
+          }
+        } else if (res.status === 401) {
+          showGhAlert('error', '❌ <b>Token GitHub không hợp lệ</b> hoặc đã hết hạn (401 Unauthorized).');
+        } else if (res.status === 404) {
+          showGhAlert('error', `❌ <b>Không tìm thấy repository</b> "${repo}" (404 Not Found). Kiểm tra lại tài khoản/tên repo.`);
+        } else {
+          showGhAlert('error', `❌ Lỗi kết nối GitHub (${res.status}). Vui lòng kiểm tra lại.`);
+        }
+      } catch (err) {
+        showGhAlert('error', `❌ Lỗi kết nối mạng: ${err.message}`);
+      } finally {
+        ghTestBtn.disabled = false;
+      }
+    });
+  }
+
+  // Nút Lưu Cấu Hình (Có tùy chọn Mã Hóa AES-256 Đồng Bộ)
+  if (ghSaveBtn) {
+    ghSaveBtn.addEventListener('click', async () => {
+      const repo = ghRepoInput?.value.trim() || '';
+      const token = ghTokenInput?.value.trim() || '';
+      const branch = ghBranchInput?.value.trim() || 'main';
+      const doEncryptSync = ghEncryptSyncCheckbox ? ghEncryptSyncCheckbox.checked : true;
+
+      if (!repo || !token) {
+        showGhAlert('error', '⚠️ Vui lòng nhập cả Tên Repository và GitHub Token!');
+        return;
+      }
+
+      const payloadObj = { repo, token, branch };
+      localStorage.setItem('wedding_admin_gh', JSON.stringify(payloadObj));
+
+      if (doEncryptSync) {
+        const adminPwd = window.__currentAdminPwd || sessionStorage.getItem('wedding_admin_pwd_tmp') || '@motdenchin';
+        ghSaveBtn.disabled = true;
+        const origBtnText = ghSaveBtn.innerText;
+        ghSaveBtn.innerText = '⏳ Đang mã hóa & đồng bộ...';
+        showGhAlert('loading', '⏳ Đang mã hóa AES-256 và lưu cấu hình lên GitHub...');
+
+        try {
+          const encryptedPayload = await encryptGitHubPayload(payloadObj, adminPwd);
+
+          if (typeof WEDDING_CONFIG === 'undefined') window.WEDDING_CONFIG = {};
+          WEDDING_CONFIG.githubSync = {
+            enabled: true,
+            encrypted: encryptedPayload,
+            updatedAt: new Date().toLocaleString('vi-VN')
+          };
+
+          const cfg = harvestUpdatedConfig();
+          cfg.githubSync = WEDDING_CONFIG.githubSync;
+          const code = generateConfigJsString(cfg);
+
+          const branchParam = branch || 'main';
+          const apiUrl = `https://api.github.com/repos/${repo}/contents/config.js?ref=${encodeURIComponent(branchParam)}`;
+
+          let sha = null;
+          const getRes = await fetch(apiUrl, {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Accept': 'application/vnd.github+json'
+            }
+          });
+          if (getRes.ok) {
+            const getData = await getRes.json();
+            sha = getData.sha;
+          }
+
+          const base64Content = btoa(encodeURIComponent(code).replace(/%([0-9A-F]{2})/g, (_, p1) => String.fromCharCode('0x' + p1)));
+          const putUrl = `https://api.github.com/repos/${repo}/contents/config.js`;
+          const putRes = await fetch(putUrl, {
+            method: 'PUT',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Accept': 'application/vnd.github+json',
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              message: 'Cập nhật cấu hình GitHub đồng bộ mã hóa AES-256',
+              content: base64Content,
+              sha: sha || undefined,
+              branch: branchParam
+            })
+          });
+
+          if (!putRes.ok) {
+            const errData = await putRes.json().catch(() => ({}));
+            throw new Error(errData.message || `Lỗi GitHub (${putRes.status})`);
+          }
+
+          showGhAlert('success', '🎉 <b>Đã mã hóa và đồng bộ thành công!</b> Giờ đây bạn có thể mở web trên bất kỳ máy tính/điện thoại nào, chỉ cần nhập mật khẩu Admin là tự động kết nối GitHub.');
+          showAdminToast('✓ Đã mã hóa và đồng bộ cấu hình GitHub lên đám mây!');
+          updateGitHubStatusBadge();
+        } catch (err) {
+          console.error('Lỗi khi mã hóa & đồng bộ GitHub:', err);
+          showGhAlert('error', `⚠️ Đã lưu cấu hình trên máy này nhưng chưa thể đồng bộ lên GitHub: ${err.message}`);
+        } finally {
+          ghSaveBtn.disabled = false;
+          ghSaveBtn.innerText = origBtnText;
+        }
+      } else {
+        showGhAlert('success', '✓ Đã lưu cấu hình GitHub vào bộ nhớ máy này!');
+        showAdminToast('Đã lưu cấu hình GitHub!');
+        updateGitHubStatusBadge();
+      }
     });
   }
 
@@ -1750,11 +2037,16 @@ function initVisualAdminModule() {
       baseConfig.openingScreen.coupleImage = chibiImg.getAttribute('src');
     }
 
+    // Cấu hình đồng bộ GitHub mã hóa
+    if (typeof WEDDING_CONFIG !== 'undefined' && WEDDING_CONFIG.githubSync) {
+      baseConfig.githubSync = WEDDING_CONFIG.githubSync;
+    }
+
     return baseConfig;
   }
 
   function generateConfigJsString(configObj) {
-    return `/* ==========================================================================\n   BẢNG CẤU HÌNH THIỆP CƯỚI 2026 (Cập nhật từ Web Admin)\n   ========================================================================== */\n\nconst WEDDING_CONFIG = ${JSON.stringify(configObj, null, 2)};\n`;
+    return `/* ==========================================================================\n   BẢNG CẤU HÌNH THIỆP CƯỚI 2026 (Cập nhật từ Web Admin)\n   ========================================================================== */\n\nconst WEDDING_CONFIG = ${JSON.stringify(configObj, null, 2)};\n\nif (typeof window !== 'undefined') {\n  window.WEDDING_CONFIG = WEDDING_CONFIG;\n}\n`;
   }
 
   // 10. Tải File config.js Về Máy

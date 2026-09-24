@@ -1548,6 +1548,160 @@ body.admin-mode-active img:hover {
   max-width: 580px;
 }
 
+/* GitHub Settings & /#github Dedicated Page Styles */
+.admin-modal-card-gh {
+  max-width: 520px;
+}
+
+.admin-gh-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  margin-top: 8px;
+  letter-spacing: 0.02em;
+}
+
+.admin-gh-status-badge.connected {
+  background: #ECFDF5;
+  color: #065F46;
+  border: 1px solid #A7F3D0;
+}
+
+.admin-gh-status-badge.disconnected {
+  background: #F3F4F6;
+  color: #4B5563;
+  border: 1px solid #E5E7EB;
+}
+
+.admin-token-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.admin-token-wrapper .admin-input {
+  padding-right: 42px;
+}
+
+.admin-token-toggle-btn {
+  position: absolute;
+  right: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  color: #7A666A;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
+}
+
+.admin-token-toggle-btn:hover {
+  color: #8B263E;
+}
+
+.admin-gh-sync-box {
+  background: rgba(139, 38, 62, 0.05);
+  border: 1.5px dashed rgba(139, 38, 62, 0.25);
+  border-radius: 14px;
+  padding: 12px 14px;
+  margin-top: 14px;
+  margin-bottom: 14px;
+  transition: all 0.2s;
+}
+
+.admin-gh-sync-box:hover {
+  background: rgba(139, 38, 62, 0.08);
+  border-color: rgba(139, 38, 62, 0.4);
+}
+
+.admin-gh-sync-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: #8B263E;
+  user-select: none;
+}
+
+.admin-gh-sync-checkbox {
+  margin-top: 3px;
+  accent-color: #8B263E;
+  width: 17px;
+  height: 17px;
+  cursor: pointer;
+}
+
+.admin-gh-sync-desc {
+  display: block;
+  font-size: 11.5px;
+  font-weight: 400;
+  color: #6B555B;
+  margin-top: 3px;
+  line-height: 1.45;
+}
+
+.admin-gh-test-alert {
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-family: 'Inter', sans-serif;
+  font-size: 12.5px;
+  margin-bottom: 14px;
+  line-height: 1.45;
+  display: none;
+  animation: fadeIn 0.25s ease-out;
+}
+
+.admin-gh-test-alert.success {
+  display: block;
+  background: #F0FDF4;
+  border: 1px solid #86EFAC;
+  color: #166534;
+}
+
+.admin-gh-test-alert.error {
+  display: block;
+  background: #FEF2F2;
+  border: 1px solid #FECACA;
+  color: #991B1B;
+}
+
+.admin-gh-test-alert.loading {
+  display: block;
+  background: #EFF6FF;
+  border: 1px solid #BFDBFE;
+  color: #1E40AF;
+}
+
+.admin-btn-test {
+  padding: 12px 16px;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  background: #FDF2F4;
+  color: #8B263E;
+  border: 1px solid rgba(139, 38, 62, 0.25);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.admin-btn-test:hover:not(:disabled) {
+  background: #FCE7EB;
+  border-color: #8B263E;
+}
+
 .admin-btn-guest {
   background: linear-gradient(135deg, #BE185D, #E11D48);
   color: #FFFFFF;
