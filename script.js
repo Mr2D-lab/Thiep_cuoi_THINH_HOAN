@@ -1585,7 +1585,7 @@ function initVisualAdminModule() {
         hashHex = '';
       }
 
-      const isMatch = targetHash ? (hashHex === targetHash) : (enteredPwd === '@motdenchin' || enteredPwd === 'hoanthinh2026');
+      const isMatch = targetHash ? (hashHex === targetHash) : (enteredPwd && hashHex);
 
       if (isMatch) {
         // Đăng nhập thành công
@@ -1884,7 +1884,11 @@ function initVisualAdminModule() {
       localStorage.setItem('wedding_admin_gh', JSON.stringify(payloadObj));
 
       if (doEncryptSync) {
-        const adminPwd = window.__currentAdminPwd || sessionStorage.getItem('wedding_admin_pwd_tmp') || '@motdenchin';
+        const adminPwd = window.__currentAdminPwd || sessionStorage.getItem('wedding_admin_pwd_tmp') || '';
+        if (!adminPwd) {
+          showGhAlert('error', '⚠️ Vui lòng đăng nhập lại mật khẩu Admin trước khi lưu cấu hình.');
+          return;
+        }
         ghSaveBtn.disabled = true;
         const origBtnText = ghSaveBtn.innerText;
         ghSaveBtn.innerText = '⏳ Đang mã hóa & đồng bộ...';
@@ -2072,8 +2076,7 @@ function initVisualAdminModule() {
     btnSave.addEventListener('click', async () => {
       const ghSettings = loadGitHubSettings();
       if (!ghSettings.repo || !ghSettings.token) {
-        alert('Chưa có cấu hình kết nối GitHub! Vui lòng truy cập trang /#github để thiết lập kết nối trước.');
-        window.location.hash = '#github';
+        showAdminToast('⚠️ Hệ thống chưa được thiết lập đồng bộ dữ liệu đám mây.');
         return;
       }
 

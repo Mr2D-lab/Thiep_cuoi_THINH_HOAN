@@ -1,4 +1,4 @@
-﻿# Byte-compiled / optimized / DLL files
+# Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 *.class
@@ -11,3 +11,15 @@ ehthumbs.db
 # Logs & temp
 *.log
 scratch/
+
+# Tài liệu & Công cụ nội bộ (Chỉ giữ ở local, không push lên Git)
+HUONG_DAN_DANG_WEB.txt
+cong-cu-tao-ma-google.html
+chay_tool.bat
+tool_chinh_thiep.py
+*.bat
+*.py
+*.env
+*.private
+huong_dan*
+notes*
