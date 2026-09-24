@@ -972,8 +972,42 @@ function initAnimations() {
 }
 
 /* =====================================================
-   Helper: Toast Notification
+   Helper: Toast Notification (Căn giữa màn hình, đè lên trên cùng)
    ===================================================== */
+function applyToastCenterStyles(toast, isShow) {
+  if (!toast) return;
+  toast.style.setProperty('position', 'fixed', 'important');
+  toast.style.setProperty('top', '50%', 'important');
+  toast.style.setProperty('left', '50%', 'important');
+  toast.style.setProperty('bottom', 'auto', 'important');
+  toast.style.setProperty('right', 'auto', 'important');
+  toast.style.setProperty('z-index', '2147483647', 'important');
+  toast.style.setProperty('background', 'rgba(28, 18, 22, 0.96)', 'important');
+  toast.style.setProperty('color', '#FFFFFF', 'important');
+  toast.style.setProperty('padding', '18px 30px', 'important');
+  toast.style.setProperty('border-radius', '20px', 'important');
+  toast.style.setProperty('box-shadow', '0 25px 60px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.22)', 'important');
+  toast.style.setProperty('max-width', 'min(90vw, 480px)', 'important');
+  toast.style.setProperty('text-align', 'center', 'important');
+  toast.style.setProperty('line-height', '1.55', 'important');
+  toast.style.setProperty('font-size', '14.5px', 'important');
+  toast.style.setProperty('font-weight', '500', 'important');
+  toast.style.setProperty('display', 'flex', 'important');
+  toast.style.setProperty('align-items', 'center', 'important');
+  toast.style.setProperty('justify-content', 'center', 'important');
+  toast.style.setProperty('transition', 'opacity 0.25s ease, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1)', 'important');
+
+  if (isShow) {
+    toast.style.setProperty('opacity', '1', 'important');
+    toast.style.setProperty('pointer-events', 'auto', 'important');
+    toast.style.setProperty('transform', 'translate(-50%, -50%) scale(1)', 'important');
+  } else {
+    toast.style.setProperty('opacity', '0', 'important');
+    toast.style.setProperty('pointer-events', 'none', 'important');
+    toast.style.setProperty('transform', 'translate(-50%, -50%) scale(0.85)', 'important');
+  }
+}
+
 let toastTimeout = null;
 function showToast(message) {
   let toast = document.getElementById('toast-notice');
@@ -984,12 +1018,14 @@ function showToast(message) {
     document.body.appendChild(toast);
   }
 
-  toast.textContent = message;
+  toast.innerHTML = message;
   toast.classList.add('show');
+  applyToastCenterStyles(toast, true);
 
   if (toastTimeout) clearTimeout(toastTimeout);
   toastTimeout = setTimeout(() => {
     toast.classList.remove('show');
+    applyToastCenterStyles(toast, false);
   }, 3500);
 }
 
@@ -2556,8 +2592,16 @@ function initVisualAdminModule() {
     if (toast) {
       toast.innerHTML = msg;
       toast.classList.add('show');
+      if (typeof applyToastCenterStyles === 'function') {
+        applyToastCenterStyles(toast, true);
+      }
       if (adminToastTimer) clearTimeout(adminToastTimer);
-      adminToastTimer = setTimeout(() => toast.classList.remove('show'), 3500);
+      adminToastTimer = setTimeout(() => {
+        toast.classList.remove('show');
+        if (typeof applyToastCenterStyles === 'function') {
+          applyToastCenterStyles(toast, false);
+        }
+      }, 3500);
     } else {
       alert(msg);
     }

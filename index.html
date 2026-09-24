@@ -27,8 +27,8 @@
   <!-- Animate.css -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
 
-  <!-- Custom Styles -->
-  <link rel="stylesheet" href="styles.css">
+  <!-- Custom Styles (Cache buster chống lưu đệm cũ) -->
+  <link rel="stylesheet" href="styles.css?v=20260924_fix_center">
 </head>
 
 <body>
@@ -676,8 +676,8 @@
     <img id="lightbox-image" class="lightbox-img" src="" alt="Ảnh cưới phóng to">
   </div>
 
-  <!-- Toast Notification Container -->
-  <div id="toast-notice" class="toast-notice"></div>
+  <!-- Toast Notification Container (Đè trên cùng z-index tối đa, căn giữa màn hình) -->
+  <div id="toast-notice" class="toast-notice" style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:2147483647;"></div>
 
   <!-- Thank-You Modal Popup Container (Lời cảm ơn khi gửi xác nhận) -->
   <div id="rsvp-thankyou-modal" class="rsvp-modal-overlay" aria-hidden="true" role="dialog">
