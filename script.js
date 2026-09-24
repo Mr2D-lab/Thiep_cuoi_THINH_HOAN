@@ -2550,12 +2550,14 @@ function initVisualAdminModule() {
     });
   }
 
+  let adminToastTimer = null;
   function showAdminToast(msg) {
     const toast = document.getElementById('toast-notice');
     if (toast) {
-      toast.innerText = msg;
+      toast.innerHTML = msg;
       toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 4000);
+      if (adminToastTimer) clearTimeout(adminToastTimer);
+      adminToastTimer = setTimeout(() => toast.classList.remove('show'), 3500);
     } else {
       alert(msg);
     }
