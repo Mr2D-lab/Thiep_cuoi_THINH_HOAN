@@ -2574,25 +2574,162 @@ function initVisualAdminModule() {
         return;
       }
 
-      showAdminToast('⚡ Đã lưu tức thì! Đang đồng bộ lên đám mây GitHub...');
+      showAdminToast('⚡ Đã lưu vào máy! Đang kết nối đồng bộ GitHub...');
 
       // TỐI ƯU 2: ĐỒNG BỘ GITHUB CHẠY NGẦM (NON-BLOCKING BACKGROUND SYNC)
-      // Chạy ngầm dưới nền, giao diện không bị giật, người dùng không phải chờ đợi
       syncConfigToGitHub(cfg, ghSettings);
     });
   }
 
-  // Đồng bộ cấu hình lên GitHub chạy ngầm (Non-blocking Background Sync + SHA Cache)
+  // Quản lý hiển thị đếm ngược tiến trình đồng bộ lên GitHub
+  const SyncCountdownManager = {
+    indicator: null,
+    icon: null,
+    title: null,
+    subtitle: null,
+    progressBar: null,
+    retryBtn: null,
+    closeBtn: null,
+    timerId: null,
+    hideTimerId: null,
+    startTime: 0,
+    estimatedMs: 0,
+
+    _bindElements() {
+      this.indicator = document.getElementById('admin-sync-indicator');
+      this.icon = document.getElementById('admin-sync-icon');
+      this.title = document.getElementById('admin-sync-title');
+      this.subtitle = document.getElementById('admin-sync-sub');
+      this.progressBar = document.getElementById('admin-sync-progress-bar');
+      this.retryBtn = document.getElementById('admin-sync-retry-btn');
+      this.closeBtn = document.getElementById('admin-sync-close-btn');
+
+      if (this.closeBtn) {
+        this.closeBtn.onclick = () => this.hide();
+      }
+    },
+
+    start(payloadKb, retryCallback) {
+      this._bindElements();
+      if (!this.indicator) return;
+
+      if (this.timerId) clearInterval(this.timerId);
+      if (this.hideTimerId) clearTimeout(this.hideTimerId);
+
+      // Ước tính thời gian dựa trên dung lượng tệp thực tế
+      // Base: 1.5s (transaction Git tại Mỹ) + upload (~140 KB/s)
+      const estimatedSec = Math.max(2.0, Math.round((1.5 + payloadKb / 140) * 10) / 10);
+      this.estimatedMs = estimatedSec * 1000;
+      this.startTime = Date.now();
+
+      this.indicator.className = 'admin-sync-indicator syncing';
+      this.indicator.style.display = 'block';
+      if (this.icon) this.icon.innerText = '⏳';
+      if (this.title) this.title.innerText = 'Đang đồng bộ lên GitHub...';
+      if (this.retryBtn) this.retryBtn.style.display = 'none';
+
+      const updateCountdown = () => {
+        const elapsedMs = Date.now() - this.startTime;
+        const remainingMs = Math.max(0, this.estimatedMs - elapsedMs);
+        const remainingSec = (remainingMs / 1000).toFixed(1);
+
+        const progress = Math.min(95, (elapsedMs / this.estimatedMs) * 100);
+        if (this.progressBar) this.progressBar.style.width = `${progress}%`;
+
+        if (this.subtitle) {
+          if (remainingMs > 0) {
+            this.subtitle.innerText = `Dung lượng: ${payloadKb} KB • Dự kiến còn: ${remainingSec}s`;
+          } else {
+            this.subtitle.innerText = `Dung lượng: ${payloadKb} KB • Đang hoàn tất commit Git...`;
+          }
+        }
+      };
+
+      updateCountdown();
+      this.timerId = setInterval(updateCountdown, 100);
+    },
+
+    success(actualDurationSec) {
+      if (this.timerId) {
+        clearInterval(this.timerId);
+        this.timerId = null;
+      }
+      this._bindElements();
+      if (!this.indicator) return;
+
+      this.indicator.className = 'admin-sync-indicator success';
+      if (this.icon) this.icon.innerText = '🎉';
+      if (this.title) this.title.innerText = 'Đã đồng bộ lên GitHub thành công!';
+      if (this.subtitle) {
+        const secText = typeof actualDurationSec === 'number' ? ` trong ${actualDurationSec.toFixed(1)}s` : '';
+        this.subtitle.innerText = `Hoàn tất${secText} • Khách mời sẽ nhận được bản mới ngay.`;
+      }
+      if (this.progressBar) this.progressBar.style.width = '100%';
+      if (this.retryBtn) this.retryBtn.style.display = 'none';
+
+      if (this.hideTimerId) clearTimeout(this.hideTimerId);
+      this.hideTimerId = setTimeout(() => {
+        this.hide();
+      }, 3500);
+    },
+
+    error(errMessage, retryCallback) {
+      if (this.timerId) {
+        clearInterval(this.timerId);
+        this.timerId = null;
+      }
+      this._bindElements();
+      if (!this.indicator) return;
+
+      this.indicator.className = 'admin-sync-indicator error';
+      if (this.icon) this.icon.innerText = '❌';
+      if (this.title) this.title.innerText = 'Không thể đồng bộ lên GitHub!';
+      if (this.subtitle) this.subtitle.innerText = errMessage || 'Lỗi kết nối mạng hoặc Token GitHub không hợp lệ.';
+      if (this.progressBar) this.progressBar.style.width = '100%';
+
+      if (this.retryBtn && typeof retryCallback === 'function') {
+        this.retryBtn.style.display = 'inline-block';
+        this.retryBtn.onclick = () => {
+          retryCallback();
+        };
+      }
+    },
+
+    hide() {
+      if (this.timerId) {
+        clearInterval(this.timerId);
+        this.timerId = null;
+      }
+      if (this.hideTimerId) {
+        clearTimeout(this.hideTimerId);
+        this.hideTimerId = null;
+      }
+      if (this.indicator) {
+        this.indicator.style.display = 'none';
+      }
+    }
+  };
+
+  // Đồng bộ cấu hình lên GitHub chạy ngầm (Non-blocking Background Sync + Countdown + SHA Cache)
   async function syncConfigToGitHub(cfg, ghSettings) {
+    const code = generateConfigJsString(cfg);
+    const branch = ghSettings.branch || 'main';
+    const apiUrl = `https://api.github.com/repos/${ghSettings.repo}/contents/config.js?ref=${encodeURIComponent(branch)}`;
+    const putUrl = `https://api.github.com/repos/${ghSettings.repo}/contents/config.js`;
+
+    // Mã hóa Base64 chuẩn UTF-8
+    const base64Content = btoa(encodeURIComponent(code).replace(/%([0-9A-F]{2})/g, (_, p1) => String.fromCharCode('0x' + p1)));
+
+    // Tính kích thước dung lượng thực tế gửi đi (KB)
+    const payloadSizeKb = Math.max(1, Math.round((base64Content.length * 0.75) / 1024));
+
+    // Khởi động giao diện đếm ngược đồng bộ
+    const syncStartTs = Date.now();
+    SyncCountdownManager.start(payloadSizeKb, () => {
+      syncConfigToGitHub(cfg, ghSettings);
+    });
+
     try {
-      const code = generateConfigJsString(cfg);
-      const branch = ghSettings.branch || 'main';
-      const apiUrl = `https://api.github.com/repos/${ghSettings.repo}/contents/config.js?ref=${encodeURIComponent(branch)}`;
-      const putUrl = `https://api.github.com/repos/${ghSettings.repo}/contents/config.js`;
-
-      // Mã hóa Base64 chuẩn UTF-8
-      const base64Content = btoa(encodeURIComponent(code).replace(/%([0-9A-F]{2})/g, (_, p1) => String.fromCharCode('0x' + p1)));
-
       // TỐI ƯU 3: Lấy SHA từ bộ nhớ đệm (Cache) để giảm 50% thời gian gọi mạng
       let sha = sessionStorage.getItem('wedding_config_sha') || null;
 
@@ -2610,7 +2747,7 @@ function initVisualAdminModule() {
           return null;
         } else {
           const errData = await getRes.json().catch(() => ({}));
-          throw new Error(errData.message || `Lỗi GitHub (${getRes.status})`);
+          throw new Error(errData.message || `Lỗi kiểm tra GitHub (${getRes.status})`);
         }
       }
 
@@ -2648,7 +2785,7 @@ function initVisualAdminModule() {
 
       if (!putRes.ok) {
         const putErr = await putRes.json().catch(() => ({}));
-        throw new Error(putErr.message || `Lỗi ghi file (${putRes.status})`);
+        throw new Error(putErr.message || `Lỗi ghi file GitHub (${putRes.status})`);
       }
 
       const putData = await putRes.json().catch(() => ({}));
@@ -2656,10 +2793,13 @@ function initVisualAdminModule() {
         sessionStorage.setItem('wedding_config_sha', putData.content.sha);
       }
 
-      showAdminToast('☁️ Đã đồng bộ lên GitHub thành công! Khách xem được ngay.');
+      const durationSec = (Date.now() - syncStartTs) / 1000;
+      SyncCountdownManager.success(durationSec);
     } catch (err) {
       console.error('GitHub API Background Sync Error:', err);
-      showAdminToast(`⚠️ Đã lưu tại máy, nhưng chưa đồng bộ GitHub: ${err.message}`);
+      SyncCountdownManager.error(err.message, () => {
+        syncConfigToGitHub(cfg, ghSettings);
+      });
     }
   }
 

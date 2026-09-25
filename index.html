@@ -749,6 +749,25 @@
     </div>
   </aside>
 
+  <!-- 2.1. Hộp trạng thái & đếm ngược đồng bộ GitHub (Sync Status & Countdown Indicator) -->
+  <div id="admin-sync-indicator" class="admin-sync-indicator" style="display:none;" role="status" aria-live="polite">
+    <div class="admin-sync-header">
+      <span class="admin-sync-icon" id="admin-sync-icon">⏳</span>
+      <div class="admin-sync-info">
+        <div class="admin-sync-title" id="admin-sync-title">Đang đồng bộ lên GitHub...</div>
+        <div class="admin-sync-subtitle" id="admin-sync-sub">Dung lượng: 0 KB • Dự kiến: 0s</div>
+      </div>
+      <button type="button" id="admin-sync-retry-btn" class="admin-sync-retry-btn" style="display:none;">🔄 Thử lại</button>
+      <button type="button" id="admin-sync-close-btn" class="admin-sync-close-btn" title="Đóng">✕</button>
+    </div>
+    <div class="admin-sync-progress-track">
+      <div class="admin-sync-progress-bar" id="admin-sync-progress-bar"></div>
+    </div>
+  </div>
+
+  <!-- Thông báo nổi Toast Notice trên màn hình -->
+  <div id="toast-notice" class="admin-toast-notice"></div>
+
   <!-- 3. GitHub Settings Modal (Hỗ trợ truy cập trực tiếp qua /#github) -->
   <div id="admin-github-modal" class="admin-modal-overlay" style="display:none;" role="dialog" aria-modal="true">
     <div class="admin-modal-card admin-modal-card-gh">
