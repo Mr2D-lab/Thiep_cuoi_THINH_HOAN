@@ -11,6 +11,22 @@ const WEDDING_CONFIG = {
     "buttonText": "Mở Thiệp Cưới",
     "hintText": "Chạm để mở thiệp & lắng nghe giai điệu ♪"
   },
+  "images": {
+    "hero": "images/hero.jpg",
+    "groom": "images/dang-thinh.jpg",
+    "bride": "images/hoan-nguyen.jpg",
+    "countdown": "images/anh-4.jpg",
+    "bankQr": "images/qr LEDANGTHINH.jpg",
+    "openingChibi": "images/ảnh cô dâu chú rể xóa nền.png",
+    "gallery": [
+      "images/anh-10.jpg",
+      "images/anh-2.jpg",
+      "images/anh-1.jpg",
+      "images/anh-11.jpg",
+      "images/anh-12.jpg",
+      "images/anh-13.jpg"
+    ]
+  },
   "groom": {
     "name": "Đăng Thịnh",
     "shortName": "Thịnh",

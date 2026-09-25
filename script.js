@@ -32,6 +32,19 @@ if (document.readyState === 'loading') {
    0. Dynamic Wedding Configuration Binding
    ===================================================== */
 function applyWeddingConfig() {
+  // Nạp bản nháp đã lưu tại máy này (nếu có)
+  try {
+    const localDraft = localStorage.getItem('wedding_config_local_draft');
+    if (localDraft) {
+      const parsedDraft = JSON.parse(localDraft);
+      if (parsedDraft && typeof parsedDraft === 'object') {
+        window.WEDDING_CONFIG = Object.assign({}, typeof WEDDING_CONFIG !== 'undefined' ? WEDDING_CONFIG : {}, parsedDraft);
+      }
+    }
+  } catch (e) {
+    console.warn('Không thể đọc local draft config:', e);
+  }
+
   if (typeof WEDDING_CONFIG === 'undefined') return;
 
   const cfg = WEDDING_CONFIG;
@@ -288,9 +301,38 @@ function applyWeddingConfig() {
   if (cfg.openingScreen?.buttonText !== undefined) bindings['opening-button-text'] = cfg.openingScreen.buttonText;
   if (cfg.openingScreen?.hintText !== undefined) bindings['opening-hint-text'] = cfg.openingScreen.hintText;
 
-  if (cfg.openingScreen?.coupleImage) {
-    const chibiEl = document.getElementById('opening-chibi-img');
-    if (chibiEl) chibiEl.src = cfg.openingScreen.coupleImage;
+  // Cấu hình tất cả hình ảnh trên website (Image Bindings)
+  const imgCfg = cfg.images || {};
+
+  const heroImg = document.querySelector('[data-img-bind="hero"]');
+  if (heroImg && imgCfg.hero) heroImg.src = imgCfg.hero;
+
+  const groomImg = document.querySelector('[data-img-bind="groom"]');
+  if (groomImg && (imgCfg.groom || cfg.groom?.image)) groomImg.src = imgCfg.groom || cfg.groom.image;
+
+  const brideImg = document.querySelector('[data-img-bind="bride"]');
+  if (brideImg && (imgCfg.bride || cfg.bride?.image)) brideImg.src = imgCfg.bride || cfg.bride.image;
+
+  const countdownImg = document.querySelector('[data-img-bind="countdown"]');
+  if (countdownImg && (imgCfg.countdown || cfg.countdown?.backgroundImage)) {
+    countdownImg.src = imgCfg.countdown || cfg.countdown.backgroundImage;
+  }
+
+  const chibiEl = document.getElementById('opening-chibi-img') || document.querySelector('[data-img-bind="opening-chibi"]');
+  if (chibiEl && (imgCfg.openingChibi || cfg.openingScreen?.coupleImage)) {
+    chibiEl.src = imgCfg.openingChibi || cfg.openingScreen.coupleImage;
+  }
+
+  const qrImg = document.querySelector('[data-img-bind="bank-qr"]') || document.querySelector('[data-bind-src="bank-qr-img"]');
+  if (qrImg && (imgCfg.bankQr || cfg.bankAccount?.qrCodeUrl)) {
+    qrImg.src = imgCfg.bankQr || cfg.bankAccount.qrCodeUrl;
+  }
+
+  if (Array.isArray(imgCfg.gallery)) {
+    imgCfg.gallery.forEach((src, idx) => {
+      const gImg = document.querySelector(`[data-img-bind="gallery-${idx}"]`);
+      if (gImg && src) gImg.src = src;
+    });
   }
 
   // Render các mốc Chuyện tình yêu linh hoạt nếu có cấu hình
@@ -1756,12 +1798,39 @@ function initVisualAdminModule() {
       if (activeImgTarget && imgUrlInput && imgUrlInput.value.trim()) {
         const newSrc = imgUrlInput.value.trim();
         activeImgTarget.src = newSrc;
-        // Cập nhật cả opening Screen chibi nếu là ảnh chibi
-        if (activeImgTarget.id === 'opening-chibi-img' && typeof WEDDING_CONFIG !== 'undefined') {
+
+        if (typeof WEDDING_CONFIG === 'undefined') window.WEDDING_CONFIG = {};
+        if (!WEDDING_CONFIG.images) WEDDING_CONFIG.images = {};
+
+        const imgBindKey = activeImgTarget.getAttribute('data-img-bind') || activeImgTarget.id;
+
+        if (imgBindKey === 'opening-chibi' || activeImgTarget.id === 'opening-chibi-img') {
           if (!WEDDING_CONFIG.openingScreen) WEDDING_CONFIG.openingScreen = {};
           WEDDING_CONFIG.openingScreen.coupleImage = newSrc;
+          WEDDING_CONFIG.images.openingChibi = newSrc;
+        } else if (imgBindKey === 'hero') {
+          WEDDING_CONFIG.images.hero = newSrc;
+        } else if (imgBindKey === 'groom') {
+          WEDDING_CONFIG.images.groom = newSrc;
+          if (WEDDING_CONFIG.groom) WEDDING_CONFIG.groom.image = newSrc;
+        } else if (imgBindKey === 'bride') {
+          WEDDING_CONFIG.images.bride = newSrc;
+          if (WEDDING_CONFIG.bride) WEDDING_CONFIG.bride.image = newSrc;
+        } else if (imgBindKey === 'countdown') {
+          WEDDING_CONFIG.images.countdown = newSrc;
+        } else if (imgBindKey === 'bank-qr' || activeImgTarget.getAttribute('data-bind-src') === 'bank-qr-img') {
+          WEDDING_CONFIG.images.bankQr = newSrc;
+          if (!WEDDING_CONFIG.bankAccount) WEDDING_CONFIG.bankAccount = {};
+          WEDDING_CONFIG.bankAccount.qrCodeUrl = newSrc;
+        } else if (imgBindKey && imgBindKey.startsWith('gallery-')) {
+          const idx = parseInt(imgBindKey.replace('gallery-', ''), 10);
+          if (!Array.isArray(WEDDING_CONFIG.images.gallery)) {
+            WEDDING_CONFIG.images.gallery = [];
+          }
+          WEDDING_CONFIG.images.gallery[idx] = newSrc;
         }
-        showAdminToast('Đã áp dụng ảnh mới thành công!');
+
+        showAdminToast('✓ Đã áp dụng ảnh mới! Nhớ bấm nút [💾 Lưu Thay Đổi] ở góc dưới để lưu vĩnh viễn.');
       }
       closeModal(imgModal);
     });
@@ -2020,6 +2089,7 @@ function initVisualAdminModule() {
     if (!baseConfig.venues.invitation) baseConfig.venues.invitation = {};
     if (!baseConfig.openingScreen) baseConfig.openingScreen = {};
     if (!baseConfig.bankAccount) baseConfig.bankAccount = {};
+    if (!baseConfig.images) baseConfig.images = {};
 
     function getText(bindKey) {
       const el = document.querySelector(`[data-bind="${bindKey}"]`);
@@ -2040,6 +2110,52 @@ function initVisualAdminModule() {
     // Ngày âm lịch
     const lunar = getText('wedding-lunar-date');
     if (lunar !== null) baseConfig.lunarDate = lunar.replace(/^\(|\)$/g, '').trim();
+
+    // Địa chỉ thiệp mời chính
+    const invVenue = getText('invitation-venue');
+    if (invVenue !== null) {
+      if (invVenue.includes(':')) {
+        const parts = invVenue.split(':');
+        baseConfig.venues.invitation.location = parts[0].trim();
+        baseConfig.venues.invitation.address = parts.slice(1).join(':').trim();
+      } else {
+        baseConfig.venues.invitation.address = invVenue.trim();
+      }
+    }
+
+    // Sự kiện 1: Lễ Vu Quy
+    if (!baseConfig.venues.ceremony) baseConfig.venues.ceremony = {};
+    const cerTitle = getText('event-ceremony-title'); if (cerTitle !== null) baseConfig.venues.ceremony.title = cerTitle;
+    const cerTime = getText('event-ceremony-time'); if (cerTime !== null) baseConfig.venues.ceremony.time = cerTime;
+    const cerDate = getText('event-ceremony-date'); if (cerDate !== null) baseConfig.venues.ceremony.dateText = cerDate;
+    const cerAddr = getText('event-ceremony-address');
+    if (cerAddr !== null) {
+      const cleanCer = cerAddr.replace(/<br\s*\/?>/gi, '\n').trim();
+      if (cleanCer.includes('\n')) {
+        const lines = cleanCer.split('\n').map(s => s.trim()).filter(Boolean);
+        baseConfig.venues.ceremony.locationName = lines[0];
+        baseConfig.venues.ceremony.address = lines.slice(1).join(', ');
+      } else {
+        baseConfig.venues.ceremony.address = cleanCer;
+      }
+    }
+
+    // Sự kiện 2: Tiệc Cưới
+    if (!baseConfig.venues.reception) baseConfig.venues.reception = {};
+    const recTitle = getText('event-reception-title'); if (recTitle !== null) baseConfig.venues.reception.title = recTitle;
+    const recTime = getText('event-reception-time'); if (recTime !== null) baseConfig.venues.reception.time = recTime;
+    const recDate = getText('event-reception-date'); if (recDate !== null) baseConfig.venues.reception.dateText = recDate;
+    const recAddr = getText('event-reception-address');
+    if (recAddr !== null) {
+      const cleanRec = recAddr.replace(/<br\s*\/?>/gi, '\n').trim();
+      if (cleanRec.includes('\n')) {
+        const lines = cleanRec.split('\n').map(s => s.trim()).filter(Boolean);
+        baseConfig.venues.reception.locationName = lines[0];
+        baseConfig.venues.reception.address = lines.slice(1).join(', ');
+      } else {
+        baseConfig.venues.reception.address = cleanRec;
+      }
+    }
 
     // Văn bản thiệp
     if (!baseConfig.texts.hero) baseConfig.texts.hero = {};
@@ -2063,21 +2179,98 @@ function initVisualAdminModule() {
     const qTxt = getText('quote-text'); if (qTxt !== null) baseConfig.texts.quote.text = qTxt;
     const qAuth = getText('quote-author'); if (qAuth !== null) baseConfig.texts.quote.author = qAuth;
 
+    // Gallery
+    if (!baseConfig.texts.gallery) baseConfig.texts.gallery = {};
+    const galSub = getText('gallery-subtitle'); if (galSub !== null) baseConfig.texts.gallery.subtitle = galSub;
+    const galHead = getText('gallery-heading'); if (galHead !== null) baseConfig.texts.gallery.heading = galHead;
+
+    // Countdown
+    if (!baseConfig.texts.countdown) baseConfig.texts.countdown = {};
+    const cdSub = getText('countdown-subtitle'); if (cdSub !== null) baseConfig.texts.countdown.subtitle = cdSub;
+    const cdHead = getText('countdown-heading'); if (cdHead !== null) baseConfig.texts.countdown.heading = cdHead;
+
+    // Events header
+    if (!baseConfig.texts.eventsHeader) baseConfig.texts.eventsHeader = {};
+    const evSub = getText('events-subtitle'); if (evSub !== null) baseConfig.texts.eventsHeader.subtitle = evSub;
+    const evHead = getText('events-heading'); if (evHead !== null) baseConfig.texts.eventsHeader.heading = evHead;
+
     // Màn hình mở đầu
     const opTitle = getText('opening-title'); if (opTitle !== null) baseConfig.openingScreen.title = opTitle;
     const opSub = getText('opening-subtitle'); if (opSub !== null) baseConfig.openingScreen.subtitle = opSub;
     const opBtn = getText('opening-button-text'); if (opBtn !== null) baseConfig.openingScreen.buttonText = opBtn;
     const opHint = getText('opening-hint-text'); if (opHint !== null) baseConfig.openingScreen.hintText = opHint;
 
+    // Mừng Cưới (Gift)
+    if (!baseConfig.texts.gift) baseConfig.texts.gift = {};
+    const giftSub = getText('gift-subtitle'); if (giftSub !== null) baseConfig.texts.gift.subtitle = giftSub;
+    const giftHead = getText('gift-heading'); if (giftHead !== null) baseConfig.texts.gift.heading = giftHead;
+    const giftNote = getText('gift-envelope-note'); if (giftNote !== null) baseConfig.texts.gift.envelopeNote = giftNote;
+    const giftQr = getText('gift-qr-instruction'); if (giftQr !== null) baseConfig.texts.gift.qrInstruction = giftQr;
+
     // Ngân hàng
     const accHolder = getText('bank-account-holder'); if (accHolder !== null) baseConfig.bankAccount.accountHolder = accHolder;
     const bNameBank = getText('bank-name'); if (bNameBank !== null) baseConfig.bankAccount.bankName = bNameBank;
     const bAccNum = getText('bank-account-number'); if (bAccNum !== null) baseConfig.bankAccount.accountNumber = bAccNum;
 
-    // Ảnh đại diện chibi mở màn nếu có đổi
-    const chibiImg = document.getElementById('opening-chibi-img');
+    // RSVP Form texts
+    if (!baseConfig.texts.rsvp) baseConfig.texts.rsvp = {};
+    const rsvpSub = getText('rsvp-subtitle'); if (rsvpSub !== null) baseConfig.texts.rsvp.subtitle = rsvpSub;
+    const rsvpHead = getText('rsvp-heading'); if (rsvpHead !== null) baseConfig.texts.rsvp.heading = rsvpHead;
+    const rsvpBtn = getText('rsvp-btn-text'); if (rsvpBtn !== null) baseConfig.texts.rsvp.buttonText = rsvpBtn;
+    const rsvpDead = getText('rsvp-deadline-text'); if (rsvpDead !== null) baseConfig.texts.rsvp.prompt = rsvpDead;
+
+    if (!baseConfig.texts.rsvp.attendanceField) baseConfig.texts.rsvp.attendanceField = {};
+    const attYes = getText('rsvp-attendance-yes'); if (attYes !== null) baseConfig.texts.rsvp.attendanceField.yesOption = attYes;
+    const attNo = getText('rsvp-attendance-no'); if (attNo !== null) baseConfig.texts.rsvp.attendanceField.noOption = attNo;
+
+    if (!baseConfig.texts.rsvp.guestOfField) baseConfig.texts.rsvp.guestOfField = {};
+    const gBride = getText('rsvp-guestof-bride'); if (gBride !== null) baseConfig.texts.rsvp.guestOfField.brideOption = gBride;
+    const gGroom = getText('rsvp-guestof-groom'); if (gGroom !== null) baseConfig.texts.rsvp.guestOfField.groomOption = gGroom;
+
+    // Footer
+    if (!baseConfig.texts.footer) baseConfig.texts.footer = {};
+    const fThank = getText('footer-thankyou'); if (fThank !== null) baseConfig.texts.footer.thankYou = fThank;
+
+    // Thu thập 100% hình ảnh trên trang
+    const heroEl = document.querySelector('[data-img-bind="hero"]');
+    if (heroEl && heroEl.getAttribute('src')) baseConfig.images.hero = heroEl.getAttribute('src');
+
+    const groomEl = document.querySelector('[data-img-bind="groom"]');
+    if (groomEl && groomEl.getAttribute('src')) {
+      baseConfig.images.groom = groomEl.getAttribute('src');
+      baseConfig.groom.image = groomEl.getAttribute('src');
+    }
+
+    const brideEl = document.querySelector('[data-img-bind="bride"]');
+    if (brideEl && brideEl.getAttribute('src')) {
+      baseConfig.images.bride = brideEl.getAttribute('src');
+      baseConfig.bride.image = brideEl.getAttribute('src');
+    }
+
+    const cdEl = document.querySelector('[data-img-bind="countdown"]');
+    if (cdEl && cdEl.getAttribute('src')) baseConfig.images.countdown = cdEl.getAttribute('src');
+
+    const chibiImg = document.getElementById('opening-chibi-img') || document.querySelector('[data-img-bind="opening-chibi"]');
     if (chibiImg && chibiImg.getAttribute('src')) {
+      baseConfig.images.openingChibi = chibiImg.getAttribute('src');
       baseConfig.openingScreen.coupleImage = chibiImg.getAttribute('src');
+    }
+
+    const qrEl = document.querySelector('[data-img-bind="bank-qr"]') || document.querySelector('[data-bind-src="bank-qr-img"]');
+    if (qrEl && qrEl.getAttribute('src')) {
+      baseConfig.images.bankQr = qrEl.getAttribute('src');
+      baseConfig.bankAccount.qrCodeUrl = qrEl.getAttribute('src');
+    }
+
+    const galleryImgs = [];
+    for (let i = 0; i < 6; i++) {
+      const gEl = document.querySelector(`[data-img-bind="gallery-${i}"]`);
+      if (gEl && gEl.getAttribute('src')) {
+        galleryImgs.push(gEl.getAttribute('src'));
+      }
+    }
+    if (galleryImgs.length > 0) {
+      baseConfig.images.gallery = galleryImgs;
     }
 
     // Cấu hình đồng bộ GitHub mã hóa
@@ -2110,12 +2303,23 @@ function initVisualAdminModule() {
     });
   }
 
-  // 11. Lưu Trực Tiếp Lên GitHub API
+  // 11. Lưu Trực Tiếp Lên GitHub API & Local Draft
   if (btnSave) {
     btnSave.addEventListener('click', async () => {
+      const cfg = harvestUpdatedConfig();
+      window.WEDDING_CONFIG = cfg;
+
+      // Bước 1: Lưu vào localStorage dự phòng ngay lập tức (đảm bảo không bao giờ mất dữ liệu trên máy)
+      try {
+        localStorage.setItem('wedding_config_local_draft', JSON.stringify(cfg));
+        localStorage.setItem('wedding_config_draft_time', Date.now().toString());
+      } catch (e) {
+        console.warn('Lỗi lưu local draft:', e);
+      }
+
       const ghSettings = loadGitHubSettings();
       if (!ghSettings.repo || !ghSettings.token) {
-        showAdminToast('⚠️ Hệ thống chưa được thiết lập đồng bộ dữ liệu đám mây.');
+        showAdminToast('💾 Đã lưu cấu hình vào bộ nhớ máy này! Để đồng bộ cho khách mời, hãy nhấn biểu tượng ⚙️ Cấu Hình GitHub để nhập Token.');
         return;
       }
 
@@ -2124,12 +2328,11 @@ function initVisualAdminModule() {
       btnSave.disabled = true;
 
       try {
-        const cfg = harvestUpdatedConfig();
         const code = generateConfigJsString(cfg);
         const branch = ghSettings.branch || 'main';
         const apiUrl = `https://api.github.com/repos/${ghSettings.repo}/contents/config.js?ref=${encodeURIComponent(branch)}`;
 
-        // Bước 1: Lấy SHA của file config.js hiện tại trên GitHub
+        // Bước 2: Lấy SHA của file config.js hiện tại trên GitHub
         let sha = null;
         const getRes = await fetch(apiUrl, {
           headers: {
@@ -2146,10 +2349,10 @@ function initVisualAdminModule() {
           throw new Error(errData.message || `Lỗi GitHub (${getRes.status})`);
         }
 
-        // Bước 2: Mã hóa Base64 chuẩn UTF-8
+        // Bước 3: Mã hóa Base64 chuẩn UTF-8
         const base64Content = btoa(encodeURIComponent(code).replace(/%([0-9A-F]{2})/g, (_, p1) => String.fromCharCode('0x' + p1)));
 
-        // Bước 3: Gửi PUT commit trực tiếp lên GitHub
+        // Bước 4: Gửi PUT commit trực tiếp lên GitHub
         const putUrl = `https://api.github.com/repos/${ghSettings.repo}/contents/config.js`;
         const putRes = await fetch(putUrl, {
           method: 'PUT',
@@ -2171,12 +2374,10 @@ function initVisualAdminModule() {
           throw new Error(putErr.message || `Lỗi ghi file (${putRes.status})`);
         }
 
-        // Cập nhật lại WEDDING_CONFIG trong bộ nhớ trang hiện tại
-        window.WEDDING_CONFIG = cfg;
-        showAdminToast('🎉 Đã lưu thành công lên GitHub! Web sẽ cập nhật cho toàn bộ khách mời sau ~30 giây.');
+        showAdminToast('🎉 Đã lưu thành công lên GitHub! Cả chữ và ảnh sẽ tự động hiển thị cho mọi người.');
       } catch (err) {
         console.error('GitHub API Error:', err);
-        alert(`❌ Không thể lưu lên GitHub: ${err.message}\n\nBạn có thể dùng nút "Tải File" để lưu file config.js về máy.`);
+        alert(`❌ Không thể lưu lên GitHub: ${err.message}\n\nDữ liệu đã được lưu tạm trên máy này. Bạn có thể dùng nút "Tải File" để lưu file config.js về máy.`);
       } finally {
         btnSave.innerHTML = originalBtnText;
         btnSave.disabled = false;
@@ -2544,6 +2745,11 @@ function initVisualAdminModule() {
   if (btnRevert) {
     btnRevert.addEventListener('click', async () => {
       if (!confirm('Bạn có chắc chắn muốn hủy các chỉnh sửa chưa lưu và khôi phục lại dữ liệu gần nhất từ GitHub không?')) return;
+
+      try {
+        localStorage.removeItem('wedding_config_local_draft');
+        localStorage.removeItem('wedding_config_draft_time');
+      } catch (e) {}
 
       const ghSettings = loadGitHubSettings();
       showAdminToast('⏳ Đang khôi phục dữ liệu gần nhất...');

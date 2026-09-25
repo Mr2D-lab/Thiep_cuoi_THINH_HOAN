@@ -74,6 +74,7 @@
             <span class="chibi-fx fx-flower-1">🌸</span>
             
             <img id="opening-chibi-img" 
+                 data-img-bind="opening-chibi"
                  src="images/ảnh cô dâu chú rể xóa nền.png" 
                  alt="Hoàn & Thịnh Chibi Xin Chào" 
                  class="chibi-img">
@@ -173,7 +174,7 @@
       <!-- Center photo with refined frame -->
       <div class="px-2 fade-on-scroll">
         <div class="minimal-frame clickable shadow-sm">
-          <img src="images/hero.jpg" alt="Ảnh cưới Hoàn Nguyễn & Đăng Thịnh"
+          <img data-img-bind="hero" src="images/hero.jpg" alt="Ảnh cưới Hoàn Nguyễn & Đăng Thịnh"
             class="gallery-zoomable w-full object-cover" style="aspect-ratio: 2/3; object-position: center;">
         </div>
       </div>
@@ -276,7 +277,7 @@
           <!-- Chú Rể -->
           <div class="flex-1">
             <div class="minimal-frame clickable shadow-sm">
-              <img src="images/dang-thinh.jpg" alt="Chú rể Đăng Thịnh" loading="lazy" decoding="async" class="gallery-zoomable w-full object-cover"
+              <img data-img-bind="groom" src="images/dang-thinh.jpg" alt="Chú rể Đăng Thịnh" loading="lazy" decoding="async" class="gallery-zoomable w-full object-cover"
                 style="aspect-ratio: 2/3;">
             </div>
             <div class="text-center mt-3">
@@ -289,7 +290,7 @@
           <!-- Cô Dâu -->
           <div class="flex-1">
             <div class="minimal-frame clickable shadow-sm">
-              <img src="images/hoan-nguyen.jpg" alt="Cô dâu Hoàn Nguyễn" loading="lazy" decoding="async" class="gallery-zoomable w-full object-cover"
+              <img data-img-bind="bride" src="images/hoan-nguyen.jpg" alt="Cô dâu Hoàn Nguyễn" loading="lazy" decoding="async" class="gallery-zoomable w-full object-cover"
                 style="aspect-ratio: 2/3;">
             </div>
             <div class="text-center mt-3">
@@ -326,36 +327,36 @@
       <div class="space-y-2.5 fade-on-scroll">
         <!-- Full width 1: Áo dài truyền thống & Chữ Hỷ -->
         <div class="minimal-frame clickable">
-          <img src="images/anh-10.jpg" alt="Khoảnh khắc áo dài truyền thống" loading="lazy" decoding="async"
+          <img data-img-bind="gallery-0" src="images/anh-10.jpg" alt="Khoảnh khắc áo dài truyền thống" loading="lazy" decoding="async"
             class="gallery-zoomable w-full object-cover" style="aspect-ratio: 16/9; object-position: center 25%;">
         </div>
 
         <!-- 2-up -->
         <div class="flex gap-2.5">
           <div class="flex-1 minimal-frame clickable">
-            <img src="images/anh-2.jpg" alt="Khoảnh khắc tựa vai ngọt ngào" loading="lazy" decoding="async" class="gallery-zoomable w-full object-cover"
+            <img data-img-bind="gallery-1" src="images/anh-2.jpg" alt="Khoảnh khắc tựa vai ngọt ngào" loading="lazy" decoding="async" class="gallery-zoomable w-full object-cover"
               style="aspect-ratio: 1/1; object-position: center 20%;">
           </div>
           <div class="flex-1 minimal-frame clickable">
-            <img src="images/anh-1.jpg" alt="Khoảnh khắc trao nụ hôn lên tay" loading="lazy" decoding="async"
+            <img data-img-bind="gallery-2" src="images/anh-1.jpg" alt="Khoảnh khắc trao nụ hôn lên tay" loading="lazy" decoding="async"
               class="gallery-zoomable w-full object-cover" style="aspect-ratio: 1/1; object-position: center 20%;">
           </div>
         </div>
 
         <!-- Full width 2: Lời hẹn ước trăm năm -->
         <div class="minimal-frame clickable">
-          <img src="images/anh-11.jpg" alt="Khoảnh khắc lời hẹn ước" loading="lazy" decoding="async" class="gallery-zoomable w-full object-cover"
+          <img data-img-bind="gallery-3" src="images/anh-11.jpg" alt="Khoảnh khắc lời hẹn ước" loading="lazy" decoding="async" class="gallery-zoomable w-full object-cover"
             style="aspect-ratio: 16/9; object-position: center 30%;">
         </div>
 
         <!-- 2-up -->
         <div class="flex gap-2.5">
           <div class="flex-1 minimal-frame clickable">
-            <img src="images/anh-12.jpg" alt="Khoảnh khắc trái tim yêu thương" loading="lazy" decoding="async"
+            <img data-img-bind="gallery-4" src="images/anh-12.jpg" alt="Khoảnh khắc trái tim yêu thương" loading="lazy" decoding="async"
               class="gallery-zoomable w-full object-cover" style="aspect-ratio: 1/1; object-position: center 20%;">
           </div>
           <div class="flex-1 minimal-frame clickable">
-            <img src="images/anh-13.jpg" alt="Nụ cười hạnh phúc cô dâu" loading="lazy" decoding="async" class="gallery-zoomable w-full object-cover"
+            <img data-img-bind="gallery-5" src="images/anh-13.jpg" alt="Nụ cười hạnh phúc cô dâu" loading="lazy" decoding="async" class="gallery-zoomable w-full object-cover"
               style="aspect-ratio: 1/1; object-position: center 15%;">
           </div>
         </div>
@@ -375,7 +376,7 @@
 
     <!-- ==================== SECTION 8: COUNTDOWN ==================== -->
     <section id="section-countdown" class="relative py-20 px-6 text-center overflow-hidden">
-      <img src="images/anh-4.jpg" alt="Countdown background" loading="lazy" decoding="async"
+      <img data-img-bind="countdown" src="images/anh-4.jpg" alt="Countdown background" loading="lazy" decoding="async"
         class="absolute inset-0 w-full h-full object-cover filter brightness-[0.6] object-top">
       <div class="absolute inset-0 bg-gradient-to-b from-black/50 via-black/60 to-black/50 pointer-events-none"></div>
 
@@ -622,7 +623,7 @@
                 <!-- VietQR code image -->
                 <img
                   src="images/qr LEDANGTHINH.jpg"
-                  alt="VietQR Chuyển Khoản Mừng Cưới" loading="lazy" decoding="async" class="w-36 h-36 mx-auto rounded-lg" data-bind-src="bank-qr-img">
+                  alt="VietQR Chuyển Khoản Mừng Cưới" loading="lazy" decoding="async" class="w-36 h-36 mx-auto rounded-lg" data-bind-src="bank-qr-img" data-img-bind="bank-qr">
               </div>
               <p class="font-display text-dark text-base font-semibold mb-0.5" data-bind="bank-account-holder">Đăng
                 Thịnh</p>
@@ -971,9 +972,9 @@
     </div>
   </div>
 
-  <!-- Scripts -->
-  <script src="config.js?v=20260920_sec"></script>
-  <script src="script.js?v=20260920_sec"></script>
+  <!-- Scripts (Cache buster chống lưu đệm) -->
+  <script src="config.js?v=20260925_fix_admin"></script>
+  <script src="script.js?v=20260925_fix_admin"></script>
 </body>
 
 </html>
