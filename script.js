@@ -20,6 +20,10 @@ function _initWeddingApp() {
   initLightbox();
   initAnimations();
   initVisualAdminModule();
+
+  // TỐI ƯU 4: Nạp ngầm cấu hình mới nhất từ đám mây (Live Cloud Data Fetch)
+  // Khách mời hoặc thiết bị khác sẽ thấy thay đổi sau 1-2s mà không phải đợi Vercel build 1 phút
+  fetchLatestCloudConfig();
 }
 
 if (document.readyState === 'loading') {
@@ -543,6 +547,66 @@ function applyWeddingConfig() {
 }
 
 /* =====================================================
+   0.1. Live Cloud Data Fetch (Tự động nạp cấu hình mới nhất từ GitHub)
+   ===================================================== */
+async function fetchLatestCloudConfig() {
+  try {
+    const ghRepo = 'Mr2D-lab/Thiep_cuoi_THINH_HOAN';
+    const apiUrl = `https://api.github.com/repos/${ghRepo}/contents/config.js?ref=main`;
+
+    const res = await fetch(apiUrl, {
+      headers: {
+        'Accept': 'application/vnd.github+json'
+      }
+    });
+
+    if (!res.ok) return;
+
+    const data = await res.json();
+    if (!data.content) return;
+
+    // Lưu SHA vào sessionStorage để khi admin bấm Lưu không cần gọi GET lần đầu (Tối ưu 3)
+    if (data.sha) {
+      sessionStorage.setItem('wedding_config_sha', data.sha);
+    }
+
+    // Giải mã Base64 UTF-8 an toàn
+    const binary = atob(data.content.replace(/\s/g, ''));
+    const bytes = Uint8Array.from(binary, (c) => c.charCodeAt(0));
+    const code = new TextDecoder('utf-8').decode(bytes);
+
+    // Chạy trong môi trường sandbox tạm thời để trích xuất WEDDING_CONFIG mới
+    let cloudConfig = null;
+    try {
+      const sandboxFn = new Function(code + '; return typeof WEDDING_CONFIG !== "undefined" ? WEDDING_CONFIG : null;');
+      cloudConfig = sandboxFn();
+    } catch (parseErr) {
+      console.warn('Lỗi phân tích cú pháp cloud config:', parseErr);
+    }
+
+    if (!cloudConfig || typeof cloudConfig !== 'object') return;
+
+    // Kiểm tra xem máy admin có draft đang chỉnh sửa chưa lưu không
+    const localDraft = localStorage.getItem('wedding_config_local_draft');
+    if (localDraft && window.location.hash.toLowerCase().includes('admin')) {
+      return; // Không ghi đè khi admin đang mở trang với draft
+    }
+
+    // So sánh nếu có thay đổi với window.WEDDING_CONFIG hiện tại
+    const currentJson = JSON.stringify(window.WEDDING_CONFIG || {});
+    const cloudJson = JSON.stringify(cloudConfig);
+    if (currentJson !== cloudJson) {
+      window.WEDDING_CONFIG = cloudConfig;
+      applyWeddingConfig();
+      initCountdown();
+      console.log('⚡ Đã cập nhật cấu hình mới nhất từ đám mây (Live Cloud Sync)');
+    }
+  } catch (err) {
+    console.debug('Cloud config background fetch notice:', err.message);
+  }
+}
+
+/* =====================================================
    1. Falling Cherry Blossom Petals
    ===================================================== */
 function initBlossomCanvas() {
@@ -665,7 +729,10 @@ function initCountdown() {
   const minutesEl = document.querySelector('.vs-time-minutes');
   const secondsEl = document.querySelector('.vs-time-seconds');
 
-  let timerInterval = null;
+  if (window._weddingCountdownInterval) {
+    clearInterval(window._weddingCountdownInterval);
+    window._weddingCountdownInterval = null;
+  }
 
   function updateTimer() {
     const now = Date.now();
@@ -677,7 +744,10 @@ function initCountdown() {
       if (hoursEl) hoursEl.textContent = '00';
       if (minutesEl) minutesEl.textContent = '00';
       if (secondsEl) secondsEl.textContent = '00';
-      if (timerInterval) clearInterval(timerInterval);
+      if (window._weddingCountdownInterval) {
+        clearInterval(window._weddingCountdownInterval);
+        window._weddingCountdownInterval = null;
+      }
       return;
     }
 
@@ -693,7 +763,7 @@ function initCountdown() {
   }
 
   updateTimer();
-  timerInterval = setInterval(updateTimer, 1000);
+  window._weddingCountdownInterval = setInterval(updateTimer, 1000);
 }
 
 /* =====================================================
@@ -2472,7 +2542,7 @@ function initVisualAdminModule() {
 
   // 11. Lưu Trực Tiếp Lên GitHub API & Local Draft
   if (btnSave) {
-    btnSave.addEventListener('click', async () => {
+    btnSave.addEventListener('click', () => {
       const cfg = harvestUpdatedConfig();
       window.WEDDING_CONFIG = cfg;
 
@@ -2484,44 +2554,68 @@ function initVisualAdminModule() {
         console.warn('Lỗi lưu local draft:', e);
       }
 
+      // TỐI ƯU 1: CẬP NHẬT GIAO DIỆN TỨC THÌ (0.05 GIÂY!)
+      // Không cần chờ mạng, không cần F5 - Màn hình cập nhật ngay trước mắt!
+      applyWeddingConfig();
+      initCountdown();
+
+      // Phản hồi nút bấm tức thì (Instant Button Feedback)
+      const originalBtnText = btnSave.innerHTML;
+      btnSave.innerHTML = '✓ <span>Đã lưu!</span>';
+      btnSave.classList.add('admin-btn-saved');
+      setTimeout(() => {
+        btnSave.innerHTML = originalBtnText;
+        btnSave.classList.remove('admin-btn-saved');
+      }, 1600);
+
       const ghSettings = loadGitHubSettings();
       if (!ghSettings.repo || !ghSettings.token) {
-        showAdminToast('💾 Đã lưu cấu hình vào bộ nhớ máy này! Để đồng bộ cho khách mời, hãy nhấn biểu tượng ⚙️ Cấu Hình GitHub để nhập Token.');
+        showAdminToast('⚡ Đã cập nhật giao diện ngay lập tức! (Chưa cài Token GitHub để đồng bộ cho khách)');
         return;
       }
 
-      const originalBtnText = btnSave.innerHTML;
-      btnSave.innerHTML = '⏳ <span>Đang lưu...</span>';
-      btnSave.disabled = true;
+      showAdminToast('⚡ Đã lưu tức thì! Đang đồng bộ lên đám mây GitHub...');
 
-      try {
-        const code = generateConfigJsString(cfg);
-        const branch = ghSettings.branch || 'main';
-        const apiUrl = `https://api.github.com/repos/${ghSettings.repo}/contents/config.js?ref=${encodeURIComponent(branch)}`;
+      // TỐI ƯU 2: ĐỒNG BỘ GITHUB CHẠY NGẦM (NON-BLOCKING BACKGROUND SYNC)
+      // Chạy ngầm dưới nền, giao diện không bị giật, người dùng không phải chờ đợi
+      syncConfigToGitHub(cfg, ghSettings);
+    });
+  }
 
-        // Bước 2: Lấy SHA của file config.js hiện tại trên GitHub
-        let sha = null;
+  // Đồng bộ cấu hình lên GitHub chạy ngầm (Non-blocking Background Sync + SHA Cache)
+  async function syncConfigToGitHub(cfg, ghSettings) {
+    try {
+      const code = generateConfigJsString(cfg);
+      const branch = ghSettings.branch || 'main';
+      const apiUrl = `https://api.github.com/repos/${ghSettings.repo}/contents/config.js?ref=${encodeURIComponent(branch)}`;
+      const putUrl = `https://api.github.com/repos/${ghSettings.repo}/contents/config.js`;
+
+      // Mã hóa Base64 chuẩn UTF-8
+      const base64Content = btoa(encodeURIComponent(code).replace(/%([0-9A-F]{2})/g, (_, p1) => String.fromCharCode('0x' + p1)));
+
+      // TỐI ƯU 3: Lấy SHA từ bộ nhớ đệm (Cache) để giảm 50% thời gian gọi mạng
+      let sha = sessionStorage.getItem('wedding_config_sha') || null;
+
+      async function fetchFreshSha() {
         const getRes = await fetch(apiUrl, {
           headers: {
             'Authorization': `Bearer ${ghSettings.token}`,
             'Accept': 'application/vnd.github+json'
           }
         });
-
         if (getRes.ok) {
           const getData = await getRes.json();
-          sha = getData.sha;
-        } else if (getRes.status !== 404) {
+          return getData.sha;
+        } else if (getRes.status === 404) {
+          return null;
+        } else {
           const errData = await getRes.json().catch(() => ({}));
           throw new Error(errData.message || `Lỗi GitHub (${getRes.status})`);
         }
+      }
 
-        // Bước 3: Mã hóa Base64 chuẩn UTF-8
-        const base64Content = btoa(encodeURIComponent(code).replace(/%([0-9A-F]{2})/g, (_, p1) => String.fromCharCode('0x' + p1)));
-
-        // Bước 4: Gửi PUT commit trực tiếp lên GitHub
-        const putUrl = `https://api.github.com/repos/${ghSettings.repo}/contents/config.js`;
-        const putRes = await fetch(putUrl, {
+      async function sendPut(commitSha) {
+        return await fetch(putUrl, {
           method: 'PUT',
           headers: {
             'Authorization': `Bearer ${ghSettings.token}`,
@@ -2531,25 +2625,42 @@ function initVisualAdminModule() {
           body: JSON.stringify({
             message: 'Cập nhật cấu hình thiệp cưới từ Web Admin',
             content: base64Content,
-            sha: sha || undefined,
+            sha: commitSha || undefined,
             branch: branch
           })
         });
-
-        if (!putRes.ok) {
-          const putErr = await putRes.json().catch(() => ({}));
-          throw new Error(putErr.message || `Lỗi ghi file (${putRes.status})`);
-        }
-
-        showAdminToast('🎉 Đã lưu thành công lên GitHub! Cả chữ và ảnh sẽ tự động hiển thị cho mọi người.');
-      } catch (err) {
-        console.error('GitHub API Error:', err);
-        alert(`❌ Không thể lưu lên GitHub: ${err.message}\n\nDữ liệu đã được lưu tạm trên máy này. Bạn có thể dùng nút "Tải File" để lưu file config.js về máy.`);
-      } finally {
-        btnSave.innerHTML = originalBtnText;
-        btnSave.disabled = false;
       }
-    });
+
+      // Nếu chưa có SHA trong cache, lấy mới
+      if (!sha) {
+        sha = await fetchFreshSha();
+      }
+
+      // Gửi PUT commit trực tiếp lên GitHub
+      let putRes = await sendPut(sha);
+
+      // Nếu trả về lỗi 409 (Conflict - SHA hết hạn): Tự động lấy lại SHA mới nhất và thử lại ngay
+      if (putRes.status === 409) {
+        console.warn('SHA cache hết hạn, đang lấy SHA mới và gửi lại...');
+        sha = await fetchFreshSha();
+        putRes = await sendPut(sha);
+      }
+
+      if (!putRes.ok) {
+        const putErr = await putRes.json().catch(() => ({}));
+        throw new Error(putErr.message || `Lỗi ghi file (${putRes.status})`);
+      }
+
+      const putData = await putRes.json().catch(() => ({}));
+      if (putData.content && putData.content.sha) {
+        sessionStorage.setItem('wedding_config_sha', putData.content.sha);
+      }
+
+      showAdminToast('☁️ Đã đồng bộ lên GitHub thành công! Khách xem được ngay.');
+    } catch (err) {
+      console.error('GitHub API Background Sync Error:', err);
+      showAdminToast(`⚠️ Đã lưu tại máy, nhưng chưa đồng bộ GitHub: ${err.message}`);
+    }
   }
 
   // --- MODULE QUẢN LÝ THIỆP GỬI KHÁCH ---

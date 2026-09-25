@@ -1961,3 +1961,12 @@ body.admin-mode-active img:hover {
   font-size: 13px;
   color: #9CA3AF;
 }
+
+/* Hiệu ứng phản hồi tức thì cho nút Lưu khi bấm */
+#admin-btn-save.admin-btn-saved {
+  background: #10B981 !important;
+  color: #ffffff !important;
+  transform: scale(1.05);
+  box-shadow: 0 0 16px rgba(16, 185, 129, 0.6) !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
