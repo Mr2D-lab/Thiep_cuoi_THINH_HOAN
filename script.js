@@ -161,7 +161,7 @@ function applyWeddingConfig() {
     const cerDate = ceremonyData.date ? parseLocalDate(ceremonyData.date) : weddingDate;
     bindings['event-ceremony-title'] = ceremonyData.title || 'Lễ Vu Quy';
     bindings['event-ceremony-time'] = ceremonyData.time || '08:00';
-    bindings['event-ceremony-date'] = formatDateShort(cerDate);
+    bindings['event-ceremony-date'] = ceremonyData.dateText || formatDateShort(cerDate);
 
     let cerAddrHtml = '';
     if (ceremonyData.locationName && ceremonyData.address) {
@@ -189,7 +189,7 @@ function applyWeddingConfig() {
     const recDate = receptionData.date ? parseLocalDate(receptionData.date) : weddingDate;
     bindings['event-reception-title'] = receptionData.title || 'Tiệc Cưới';
     bindings['event-reception-time'] = receptionData.time || '17:30';
-    bindings['event-reception-date'] = formatDateShort(recDate);
+    bindings['event-reception-date'] = receptionData.dateText || formatDateShort(recDate);
 
     let recAddrHtml = '';
     if (receptionData.locationName && receptionData.address) {
@@ -1715,6 +1715,145 @@ function initVisualAdminModule() {
     });
   }
 
+  // Helper phân tích ngày nhập từ bàn phím
+  function parseUserDateString(str) {
+    if (!str) return null;
+    const clean = str.trim();
+    const match1 = clean.match(/(\d{1,2})[\s\.\/\-]+(\d{1,2})[\s\.\/\-]+(\d{4})/);
+    if (match1) {
+      const d = parseInt(match1[1], 10);
+      const m = parseInt(match1[2], 10);
+      const y = parseInt(match1[3], 10);
+      if (d >= 1 && d <= 31 && m >= 1 && m <= 12 && y >= 2020) {
+        return `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+      }
+    }
+    const match2 = clean.match(/ngày\s+(\d{1,2})\s+tháng\s+(\d{1,2})\s+năm\s+(\d{4})/i);
+    if (match2) {
+      const d = parseInt(match2[1], 10);
+      const m = parseInt(match2[2], 10);
+      const y = parseInt(match2[3], 10);
+      if (d >= 1 && d <= 31 && m >= 1 && m <= 12 && y >= 2020) {
+        return `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+      }
+    }
+    return null;
+  }
+
+  // Helper phân tích giờ nhập từ bàn phím
+  function parseUserTimeString(str) {
+    if (!str) return null;
+    const clean = str.trim();
+    const match = clean.match(/(\d{1,2})\s*(?:giờ|h|:)\s*(\d{1,2})?/i);
+    if (match) {
+      const h = parseInt(match[1], 10);
+      const m = match[2] ? parseInt(match[2], 10) : 0;
+      if (h >= 0 && h <= 23 && m >= 0 && m <= 59) {
+        return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+      }
+    }
+    return null;
+  }
+
+  function handleDataBindInput(e) {
+    const el = e.currentTarget;
+    const key = el.getAttribute('data-bind');
+    const val = el.innerText.trim();
+
+    if (typeof WEDDING_CONFIG === 'undefined') window.WEDDING_CONFIG = {};
+    if (!WEDDING_CONFIG.groom) WEDDING_CONFIG.groom = {};
+    if (!WEDDING_CONFIG.bride) WEDDING_CONFIG.bride = {};
+    if (!WEDDING_CONFIG.venues) WEDDING_CONFIG.venues = {};
+    if (!WEDDING_CONFIG.venues.invitation) WEDDING_CONFIG.venues.invitation = {};
+    if (!WEDDING_CONFIG.venues.ceremony) WEDDING_CONFIG.venues.ceremony = {};
+    if (!WEDDING_CONFIG.venues.reception) WEDDING_CONFIG.venues.reception = {};
+    if (!WEDDING_CONFIG.texts) WEDDING_CONFIG.texts = {};
+    if (!WEDDING_CONFIG.bankAccount) WEDDING_CONFIG.bankAccount = {};
+
+    // 1. Đồng bộ tức thì tên Chú rể sang các vị trí khác
+    if (key === 'couple-hero-groom' || key === 'groom-name') {
+      WEDDING_CONFIG.groom.name = val;
+      document.querySelectorAll('[data-bind="couple-hero-groom"], [data-bind="groom-name"]').forEach(other => {
+        if (other !== el) other.innerText = val;
+      });
+      const inviteNames = document.querySelector('[data-bind="couple-names-invite"]');
+      if (inviteNames) inviteNames.innerText = `${val} ❤ ${WEDDING_CONFIG.bride?.name || ''}`;
+      const footerNames = document.querySelector('[data-bind="couple-footer"]');
+      if (footerNames) footerNames.innerText = `${WEDDING_CONFIG.bride?.name || ''} & ${val}`;
+      document.title = `${WEDDING_CONFIG.bride?.name || ''} & ${val} — Thiệp Cưới 2026`;
+    }
+
+    // 2. Đồng bộ tức thì tên Cô dâu sang các vị trí khác
+    else if (key === 'couple-hero-bride' || key === 'bride-name') {
+      WEDDING_CONFIG.bride.name = val;
+      document.querySelectorAll('[data-bind="couple-hero-bride"], [data-bind="bride-name"]').forEach(other => {
+        if (other !== el) other.innerText = val;
+      });
+      const inviteNames = document.querySelector('[data-bind="couple-names-invite"]');
+      if (inviteNames) inviteNames.innerText = `${WEDDING_CONFIG.groom?.name || ''} ❤ ${val}`;
+      const footerNames = document.querySelector('[data-bind="couple-footer"]');
+      if (footerNames) footerNames.innerText = `${val} & ${WEDDING_CONFIG.groom?.name || ''}`;
+      document.title = `${val} & ${WEDDING_CONFIG.groom?.name || ''} — Thiệp Cưới 2026`;
+    }
+
+    // 3. Phân tích ngày cưới khi người dùng gõ
+    else if (key === 'wedding-date-dots' || key === 'wedding-date-full') {
+      const parsedDate = parseUserDateString(val);
+      if (parsedDate) {
+        WEDDING_CONFIG.weddingDate = parsedDate;
+      }
+    }
+
+    // 4. Phân tích giờ cưới khi người dùng gõ
+    else if (key === 'wedding-time-text') {
+      const parsedTime = parseUserTimeString(val);
+      if (parsedTime) {
+        WEDDING_CONFIG.weddingTime = parsedTime;
+      }
+    }
+
+    // 5. Ngày âm lịch
+    else if (key === 'wedding-lunar-date') {
+      WEDDING_CONFIG.lunarDate = val.replace(/^\(|\)$/g, '').trim();
+    }
+
+    // 6. Địa chỉ thiệp mời chính
+    else if (key === 'invitation-venue') {
+      if (val.includes(':')) {
+        const parts = val.split(':');
+        WEDDING_CONFIG.venues.invitation.location = parts[0].trim();
+        WEDDING_CONFIG.venues.invitation.address = parts.slice(1).join(':').trim();
+      } else {
+        WEDDING_CONFIG.venues.invitation.address = val;
+      }
+    }
+
+    // 7. Bố mẹ & địa chỉ 2 bên
+    else if (key === 'groom-father') WEDDING_CONFIG.groom.father = val;
+    else if (key === 'groom-mother') WEDDING_CONFIG.groom.mother = val;
+    else if (key === 'groom-address') WEDDING_CONFIG.groom.address = val;
+    else if (key === 'bride-father') WEDDING_CONFIG.bride.father = val;
+    else if (key === 'bride-mother') WEDDING_CONFIG.bride.mother = val;
+    else if (key === 'bride-address') WEDDING_CONFIG.bride.address = val;
+
+    // 8. Sự kiện Lễ Vu Quy
+    else if (key === 'event-ceremony-title') WEDDING_CONFIG.venues.ceremony.title = val;
+    else if (key === 'event-ceremony-time') WEDDING_CONFIG.venues.ceremony.time = val;
+    else if (key === 'event-ceremony-date') WEDDING_CONFIG.venues.ceremony.dateText = val;
+    else if (key === 'event-ceremony-address') WEDDING_CONFIG.venues.ceremony.address = val;
+
+    // 9. Sự kiện Tiệc Cưới
+    else if (key === 'event-reception-title') WEDDING_CONFIG.venues.reception.title = val;
+    else if (key === 'event-reception-time') WEDDING_CONFIG.venues.reception.time = val;
+    else if (key === 'event-reception-date') WEDDING_CONFIG.venues.reception.dateText = val;
+    else if (key === 'event-reception-address') WEDDING_CONFIG.venues.reception.address = val;
+
+    // 10. Ngân hàng & Mừng cưới
+    else if (key === 'bank-account-holder') WEDDING_CONFIG.bankAccount.accountHolder = val;
+    else if (key === 'bank-name') WEDDING_CONFIG.bankAccount.bankName = val;
+    else if (key === 'bank-account-number') WEDDING_CONFIG.bankAccount.accountNumber = val.replace(/\s+/g, '');
+  }
+
   // 5. Kích Hoạt Chế Độ Nhà Phát Triển (Visual Click-to-Edit)
   function activateAdminMode(showWelcomeToast = false) {
     if (typeof window.__stopWeddingMusic === 'function') {
@@ -1723,10 +1862,12 @@ function initVisualAdminModule() {
     document.body.classList.add('admin-mode-active');
     if (toolbar) toolbar.style.display = 'flex';
 
-    // Cho phép sửa trực tiếp mọi văn bản có data-bind
+    // Cho phép sửa trực tiếp mọi văn bản có data-bind & gắn lắng nghe đồng bộ theo thời gian thực
     document.querySelectorAll('[data-bind]').forEach(el => {
       el.setAttribute('contenteditable', 'true');
       el.setAttribute('spellcheck', 'false');
+      el.removeEventListener('input', handleDataBindInput);
+      el.addEventListener('input', handleDataBindInput);
     });
 
     // Mở màn hình mở đầu nếu đang bị khóa cuộn để admin dễ chỉnh sửa toàn trang
@@ -2096,9 +2237,21 @@ function initVisualAdminModule() {
       return el ? el.innerText.trim() : null;
     }
 
-    // Cô dâu & Chú rể
-    const gName = getText('groom-name'); if (gName !== null) baseConfig.groom.name = gName;
-    const bName = getText('bride-name'); if (bName !== null) baseConfig.bride.name = bName;
+    // Cô dâu & Chú rể (Quét đa điểm: Hero, Couple section,...)
+    const gName = getText('groom-name') || getText('couple-hero-groom');
+    if (gName !== null && gName !== '') {
+      baseConfig.groom.name = gName;
+      const gParts = gName.split(/\s+/).filter(Boolean);
+      if (gParts.length > 0) baseConfig.groom.shortName = gParts[gParts.length - 1];
+    }
+
+    const bName = getText('bride-name') || getText('couple-hero-bride');
+    if (bName !== null && bName !== '') {
+      baseConfig.bride.name = bName;
+      const bParts = bName.split(/\s+/).filter(Boolean);
+      if (bParts.length > 0) baseConfig.bride.shortName = bParts[bParts.length - 1];
+    }
+
     const gFather = getText('groom-father'); if (gFather !== null) baseConfig.groom.father = gFather;
     const gMother = getText('groom-mother'); if (gMother !== null) baseConfig.groom.mother = gMother;
     const gAddr = getText('groom-address'); if (gAddr !== null) baseConfig.groom.address = gAddr;
@@ -2106,6 +2259,20 @@ function initVisualAdminModule() {
     const bFather = getText('bride-father'); if (bFather !== null) baseConfig.bride.father = bFather;
     const bMother = getText('bride-mother'); if (bMother !== null) baseConfig.bride.mother = bMother;
     const bAddr = getText('bride-address'); if (bAddr !== null) baseConfig.bride.address = bAddr;
+
+    // Ngày cưới & Giờ cưới (Tự động nhận diện chuỗi ngày giờ gõ tay)
+    const dateDots = getText('wedding-date-dots');
+    const dateFull = getText('wedding-date-full');
+    const parsedDate = parseUserDateString(dateDots) || parseUserDateString(dateFull);
+    if (parsedDate) {
+      baseConfig.weddingDate = parsedDate;
+    }
+
+    const timeText = getText('wedding-time-text');
+    const parsedTime = parseUserTimeString(timeText);
+    if (parsedTime) {
+      baseConfig.weddingTime = parsedTime;
+    }
 
     // Ngày âm lịch
     const lunar = getText('wedding-lunar-date');
