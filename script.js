@@ -2518,8 +2518,9 @@ function initVisualAdminModule() {
     return baseConfig;
   }
 
-  function generateConfigJsString(configObj) {
-    return `/* ==========================================================================\n   BẢNG CẤU HÌNH THIỆP CƯỚI 2026 (Cập nhật từ Web Admin)\n   ========================================================================== */\n\nconst WEDDING_CONFIG = ${JSON.stringify(configObj, null, 2)};\n\nif (typeof window !== 'undefined') {\n  window.WEDDING_CONFIG = WEDDING_CONFIG;\n}\n`;
+  function generateConfigJsString(configObj, buildTimestamp) {
+    const vTime = buildTimestamp || Date.now().toString();
+    return `/* ==========================================================================\n   BẢNG CẤU HÌNH THIỆP CƯỚI 2026 (Cập nhật: ${vTime})\n   ========================================================================== */\n\nconst WEDDING_CONFIG = ${JSON.stringify(configObj, null, 2)};\n\nif (typeof window !== 'undefined') {\n  window.WEDDING_CONFIG = WEDDING_CONFIG;\n  window._weddingConfigBuildTime = "${vTime}";\n}\n`;
   }
 
   // 10. Tải File config.js Về Máy
@@ -2581,7 +2582,7 @@ function initVisualAdminModule() {
     });
   }
 
-  // Quản lý hiển thị đếm ngược tiến trình đồng bộ lên GitHub
+  // Quản lý hiển thị đếm ngược tiến trình đồng bộ lên GitHub & Vercel
   const SyncCountdownManager = {
     indicator: null,
     icon: null,
@@ -2591,9 +2592,16 @@ function initVisualAdminModule() {
     retryBtn: null,
     closeBtn: null,
     timerId: null,
+    pollTimerId: null,
     hideTimerId: null,
     startTime: 0,
-    estimatedMs: 0,
+    githubEstMs: 0,
+    githubActualMs: 0,
+    vercelEstMs: 0,
+    totalEstMs: 0,
+    stage: 0, // 1: GitHub upload, 2: Vercel deploy, 3: Completed
+    expectedBuildTime: null,
+    expectedSha: null,
 
     _bindElements() {
       this.indicator = document.getElementById('admin-sync-indicator');
@@ -2609,38 +2617,61 @@ function initVisualAdminModule() {
       }
     },
 
-    start(payloadKb, retryCallback) {
+    start(payloadKb, buildTimestamp, retryCallback) {
       this._bindElements();
       if (!this.indicator) return;
 
-      if (this.timerId) clearInterval(this.timerId);
-      if (this.hideTimerId) clearTimeout(this.hideTimerId);
+      this.clearAllTimers();
 
-      // Ước tính thời gian dựa trên dung lượng tệp thực tế
-      // Base: 1.5s (transaction Git tại Mỹ) + upload (~140 KB/s)
-      const estimatedSec = Math.max(2.0, Math.round((1.5 + payloadKb / 140) * 10) / 10);
-      this.estimatedMs = estimatedSec * 1000;
+      // 1. Tính toán thời gian dự kiến 2 giai đoạn:
+      // - Giai đoạn 1 (GitHub): 1.5s cơ sở + upload theo dung lượng (~140 KB/s)
+      // - Giai đoạn 2 (Vercel): 28.0s (đóng gói static build & phân phối CDN toàn cầu)
+      const githubSec = Math.max(2.0, Math.round((1.5 + payloadKb / 140) * 10) / 10);
+      const vercelSec = 28.0;
+      const totalSec = githubSec + vercelSec; // khoảng 30s - 35s
+
+      this.githubEstMs = githubSec * 1000;
+      this.vercelEstMs = vercelSec * 1000;
+      this.totalEstMs = totalSec * 1000;
       this.startTime = Date.now();
+      this.stage = 1;
+      this.expectedBuildTime = buildTimestamp;
 
-      this.indicator.className = 'admin-sync-indicator syncing';
+      this.indicator.className = 'admin-sync-indicator syncing stage-github';
       this.indicator.style.display = 'block';
-      if (this.icon) this.icon.innerText = '⏳';
-      if (this.title) this.title.innerText = 'Đang đồng bộ lên GitHub...';
+      if (this.icon) this.icon.innerText = '📦';
+      if (this.title) this.title.innerText = `Đang tải dữ liệu lên GitHub (${payloadKb} KB)...`;
       if (this.retryBtn) this.retryBtn.style.display = 'none';
 
       const updateCountdown = () => {
         const elapsedMs = Date.now() - this.startTime;
-        const remainingMs = Math.max(0, this.estimatedMs - elapsedMs);
-        const remainingSec = (remainingMs / 1000).toFixed(1);
+        const remainingMs = Math.max(0, this.totalEstMs - elapsedMs);
+        const remainingSec = Math.ceil(remainingMs / 1000);
 
-        const progress = Math.min(95, (elapsedMs / this.estimatedMs) * 100);
-        if (this.progressBar) this.progressBar.style.width = `${progress}%`;
+        if (this.stage === 1) {
+          // Giai đoạn 1: Tiến trình từ 0% đến 20%
+          const ghProgress = Math.min(20, (elapsedMs / this.githubEstMs) * 20);
+          if (this.progressBar) this.progressBar.style.width = `${ghProgress}%`;
+          if (this.subtitle) {
+            this.subtitle.innerText = `⏳ Dự kiến toàn bộ: còn ~${remainingSec}s (Bao gồm Vercel xuất bản)`;
+          }
+        } else if (this.stage === 2) {
+          // Giai đoạn 2: Tiến trình từ 20% đến 95%
+          const vercelElapsed = elapsedMs - this.githubActualMs;
+          const vercelProgress = Math.min(95, 20 + (vercelElapsed / this.vercelEstMs) * 75);
+          if (this.progressBar) this.progressBar.style.width = `${vercelProgress}%`;
 
-        if (this.subtitle) {
-          if (remainingMs > 0) {
-            this.subtitle.innerText = `Dung lượng: ${payloadKb} KB • Dự kiến còn: ${remainingSec}s`;
-          } else {
-            this.subtitle.innerText = `Dung lượng: ${payloadKb} KB • Đang hoàn tất commit Git...`;
+          if (this.subtitle) {
+            if (remainingMs > 0) {
+              this.subtitle.innerText = `⏳ Đang triển khai toàn cầu: còn ~${remainingSec}s...`;
+            } else {
+              this.subtitle.innerText = `⏳ Đang kích hoạt CDN toàn cầu...`;
+            }
+          }
+
+          // Khi hết thời gian đếm ngược mà chưa bắt được polling, tự động hoàn tất
+          if (remainingMs <= 0 && elapsedMs >= this.totalEstMs) {
+            this.success(elapsedMs / 1000);
           }
         }
       };
@@ -2649,20 +2680,68 @@ function initVisualAdminModule() {
       this.timerId = setInterval(updateCountdown, 100);
     },
 
+    // Khi GitHub API trả về 200 OK -> Chuyển sang Giai đoạn 2: Vercel Deploy!
+    onGitHubCommitted(commitSha) {
+      if (this.stage !== 1) return;
+      this.stage = 2;
+      this.expectedSha = commitSha;
+      this.githubActualMs = Date.now() - this.startTime;
+
+      if (!this.indicator) this._bindElements();
+      if (!this.indicator) return;
+
+      this.indicator.className = 'admin-sync-indicator syncing stage-vercel';
+      if (this.icon) this.icon.innerText = '🌐';
+      if (this.title) this.title.innerText = 'GitHub đã lưu! Vercel đang xuất bản web...';
+
+      // Khởi động thăm dò nhẹ xem Vercel đã phục vụ bản mới chưa
+      this.startVercelPolling();
+    },
+
+    // Thăm dò kiểm tra xem Vercel CDN đã nhận bản mới chưa
+    startVercelPolling() {
+      if (this.pollTimerId) clearInterval(this.pollTimerId);
+
+      // Bắt đầu thăm dò sau 16 giây từ lúc bắt đầu (Vercel cần tối thiểu 16s để build)
+      const checkFn = async () => {
+        if (this.stage !== 2) return;
+        try {
+          const res = await fetch(`/config.js?_vcheck=${Date.now()}`, {
+            cache: 'no-store'
+          });
+          if (res.ok) {
+            const text = await res.text();
+            // Kiểm tra xem config trên Vercel đã khớp với thay đổi gần nhất chưa
+            const isMatch = (this.expectedBuildTime && text.includes(this.expectedBuildTime)) ||
+                            (this.expectedSha && text.includes(this.expectedSha)) ||
+                            (window.WEDDING_CONFIG?.groom?.name && text.includes(window.WEDDING_CONFIG.groom.name));
+
+            if (isMatch) {
+              const actualDuration = (Date.now() - this.startTime) / 1000;
+              this.success(actualDuration);
+            }
+          }
+        } catch (e) {
+          // Bỏ qua lỗi mạng ngầm khi thăm dò
+        }
+      };
+
+      // Đặt lịch thăm dò mỗi 3.5 giây
+      this.pollTimerId = setInterval(checkFn, 3500);
+    },
+
     success(actualDurationSec) {
-      if (this.timerId) {
-        clearInterval(this.timerId);
-        this.timerId = null;
-      }
+      this.clearAllTimers();
+      this.stage = 3;
       this._bindElements();
       if (!this.indicator) return;
 
       this.indicator.className = 'admin-sync-indicator success';
       if (this.icon) this.icon.innerText = '🎉';
-      if (this.title) this.title.innerText = 'Đã đồng bộ lên GitHub thành công!';
+      if (this.title) this.title.innerText = 'Vercel đã xuất bản xong!';
       if (this.subtitle) {
         const secText = typeof actualDurationSec === 'number' ? ` trong ${actualDurationSec.toFixed(1)}s` : '';
-        this.subtitle.innerText = `Hoàn tất${secText} • Khách mời sẽ nhận được bản mới ngay.`;
+        this.subtitle.innerText = `Hoàn tất${secText} • Mọi thiết bị đều đã xem được bản mới!`;
       }
       if (this.progressBar) this.progressBar.style.width = '100%';
       if (this.retryBtn) this.retryBtn.style.display = 'none';
@@ -2670,14 +2749,12 @@ function initVisualAdminModule() {
       if (this.hideTimerId) clearTimeout(this.hideTimerId);
       this.hideTimerId = setTimeout(() => {
         this.hide();
-      }, 3500);
+      }, 4000);
     },
 
     error(errMessage, retryCallback) {
-      if (this.timerId) {
-        clearInterval(this.timerId);
-        this.timerId = null;
-      }
+      this.clearAllTimers();
+      this.stage = 0;
       this._bindElements();
       if (!this.indicator) return;
 
@@ -2695,15 +2772,23 @@ function initVisualAdminModule() {
       }
     },
 
-    hide() {
+    clearAllTimers() {
       if (this.timerId) {
         clearInterval(this.timerId);
         this.timerId = null;
+      }
+      if (this.pollTimerId) {
+        clearInterval(this.pollTimerId);
+        this.pollTimerId = null;
       }
       if (this.hideTimerId) {
         clearTimeout(this.hideTimerId);
         this.hideTimerId = null;
       }
+    },
+
+    hide() {
+      this.clearAllTimers();
       if (this.indicator) {
         this.indicator.style.display = 'none';
       }
@@ -2712,7 +2797,8 @@ function initVisualAdminModule() {
 
   // Đồng bộ cấu hình lên GitHub chạy ngầm (Non-blocking Background Sync + Countdown + SHA Cache)
   async function syncConfigToGitHub(cfg, ghSettings) {
-    const code = generateConfigJsString(cfg);
+    const buildTimestamp = Date.now().toString();
+    const code = generateConfigJsString(cfg, buildTimestamp);
     const branch = ghSettings.branch || 'main';
     const apiUrl = `https://api.github.com/repos/${ghSettings.repo}/contents/config.js?ref=${encodeURIComponent(branch)}`;
     const putUrl = `https://api.github.com/repos/${ghSettings.repo}/contents/config.js`;
@@ -2723,9 +2809,8 @@ function initVisualAdminModule() {
     // Tính kích thước dung lượng thực tế gửi đi (KB)
     const payloadSizeKb = Math.max(1, Math.round((base64Content.length * 0.75) / 1024));
 
-    // Khởi động giao diện đếm ngược đồng bộ
-    const syncStartTs = Date.now();
-    SyncCountdownManager.start(payloadSizeKb, () => {
+    // Khởi động giao diện đếm ngược đồng bộ (bao gồm cả Vercel)
+    SyncCountdownManager.start(payloadSizeKb, buildTimestamp, () => {
       syncConfigToGitHub(cfg, ghSettings);
     });
 
@@ -2793,8 +2878,8 @@ function initVisualAdminModule() {
         sessionStorage.setItem('wedding_config_sha', putData.content.sha);
       }
 
-      const durationSec = (Date.now() - syncStartTs) / 1000;
-      SyncCountdownManager.success(durationSec);
+      // Chuyển sang Giai đoạn 2: Vercel đang xuất bản web!
+      SyncCountdownManager.onGitHubCommitted(putData.content?.sha);
     } catch (err) {
       console.error('GitHub API Background Sync Error:', err);
       SyncCountdownManager.error(err.message, () => {

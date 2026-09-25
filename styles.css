@@ -2111,6 +2111,16 @@ body.admin-mode-active img:hover {
   background: linear-gradient(90deg, #3B82F6, #8B263E);
 }
 
+.admin-sync-indicator.syncing.stage-vercel {
+  border-color: rgba(139, 38, 62, 0.45);
+}
+.admin-sync-indicator.syncing.stage-vercel .admin-sync-icon {
+  background: #FDF2F4;
+}
+.admin-sync-indicator.syncing.stage-vercel .admin-sync-progress-bar {
+  background: linear-gradient(90deg, #3B82F6, #EC4899, #8B263E);
+}
+
 .admin-sync-indicator.success {
   border-color: rgba(16, 185, 129, 0.5);
   box-shadow: 0 12px 32px rgba(16, 185, 129, 0.15), 0 2px 8px rgba(0, 0, 0, 0.08);
