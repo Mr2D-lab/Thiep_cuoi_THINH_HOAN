@@ -34,6 +34,7 @@
     .bank-card-admin-badge {
       display: none !important;
     }
+
     body.admin-mode-active .bank-card-admin-badge {
       display: inline-block !important;
     }
@@ -50,7 +51,7 @@
     <!-- Centered Envelope Card -->
     <div class="opening-card-wrapper" id="opening-card-wrapper">
       <div class="opening-card" id="opening-card">
-        
+
         <!-- Elegant corner accents -->
         <span class="corner-decor top-left"></span>
         <span class="corner-decor top-right"></span>
@@ -63,7 +64,9 @@
         <div class="opening-content">
           <!-- Header Subtitle & Title -->
           <div class="opening-header">
-            <p class="opening-badge" data-bind="opening-subtitle"><span class="admin-field-autogen-inline select-none">Trân trọng kính mời</span><span id="opening-guest-slot" class="admin-field-autogen-inline select-none font-semibold text-rose"></span></p>
+            <p class="opening-badge" data-bind="opening-subtitle"><span
+                class="admin-field-autogen-inline select-none">Trân trọng kính mời</span><span id="opening-guest-slot"
+                class="admin-field-autogen-inline select-none font-semibold text-rose"></span></p>
             <h1 class="opening-title" data-bind="opening-title">WEDDING INVITATION</h1>
             <div class="opening-divider">
               <span class="opening-divider-line"></span>
@@ -81,12 +84,9 @@
             <span class="chibi-fx fx-star-1">✦</span>
             <span class="chibi-fx fx-star-2">✨</span>
             <span class="chibi-fx fx-flower-1">🌸</span>
-            
-            <img id="opening-chibi-img" 
-                 data-img-bind="opening-chibi"
-                 src="images/ảnh cô dâu chú rể xóa nền.png" 
-                 alt="Hoàn & Thịnh Chibi Xin Chào" 
-                 class="chibi-img">
+
+            <img id="opening-chibi-img" data-img-bind="opening-chibi" src="images/ảnh cô dâu chú rể xóa nền.png"
+              alt="Hoàn & Thịnh Chibi Xin Chào" class="chibi-img">
           </div>
 
           <!-- Couple Names & Wedding Date -->
@@ -106,8 +106,8 @@
               <span class="seal-pulse-wave"></span>
               <span class="seal-button-inner">
                 <svg class="seal-svg-envelope" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                        d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                 </svg>
                 <span class="seal-text-label" data-bind="opening-button-text">Mở Thiệp Cưới</span>
               </span>
@@ -176,7 +176,11 @@
         <h1 class="font-display text-4xl text-rose leading-tight tracking-wide font-medium"
           data-bind="couple-hero-groom">Đăng Thịnh
         </h1>
-        <p class="font-sans text-muted text-[11px] tracking-[0.3em] uppercase mt-3 wedding-date-master-row"><span data-bind="wedding-date-day" class="px-1 cursor-pointer">22</span><span class="admin-field-autogen-inline select-none text-muted/60"> . </span><span data-bind="wedding-date-month" class="px-1 cursor-pointer">11</span><span class="admin-field-autogen-inline select-none text-muted/60"> . </span><span data-bind="wedding-date-year" class="px-1 cursor-pointer">2026</span></p>
+        <p class="font-sans text-muted text-[11px] tracking-[0.3em] uppercase mt-3 wedding-date-master-row"><span
+            data-bind="wedding-date-day" class="px-1 cursor-pointer">22</span><span
+            class="admin-field-autogen-inline select-none text-muted/60"> . </span><span data-bind="wedding-date-month"
+            class="px-1 cursor-pointer">11</span><span class="admin-field-autogen-inline select-none text-muted/60"> .
+          </span><span data-bind="wedding-date-year" class="px-1 cursor-pointer">2026</span></p>
       </div>
 
       <!-- Center photo with refined frame -->
@@ -211,18 +215,24 @@
           </div>
           <!-- Hàng 2: Bố (Cùng hàng) -->
           <div class="flex justify-center gap-6 parents-row-fathers">
-            <div class="flex-1 text-center font-script text-dark text-base leading-relaxed italic" data-bind="groom-father"></div>
-            <div class="flex-1 text-center font-script text-dark text-base leading-relaxed italic" data-bind="bride-father">Ông Nguyễn Mỹ Thưởng</div>
+            <div class="flex-1 text-center font-script text-dark text-base leading-relaxed italic"
+              data-bind="groom-father"></div>
+            <div class="flex-1 text-center font-script text-dark text-base leading-relaxed italic"
+              data-bind="bride-father">Ông Nguyễn Mỹ Thưởng</div>
           </div>
           <!-- Hàng 3: Mẹ (Cùng hàng) -->
           <div class="flex justify-center gap-6 parents-row-mothers">
-            <div class="flex-1 text-center font-script text-dark text-base leading-relaxed italic" data-bind="groom-mother">Bà Đặng Thị Tuyết</div>
-            <div class="flex-1 text-center font-script text-dark text-base leading-relaxed italic" data-bind="bride-mother">Bà Nguyễn Thị Nhàn</div>
+            <div class="flex-1 text-center font-script text-dark text-base leading-relaxed italic"
+              data-bind="groom-mother">Bà Đặng Thị Tuyết</div>
+            <div class="flex-1 text-center font-script text-dark text-base leading-relaxed italic"
+              data-bind="bride-mother">Bà Nguyễn Thị Nhàn</div>
           </div>
           <!-- Hàng 4: Địa chỉ (Cùng hàng) -->
           <div class="flex justify-center gap-6 parents-row-addresses mt-1.5">
-            <div class="flex-1 text-center font-sans text-muted text-[11px] leading-tight" data-bind="groom-address">Xóm Đại Đồng, xã Bạch Hà, tỉnh Nghệ An (xóm 2, Đại Sơn, Đô Lương cũ)</div>
-            <div class="flex-1 text-center font-sans text-muted text-[11px] leading-tight" data-bind="bride-address">Xóm Văn Tân, xã Thuần Trung, tỉnh Nghệ An (xóm văn Tân, Nhân Sơn, Đô Lương cũ)</div>
+            <div class="flex-1 text-center font-sans text-muted text-[11px] leading-tight" data-bind="groom-address">Xóm
+              Đại Đồng, xã Bạch Hà, tỉnh Nghệ An (xóm 2, Đại Sơn, Đô Lương cũ)</div>
+            <div class="flex-1 text-center font-sans text-muted text-[11px] leading-tight" data-bind="bride-address">Xóm
+              Văn Tân, xã Thuần Trung, tỉnh Nghệ An (xóm văn Tân, Nhân Sơn, Đô Lương cũ)</div>
           </div>
         </div>
 
@@ -231,7 +241,12 @@
         <!-- Main Invitation Heading -->
         <h2 class="font-display text-2xl text-dark font-semibold tracking-wide mb-2" data-bind="invitation-heading">TRÂN
           TRỌNG KÍNH MỜI</h2>
-        <p class="font-sans text-dark text-sm font-medium mb-1"><span class="admin-field-autogen-inline select-none font-semibold text-dark" data-bind-pronoun="invitation-guest-pronoun" title="🔒 Danh xưng & tên khách mời sẽ tự động đổi khi gửi thiệp">Quý khách</span> <span data-bind="invitation-guest-suffix" title="Nhấp để sửa (ví dụ: cùng gia đình, và người thương...)">cùng gia đình</span></p>
+        <p class="font-sans text-dark text-sm font-medium mb-1"><span
+            class="admin-field-autogen-inline select-none font-semibold text-dark"
+            data-bind-pronoun="invitation-guest-pronoun"
+            title="🔒 Danh xưng & tên khách mời sẽ tự động đổi khi gửi thiệp">Quý khách</span> <span
+            data-bind="invitation-guest-suffix" title="Nhấp để sửa (ví dụ: cùng gia đình, và người thương...)">cùng gia
+            đình</span></p>
         <p class="font-script text-muted text-base italic mb-6" data-bind="invitation-subheading">(Tới dự Lễ Thành Hôn
           của chúng tôi)</p>
 
@@ -241,9 +256,14 @@
 
         <!-- Time & Date -->
         <p class="font-sans text-dark text-sm mb-2 wedding-time-row">
-          <span class="admin-field-autogen-inline select-none font-medium">Tổ chức vào lúc </span><span data-bind="wedding-time-hour" class="font-semibold text-rose px-1 cursor-pointer">11</span><span class="admin-field-autogen-inline select-none font-medium"> giờ </span><span data-bind="wedding-time-minute" class="font-semibold text-rose px-1 cursor-pointer">11</span><span class="admin-field-autogen-inline select-none font-medium"> phút</span>
+          <span class="admin-field-autogen-inline select-none font-medium">Tổ chức vào lúc </span><span
+            data-bind="wedding-time-hour" class="font-semibold text-rose px-1 cursor-pointer">11</span><span
+            class="admin-field-autogen-inline select-none font-medium"> giờ </span><span data-bind="wedding-time-minute"
+            class="font-semibold text-rose px-1 cursor-pointer">11</span><span
+            class="admin-field-autogen-inline select-none font-medium"> phút</span>
         </p>
-        <p class="font-display text-dark text-base font-semibold mb-1" data-bind="wedding-date-full">Chủ Nhật, ngày 22 tháng 11 năm 2026</p>
+        <p class="font-display text-dark text-base font-semibold mb-1" data-bind="wedding-date-full">Chủ Nhật, ngày 22
+          tháng 11 năm 2026</p>
         <p class="font-script text-muted text-sm italic mb-4" data-bind="wedding-lunar-date">(Tức ngày 10 tháng 07 năm
           Bính Ngọ)</p>
 
@@ -258,7 +278,9 @@
         <!-- Closing blessing -->
         <p class="font-script text-rose text-base italic leading-relaxed max-w-sm mx-auto"
           data-bind="invitation-blessing">
-          "Sự hiện diện của <span class="admin-field-autogen-inline select-none font-normal" data-bind-pronoun="blessing-pronoun" title="🔒 Danh xưng sẽ tự động đổi theo khách">Quý khách</span> là niềm vinh hạnh lớn lao của gia đình chúng tôi!"
+          "Sự hiện diện của <span class="admin-field-autogen-inline select-none font-normal"
+            data-bind-pronoun="blessing-pronoun" title="🔒 Danh xưng sẽ tự động đổi theo khách">Quý khách</span> là niềm
+          vinh hạnh lớn lao của gia đình chúng tôi!"
         </p>
       </div>
     </section>
@@ -290,8 +312,8 @@
           <!-- Chú Rể -->
           <div class="flex-1">
             <div class="minimal-frame clickable shadow-sm">
-              <img data-img-bind="groom" src="images/dang-thinh.jpg" alt="Chú rể Đăng Thịnh" loading="lazy" decoding="async" class="gallery-zoomable w-full object-cover"
-                style="aspect-ratio: 2/3;">
+              <img data-img-bind="groom" src="images/dang-thinh.jpg" alt="Chú rể Đăng Thịnh" loading="lazy"
+                decoding="async" class="gallery-zoomable w-full object-cover" style="aspect-ratio: 2/3;">
             </div>
             <div class="text-center mt-3">
               <h3 class="font-display text-xl text-rose font-medium" data-bind="groom-name">Đăng Thịnh</h3>
@@ -303,8 +325,8 @@
           <!-- Cô Dâu -->
           <div class="flex-1">
             <div class="minimal-frame clickable shadow-sm">
-              <img data-img-bind="bride" src="images/hoan-nguyen.jpg" alt="Cô dâu Hoàn Nguyễn" loading="lazy" decoding="async" class="gallery-zoomable w-full object-cover"
-                style="aspect-ratio: 2/3;">
+              <img data-img-bind="bride" src="images/hoan-nguyen.jpg" alt="Cô dâu Hoàn Nguyễn" loading="lazy"
+                decoding="async" class="gallery-zoomable w-full object-cover" style="aspect-ratio: 2/3;">
             </div>
             <div class="text-center mt-3">
               <h3 class="font-display text-xl text-rose font-medium" data-bind="bride-name">Hoàn Nguyễn</h3>
@@ -340,36 +362,42 @@
       <div class="space-y-2.5 fade-on-scroll">
         <!-- Full width 1: Áo dài truyền thống & Chữ Hỷ -->
         <div class="minimal-frame clickable">
-          <img data-img-bind="gallery-0" src="images/anh-10.jpg" alt="Khoảnh khắc áo dài truyền thống" loading="lazy" decoding="async"
-            class="gallery-zoomable w-full object-cover" style="aspect-ratio: 16/9; object-position: center 25%;">
+          <img data-img-bind="gallery-0" src="images/anh-10.jpg" alt="Khoảnh khắc áo dài truyền thống" loading="lazy"
+            decoding="async" class="gallery-zoomable w-full object-cover"
+            style="aspect-ratio: 16/9; object-position: center 25%;">
         </div>
 
         <!-- 2-up -->
         <div class="flex gap-2.5">
           <div class="flex-1 minimal-frame clickable">
-            <img data-img-bind="gallery-1" src="images/anh-2.jpg" alt="Khoảnh khắc tựa vai ngọt ngào" loading="lazy" decoding="async" class="gallery-zoomable w-full object-cover"
+            <img data-img-bind="gallery-1" src="images/anh-2.jpg" alt="Khoảnh khắc tựa vai ngọt ngào" loading="lazy"
+              decoding="async" class="gallery-zoomable w-full object-cover"
               style="aspect-ratio: 1/1; object-position: center 20%;">
           </div>
           <div class="flex-1 minimal-frame clickable">
-            <img data-img-bind="gallery-2" src="images/anh-1.jpg" alt="Khoảnh khắc trao nụ hôn lên tay" loading="lazy" decoding="async"
-              class="gallery-zoomable w-full object-cover" style="aspect-ratio: 1/1; object-position: center 20%;">
+            <img data-img-bind="gallery-2" src="images/anh-1.jpg" alt="Khoảnh khắc trao nụ hôn lên tay" loading="lazy"
+              decoding="async" class="gallery-zoomable w-full object-cover"
+              style="aspect-ratio: 1/1; object-position: center 20%;">
           </div>
         </div>
 
         <!-- Full width 2: Lời hẹn ước trăm năm -->
         <div class="minimal-frame clickable">
-          <img data-img-bind="gallery-3" src="images/anh-11.jpg" alt="Khoảnh khắc lời hẹn ước" loading="lazy" decoding="async" class="gallery-zoomable w-full object-cover"
+          <img data-img-bind="gallery-3" src="images/anh-11.jpg" alt="Khoảnh khắc lời hẹn ước" loading="lazy"
+            decoding="async" class="gallery-zoomable w-full object-cover"
             style="aspect-ratio: 16/9; object-position: center 30%;">
         </div>
 
         <!-- 2-up -->
         <div class="flex gap-2.5">
           <div class="flex-1 minimal-frame clickable">
-            <img data-img-bind="gallery-4" src="images/anh-12.jpg" alt="Khoảnh khắc trái tim yêu thương" loading="lazy" decoding="async"
-              class="gallery-zoomable w-full object-cover" style="aspect-ratio: 1/1; object-position: center 20%;">
+            <img data-img-bind="gallery-4" src="images/anh-12.jpg" alt="Khoảnh khắc trái tim yêu thương" loading="lazy"
+              decoding="async" class="gallery-zoomable w-full object-cover"
+              style="aspect-ratio: 1/1; object-position: center 20%;">
           </div>
           <div class="flex-1 minimal-frame clickable">
-            <img data-img-bind="gallery-5" src="images/anh-13.jpg" alt="Nụ cười hạnh phúc cô dâu" loading="lazy" decoding="async" class="gallery-zoomable w-full object-cover"
+            <img data-img-bind="gallery-5" src="images/anh-13.jpg" alt="Nụ cười hạnh phúc cô dâu" loading="lazy"
+              decoding="async" class="gallery-zoomable w-full object-cover"
               style="aspect-ratio: 1/1; object-position: center 15%;">
           </div>
         </div>
@@ -449,8 +477,7 @@
             Tư gia Nhà Gái<br>Xóm Văn Tân, xã Thuần Trung, tỉnh Nghệ An (xóm văn Tân, Nhân Sơn, Đô Lương cũ)
           </p>
           <div class="mt-4">
-            <a href="javascript:void(0)" rel="noopener noreferrer"
-              data-bind-href="event-ceremony-map"
+            <a href="javascript:void(0)" rel="noopener noreferrer" data-bind-href="event-ceremony-map"
               class="inline-flex items-center gap-1.5 px-4 py-1.5 border border-[#6C3B5E] text-[#6C3B5E] font-semibold rounded-full text-[10px] tracking-[0.1em] uppercase hover:bg-[#6C3B5E] hover:text-white transition-all shadow-sm cursor-pointer"
               title="Chạm để xem bản đồ chỉ đường">
               <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -475,8 +502,7 @@
             Tư gia Nhà Trai<br>Xóm Đại Đồng, xã Bạch Hà, tỉnh Nghệ An (xóm 2, Đại Sơn, Đô Lương cũ)
           </p>
           <div class="mt-4">
-            <a href="javascript:void(0)" rel="noopener noreferrer"
-              data-bind-href="event-reception-map"
+            <a href="javascript:void(0)" rel="noopener noreferrer" data-bind-href="event-reception-map"
               class="inline-flex items-center gap-1.5 px-4 py-1.5 border border-[#6C3B5E] text-[#6C3B5E] font-semibold rounded-full text-[10px] tracking-[0.1em] uppercase hover:bg-[#6C3B5E] hover:text-white transition-all shadow-sm cursor-pointer"
               title="Chạm để xem bản đồ chỉ đường">
               <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -499,7 +525,8 @@
     <!-- ==================== SECTION 11: RSVP FORM ==================== -->
     <section id="rsvp-section" class="py-14 px-6 bg-wedding-card-alt">
       <div class="text-center mb-8 fade-on-scroll">
-        <p class="font-sans text-rose text-[10px] tracking-[0.3em] uppercase font-semibold mb-1.5" data-bind="rsvp-subtitle">PHẢN HỒI THAM DỰ</p>
+        <p class="font-sans text-rose text-[10px] tracking-[0.3em] uppercase font-semibold mb-1.5"
+          data-bind="rsvp-subtitle">PHẢN HỒI THAM DỰ</p>
         <h2 class="font-display text-2xl text-dark mb-1.5" data-bind="rsvp-heading">Xác Nhận Tham Dự</h2>
         <p class="font-sans text-muted text-xs" data-bind="rsvp-deadline-text">Xin vui lòng xác nhận trước ngày
           15/08/2026 để chúng tôi chu toàn đón
@@ -508,27 +535,34 @@
 
       <form class="vs-attendance-form max-w-sm mx-auto space-y-4 fade-on-scroll">
         <div id="rsvp-name-group">
-          <label class="font-sans text-dark text-xs font-medium mb-1.5 block" data-bind="rsvp-name-label">Họ và tên *</label>
+          <label class="font-sans text-dark text-xs font-medium mb-1.5 block" data-bind="rsvp-name-label">Họ và tên
+            *</label>
           <input type="text" name="name" required class="vs-attendance-name form-input"
             placeholder="Nhập họ và tên của bạn" data-bind-placeholder="rsvp-name-placeholder">
         </div>
 
         <div id="rsvp-attendance-group">
-          <label class="font-sans text-dark text-xs font-medium mb-1.5 block" data-bind="rsvp-attendance-label" style="display:none;"></label>
+          <label class="font-sans text-dark text-xs font-medium mb-1.5 block" data-bind="rsvp-attendance-label"
+            style="display:none;"></label>
           <div class="flex flex-col gap-2">
             <label class="radio-option checked">
               <input type="radio" name="decision" value="yes" checked required>
-              <span data-bind="rsvp-attendance-yes" data-bind-pronoun="rsvp-yes-pronoun"><span class="admin-field-autogen-inline select-none font-semibold text-rose">Tôi</span> sẽ đến chung vui 😊</span>
+              <span data-bind="rsvp-attendance-yes" data-bind-pronoun="rsvp-yes-pronoun"><span
+                  class="admin-field-autogen-inline select-none font-semibold text-rose">Tôi</span> sẽ đến chung vui
+                😊</span>
             </label>
             <label class="radio-option">
               <input type="radio" name="decision" value="no">
-              <span data-bind="rsvp-attendance-no" data-bind-pronoun="rsvp-no-pronoun">Rất tiếc, <span class="admin-field-autogen-inline select-none font-semibold text-rose">tôi</span> không thể tham dự 😢</span>
+              <span data-bind="rsvp-attendance-no" data-bind-pronoun="rsvp-no-pronoun">Rất tiếc, <span
+                  class="admin-field-autogen-inline select-none font-semibold text-rose">tôi</span> không thể tham dự
+                😢</span>
             </label>
           </div>
         </div>
 
         <div id="rsvp-guestof-group">
-          <label class="font-sans text-dark text-xs font-medium mb-1.5 block" data-bind="rsvp-guestof-label">Bạn là khách của? *</label>
+          <label class="font-sans text-dark text-xs font-medium mb-1.5 block" data-bind="rsvp-guestof-label">Bạn là
+            khách của? *</label>
           <div class="flex gap-2">
             <label class="radio-option flex-1 justify-center checked">
               <input type="radio" name="guest_of" value="bride" checked required>
@@ -542,7 +576,8 @@
         </div>
 
         <div id="rsvp-accompany-group">
-          <label class="font-sans text-dark text-xs font-medium mb-1.5 block" data-bind="rsvp-accompany-label">👨‍👩‍👧‍👦 Tổng số người có thể đến tham gia</label>
+          <label class="font-sans text-dark text-xs font-medium mb-1.5 block"
+            data-bind="rsvp-accompany-label">👨‍👩‍👧‍👦 Tổng số người có thể đến tham gia</label>
           <select name="number_of_guests" class="vs-number-of-guests form-input form-select">
             <option value="1 người">1 người</option>
             <option value="2 người">2 người</option>
@@ -558,7 +593,8 @@
         </div>
 
         <div id="rsvp-message-group">
-          <label class="font-sans text-dark text-xs font-medium mb-1.5 block" data-bind="rsvp-message-label">Lời nhắn gửi cô dâu & chú rể</label>
+          <label class="font-sans text-dark text-xs font-medium mb-1.5 block" data-bind="rsvp-message-label">Lời nhắn
+            gửi cô dâu & chú rể</label>
           <textarea name="message" rows="3" class="vs-attendance-message form-input"
             placeholder="Gửi lời chúc mừng tốt đẹp nhất..." data-bind-placeholder="rsvp-message-placeholder"></textarea>
         </div>
@@ -635,67 +671,95 @@
           <div class="vs-qr-content vs-hidden max-w-2xl mx-auto">
             <div id="bank-cards-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6 justify-center items-start w-full">
               <!-- Thẻ Chú Rể -->
-              <div id="bank-card-groom" class="bg-white border border-[#EEEEEE] rounded-2xl p-6 shadow-md relative text-center w-full max-w-sm mx-auto">
-                <span class="bank-card-admin-badge inline-block px-3 py-1 bg-rose/10 text-rose text-[11px] font-bold rounded-full mb-3 tracking-wider uppercase">🤵 Mừng Cưới Chú Rể</span>
-                <div class="bank-qr-frame relative w-36 h-36 mx-auto rounded-xl overflow-hidden bg-white border border-gray-100 shadow-sm flex items-center justify-center cursor-pointer mb-3" title="Chạm để tải mã QR về máy">
-                  <img
-                    id="bank-qr-groom-img"
-                    src="images/qr LEDANGTHINH.jpg"
-                    alt="VietQR Mừng Cưới Chú Rể" loading="lazy" decoding="async" class="bank-qr-img w-full h-full object-contain transition-transform duration-200" data-bind-src="bank-qr-groom-img" data-img-bind="bank-qr-groom" title="Nhấp vào ảnh để thay đổi mã QR Chú rể">
+              <div id="bank-card-groom"
+                class="bg-white border border-[#EEEEEE] rounded-2xl p-6 shadow-md relative text-center w-full max-w-sm mx-auto">
+                <span
+                  class="bank-card-admin-badge inline-block px-3 py-1 bg-rose/10 text-rose text-[11px] font-bold rounded-full mb-3 tracking-wider uppercase">🤵
+                  Mừng Cưới Chú Rể</span>
+                <div
+                  class="bank-qr-frame relative w-36 h-36 mx-auto rounded-xl overflow-hidden bg-white border border-gray-100 shadow-sm flex items-center justify-center cursor-pointer mb-3"
+                  title="Chạm để tải mã QR về máy">
+                  <img id="bank-qr-groom-img" src="images/qr LEDANGTHINH.jpg" alt="VietQR Mừng Cưới Chú Rể"
+                    loading="lazy" decoding="async"
+                    class="bank-qr-img w-full h-full object-contain transition-transform duration-200"
+                    data-bind-src="bank-qr-groom-img" data-img-bind="bank-qr-groom"
+                    title="Nhấp vào ảnh để thay đổi mã QR Chú rể">
                 </div>
-                <p class="font-display text-dark text-base font-semibold mb-0.5" data-bind="bank-groom-account-holder">Đăng Thịnh</p>
-                <p class="font-sans text-rose text-xs tracking-wider uppercase font-semibold" data-bind="bank-groom-name">BIDV</p>
+                <p class="font-display text-dark text-base font-semibold mb-0.5" data-bind="bank-groom-account-holder">
+                  Đăng Thịnh</p>
+                <p class="font-sans text-rose text-xs tracking-wider uppercase font-semibold"
+                  data-bind="bank-groom-name">BIDV</p>
 
                 <div class="mt-2">
-                  <span class="font-sans text-dark text-base tracking-widest font-semibold block mb-2" data-bind="bank-groom-account-number">8823 9681 72</span>
+                  <span class="font-sans text-dark text-base tracking-widest font-semibold block mb-2"
+                    data-bind="bank-groom-account-number">8823 9681 72</span>
                   <div class="flex items-center justify-center gap-2">
-                    <button type="button" id="copy-bank-groom-btn" data-account="8823968172" class="copy-badge" title="Sao chép số tài khoản Chú rể">
+                    <button type="button" id="copy-bank-groom-btn" data-account="8823968172" class="copy-badge"
+                      title="Sao chép số tài khoản Chú rể">
                       <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
                       </svg>
                       Sao chép STK
                     </button>
-                    <button type="button" id="download-bank-groom-btn" class="download-badge" title="Tải ảnh mã QR đầy đủ về máy">
+                    <button type="button" id="download-bank-groom-btn" class="download-badge"
+                      title="Tải ảnh mã QR đầy đủ về máy">
                       <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                       </svg>
                       Tải mã QR
                     </button>
                   </div>
                 </div>
-                <p class="text-[11px] text-muted italic mt-3" data-bind="gift-qr-instruction">Quét mã QR bằng ứng dụng ngân hàng bất kỳ</p>
+                <p class="text-[11px] text-muted italic mt-3" data-bind="gift-qr-instruction">Quét mã QR bằng ứng dụng
+                  ngân hàng bất kỳ</p>
               </div>
 
               <!-- Thẻ Cô Dâu -->
-              <div id="bank-card-bride" class="bg-white border border-[#EEEEEE] rounded-2xl p-6 shadow-md relative text-center w-full max-w-sm mx-auto">
-                <span class="bank-card-admin-badge inline-block px-3 py-1 bg-rose/10 text-rose text-[11px] font-bold rounded-full mb-3 tracking-wider uppercase">👰 Mừng Cưới Cô Dâu</span>
-                <div class="bank-qr-frame relative w-36 h-36 mx-auto rounded-xl overflow-hidden bg-white border border-gray-100 shadow-sm flex items-center justify-center cursor-pointer mb-3" title="Chạm để tải mã QR về máy">
-                  <img
-                    id="bank-qr-bride-img"
-                    src="images/qr LEDANGTHINH.jpg"
-                    alt="VietQR Mừng Cưới Cô Dâu" loading="lazy" decoding="async" class="bank-qr-img w-full h-full object-contain transition-transform duration-200" data-bind-src="bank-qr-bride-img" data-img-bind="bank-qr-bride" title="Nhấp vào ảnh để thay đổi mã QR Cô dâu">
+              <div id="bank-card-bride"
+                class="bg-white border border-[#EEEEEE] rounded-2xl p-6 shadow-md relative text-center w-full max-w-sm mx-auto">
+                <span
+                  class="bank-card-admin-badge inline-block px-3 py-1 bg-rose/10 text-rose text-[11px] font-bold rounded-full mb-3 tracking-wider uppercase">👰
+                  Mừng Cưới Cô Dâu</span>
+                <div
+                  class="bank-qr-frame relative w-36 h-36 mx-auto rounded-xl overflow-hidden bg-white border border-gray-100 shadow-sm flex items-center justify-center cursor-pointer mb-3"
+                  title="Chạm để tải mã QR về máy">
+                  <img id="bank-qr-bride-img" src="images/qr LEDANGTHINH.jpg" alt="VietQR Mừng Cưới Cô Dâu"
+                    loading="lazy" decoding="async"
+                    class="bank-qr-img w-full h-full object-contain transition-transform duration-200"
+                    data-bind-src="bank-qr-bride-img" data-img-bind="bank-qr-bride"
+                    title="Nhấp vào ảnh để thay đổi mã QR Cô dâu">
                 </div>
-                <p class="font-display text-dark text-base font-semibold mb-0.5" data-bind="bank-bride-account-holder">Hoàn Nguyễn</p>
-                <p class="font-sans text-rose text-xs tracking-wider uppercase font-semibold" data-bind="bank-bride-name">BIDV</p>
+                <p class="font-display text-dark text-base font-semibold mb-0.5" data-bind="bank-bride-account-holder">
+                  Hoàn Nguyễn</p>
+                <p class="font-sans text-rose text-xs tracking-wider uppercase font-semibold"
+                  data-bind="bank-bride-name">BIDV</p>
 
                 <div class="mt-2">
-                  <span class="font-sans text-dark text-base tracking-widest font-semibold block mb-2" data-bind="bank-bride-account-number">8823 9681 72</span>
+                  <span class="font-sans text-dark text-base tracking-widest font-semibold block mb-2"
+                    data-bind="bank-bride-account-number">8823 9681 72</span>
                   <div class="flex items-center justify-center gap-2">
-                    <button type="button" id="copy-bank-bride-btn" data-account="8823968172" class="copy-badge" title="Sao chép số tài khoản Cô dâu">
+                    <button type="button" id="copy-bank-bride-btn" data-account="8823968172" class="copy-badge"
+                      title="Sao chép số tài khoản Cô dâu">
                       <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
                       </svg>
                       Sao chép STK
                     </button>
-                    <button type="button" id="download-bank-bride-btn" class="download-badge" title="Tải ảnh mã QR đầy đủ về máy">
+                    <button type="button" id="download-bank-bride-btn" class="download-badge"
+                      title="Tải ảnh mã QR đầy đủ về máy">
                       <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                       </svg>
                       Tải mã QR
                     </button>
                   </div>
                 </div>
-                <p class="text-[11px] text-muted italic mt-3" data-bind="gift-qr-instruction">Quét mã QR bằng ứng dụng ngân hàng bất kỳ</p>
+                <p class="text-[11px] text-muted italic mt-3" data-bind="gift-qr-instruction">Quét mã QR bằng ứng dụng
+                  ngân hàng bất kỳ</p>
               </div>
             </div>
 
@@ -715,7 +779,8 @@
       <div class="dot-accent mx-auto mb-5"></div>
       <h2 class="font-display text-2xl text-rose font-medium" data-bind="couple-footer">Hoàn Nguyễn &amp; Đăng Thịnh
       </h2>
-      <p class="font-sans text-muted text-[11px] tracking-[0.3em] uppercase mt-2" data-bind="wedding-date-dots">22 . 11 . 2026</p>
+      <p class="font-sans text-muted text-[11px] tracking-[0.3em] uppercase mt-2" data-bind="wedding-date-dots">22 . 11
+        . 2026</p>
 
       <p class="font-script text-rose text-base italic mt-4" data-bind="footer-thankyou" style="display:none;"></p>
     </footer>
@@ -736,7 +801,8 @@
     <div class="rsvp-modal-card">
       <div id="rsvp-modal-icon" class="rsvp-modal-icon">💌</div>
       <h3 id="rsvp-modal-title" class="rsvp-modal-title">CẢM ƠN QUÝ KHÁCH</h3>
-      <p id="rsvp-modal-message" class="rsvp-modal-message">cảm ơn đã xác nhận, chúng tôi rất vui khi được đón tiếp Quý khách</p>
+      <p id="rsvp-modal-message" class="rsvp-modal-message">cảm ơn đã xác nhận, chúng tôi rất vui khi được đón tiếp Quý
+        khách</p>
       <button id="rsvp-modal-close" class="rsvp-modal-btn" type="button">Đóng</button>
     </div>
   </div>
@@ -758,11 +824,13 @@
 
       <form id="admin-login-form" onsubmit="return false;">
         <!-- Bẫy Bot ẩn Honeypot Trap (Bot quét HTML sẽ điền, người thật không thấy) -->
-        <input type="text" name="admin_verification_trap" id="admin-trap-field" class="admin-honeypot" tabindex="-1" autocomplete="off">
-        
+        <input type="text" name="admin_verification_trap" id="admin-trap-field" class="admin-honeypot" tabindex="-1"
+          autocomplete="off">
+
         <div class="admin-form-group" id="admin-password-group">
           <label for="admin-password-input" class="admin-label">Mật khẩu Quản Trị:</label>
-          <input type="password" id="admin-password-input" class="admin-input" placeholder="Nhập mật khẩu..." autocomplete="current-password">
+          <input type="password" id="admin-password-input" class="admin-input" placeholder="Nhập mật khẩu..."
+            autocomplete="current-password">
         </div>
 
         <div id="admin-login-error" class="admin-error-text" style="display:none;"></div>
@@ -775,30 +843,42 @@
     </div>
   </div>
 
-  <!-- 2. Floating Admin Toolbar (Hiển thị khi đang ở chế độ sửa) -->
-  <aside id="admin-toolbar" class="admin-toolbar" style="display:none;" aria-label="Thanh công cụ chỉnh sửa">
-    <div class="admin-toolbar-badge">
+  <!-- 2. Floating Admin Toolbar Container (Hiển thị khi đang ở chế độ sửa) -->
+  <div id="admin-toolbar-container" style="display:none;">
+    <!-- Nút toggle để đóng/mở thanh công cụ -->
+    <button id="admin-toggle-btn" class="admin-toggle-btn" title="Mở/Đóng thanh công cụ Admin" aria-label="Mở/Đóng thanh công cụ">
+      <span class="admin-toggle-icon">⚙️</span>
+      <span class="admin-toggle-label">Admin</span>
       <span class="admin-live-dot"></span>
-      <span>CHẾ ĐỘ SỬA TRỰC QUAN</span>
-    </div>
-    <div class="admin-toolbar-actions">
-      <button id="admin-btn-create-guest" class="admin-toolbar-btn admin-btn-guest" title="Tạo thiệp gửi từng khách mời & lấy link">
-        💌 <span>Tạo Thiệp Khách</span>
-      </button>
-      <button id="admin-btn-save" class="admin-toolbar-btn admin-btn-save" title="Lưu thay đổi trực tiếp lên GitHub">
-        💾 <span>Lưu Thay Đổi</span>
-      </button>
-      <button id="admin-btn-revert" class="admin-toolbar-btn admin-btn-revert" title="Khôi phục lại dữ liệu gốc gần nhất từ GitHub">
-        🔄 <span>Khôi Phục</span>
-      </button>
-      <button id="admin-btn-download" class="admin-toolbar-btn admin-btn-download" title="Tải file config.js dự phòng về máy">
-        📥 <span>Tải File</span>
-      </button>
-      <button id="admin-btn-exit" class="admin-toolbar-btn admin-btn-exit" title="Thoát chế độ sửa">
-        👁️ <span>Thoát</span>
-      </button>
-    </div>
-  </aside>
+    </button>
+    <!-- Thanh công cụ Admin -->
+    <aside id="admin-toolbar" class="admin-toolbar" aria-label="Thanh công cụ chỉnh sửa">
+      <div class="admin-toolbar-badge">
+        <span class="admin-live-dot"></span>
+        <span>CHẾ ĐỘ SỬA TRỰC QUAN</span>
+      </div>
+      <div class="admin-toolbar-actions">
+        <button id="admin-btn-create-guest" class="admin-toolbar-btn admin-btn-guest"
+          title="Tạo thiệp gửi từng khách mời & lấy link">
+          💌 <span>Tạo Thiệp Khách</span>
+        </button>
+        <button id="admin-btn-save" class="admin-toolbar-btn admin-btn-save" title="Lưu thay đổi trực tiếp lên GitHub">
+          💾 <span>Lưu Thay Đổi</span>
+        </button>
+        <button id="admin-btn-revert" class="admin-toolbar-btn admin-btn-revert"
+          title="Khôi phục lại dữ liệu gốc gần nhất từ GitHub">
+          🔄 <span>Khôi Phục</span>
+        </button>
+        <button id="admin-btn-download" class="admin-toolbar-btn admin-btn-download"
+          title="Tải file config.js dự phòng về máy">
+          📥 <span>Tải File</span>
+        </button>
+        <button id="admin-btn-exit" class="admin-toolbar-btn admin-btn-exit" title="Thoát chế độ sửa">
+          👁️ <span>Thoát</span>
+        </button>
+      </div>
+    </aside>
+  </div>
 
   <!-- 2.1. Hộp trạng thái & đếm ngược đồng bộ GitHub (Sync Status & Countdown Indicator) -->
   <div id="admin-sync-indicator" class="admin-sync-indicator" style="display:none;" role="status" aria-live="polite">
@@ -808,7 +888,8 @@
         <div class="admin-sync-title" id="admin-sync-title">Đang đồng bộ lên GitHub...</div>
         <div class="admin-sync-subtitle" id="admin-sync-sub">Dung lượng: 0 KB • Dự kiến: 0s</div>
       </div>
-      <button type="button" id="admin-sync-retry-btn" class="admin-sync-retry-btn" style="display:none;">🔄 Thử lại</button>
+      <button type="button" id="admin-sync-retry-btn" class="admin-sync-retry-btn" style="display:none;">🔄 Thử
+        lại</button>
       <button type="button" id="admin-sync-close-btn" class="admin-sync-close-btn" title="Đóng">✕</button>
     </div>
     <div class="admin-sync-progress-track">
@@ -842,12 +923,15 @@
       <div class="admin-form-group">
         <label for="admin-gh-token" class="admin-label">GitHub Personal Access Token (Classic):</label>
         <div class="admin-token-wrapper">
-          <input type="password" id="admin-gh-token" class="admin-input" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" autocomplete="off">
-          <button type="button" id="admin-gh-token-toggle" class="admin-token-toggle-btn" title="Hiện / Ẩn token">👁️</button>
+          <input type="password" id="admin-gh-token" class="admin-input" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx"
+            autocomplete="off">
+          <button type="button" id="admin-gh-token-toggle" class="admin-token-toggle-btn"
+            title="Hiện / Ẩn token">👁️</button>
         </div>
         <p class="admin-hint-text">
-          💡 Chọn quyền <b>repo</b> và Expiration là <b>No expiration</b>. 
-          <a href="https://github.com/settings/tokens/new" target="_blank" rel="noopener noreferrer" style="color: #8B263E; font-weight: 600; text-decoration: underline;">👉 Tạo token mới tại đây</a>
+          💡 Chọn quyền <b>repo</b> và Expiration là <b>No expiration</b>.
+          <a href="https://github.com/settings/tokens/new" target="_blank" rel="noopener noreferrer"
+            style="color: #8B263E; font-weight: 600; text-decoration: underline;">👉 Tạo token mới tại đây</a>
         </p>
       </div>
 
@@ -863,7 +947,8 @@
           <span>
             🔒 <b>Mã hóa AES-256 & Tự động đồng bộ đa thiết bị</b>
             <span class="admin-gh-sync-desc">
-              Token sẽ được mã hóa an toàn bằng mật khẩu Admin của bạn. Khi bạn mở web trên máy tính khác hoặc điện thoại, chỉ cần nhập mật khẩu là web tự động nhận kết nối GitHub mà không cần cài lại!
+              Token sẽ được mã hóa an toàn bằng mật khẩu Admin của bạn. Khi bạn mở web trên máy tính khác hoặc điện
+              thoại, chỉ cần nhập mật khẩu là web tự động nhận kết nối GitHub mà không cần cài lại!
             </span>
           </span>
         </label>
@@ -889,7 +974,8 @@
       <div class="admin-image-preview-wrapper" id="admin-image-preview-wrapper">
         <!-- Huy hiệu định danh (chỉ hiện khi chỉnh ảnh QR) -->
         <div class="admin-qr-preview-badge" id="admin-qr-preview-badge" style="display:none;">
-          <span id="admin-qr-preview-badge-text" class="bank-card-admin-badge" style="display:inline-block !important;">🤵 Mừng Cưới Chú Rể</span>
+          <span id="admin-qr-preview-badge-text" class="bank-card-admin-badge"
+            style="display:inline-block !important;">🤵 Mừng Cưới Chú Rể</span>
         </div>
 
         <!-- Khung QR mô phỏng chuẩn xác 100% theo .bank-qr-frame -->
@@ -904,12 +990,15 @@
       </div>
 
       <!-- Khung tùy chỉnh tỉ lệ thu phóng & căn chỉnh vị trí mã QR (Nằm ngay trên để vừa chỉnh vừa nhìn trực quan) -->
-      <div id="admin-qr-zoom-group" class="admin-form-group" style="display:none;background:#FAF8F5;border:1px solid #EFEAE6;padding:12px;border-radius:12px;margin-bottom:16px;">
+      <div id="admin-qr-zoom-group" class="admin-form-group"
+        style="display:none;background:#FAF8F5;border:1px solid #EFEAE6;padding:12px;border-radius:12px;margin-bottom:16px;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-          <label for="admin-qr-zoom-range" class="admin-label" style="margin-bottom:0;font-weight:700;">🔍 Tỉ lệ thu phóng (Crop ẩn viền chữ):</label>
+          <label for="admin-qr-zoom-range" class="admin-label" style="margin-bottom:0;font-weight:700;">🔍 Tỉ lệ thu
+            phóng (Crop ẩn viền chữ):</label>
           <span id="admin-qr-zoom-val" style="font-weight:700;color:#8B263E;font-size:13px;">135%</span>
         </div>
-        <input type="range" id="admin-qr-zoom-range" min="100" max="250" step="5" value="135" class="admin-input" style="cursor:pointer;padding:0;height:8px;">
+        <input type="range" id="admin-qr-zoom-range" min="100" max="250" step="5" value="135" class="admin-input"
+          style="cursor:pointer;padding:0;height:8px;">
         <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;">
           <button type="button" class="qr-zoom-preset-btn" data-scale="100">Gốc (100%)</button>
           <button type="button" class="qr-zoom-preset-btn active" data-scale="135">Chuẩn (135%)</button>
@@ -920,10 +1009,12 @@
 
         <!-- Căn chỉnh vị trí lên / xuống -->
         <div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px;margin-bottom:6px;">
-          <label for="admin-qr-offset-range" class="admin-label" style="margin-bottom:0;font-weight:700;">↕️ Vị trí lên / xuống (Tránh khuất phần trên):</label>
+          <label for="admin-qr-offset-range" class="admin-label" style="margin-bottom:0;font-weight:700;">↕️ Vị trí lên
+            / xuống (Tránh khuất phần trên):</label>
           <span id="admin-qr-offset-val" style="font-weight:700;color:#8B263E;font-size:13px;">0px (Giữa)</span>
         </div>
-        <input type="range" id="admin-qr-offset-range" min="-50" max="50" step="2" value="0" class="admin-input" style="cursor:pointer;padding:0;height:8px;">
+        <input type="range" id="admin-qr-offset-range" min="-50" max="50" step="2" value="0" class="admin-input"
+          style="cursor:pointer;padding:0;height:8px;">
         <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;">
           <button type="button" class="qr-offset-preset-btn" data-offset="-20">⬆️ Lên (-20px)</button>
           <button type="button" class="qr-offset-preset-btn" data-offset="-10">⬆️ Lên nhẹ (-10px)</button>
@@ -966,7 +1057,8 @@
       <!-- Navigation Tabs -->
       <div class="admin-tab-bar">
         <button type="button" id="tab-btn-create-guest" class="admin-tab-btn active">✨ Tạo Thiệp Mới</button>
-        <button type="button" id="tab-btn-guest-list" class="admin-tab-btn">📋 Danh Sách Đã Tạo (<span id="guest-count-badge">0</span>)</button>
+        <button type="button" id="tab-btn-guest-list" class="admin-tab-btn">📋 Danh Sách Đã Tạo (<span
+            id="guest-count-badge">0</span>)</button>
       </div>
 
       <!-- TAB 1: FORM TẠO THIỆP -->
@@ -991,8 +1083,10 @@
 
         <!-- Mục 2: Họ và tên đầy đủ -->
         <div class="admin-form-group">
-          <label for="admin-guest-fullname" class="admin-label">2. Họ và tên đầy đủ (cho danh sách & tự điền form RSVP):</label>
-          <input type="text" id="admin-guest-fullname" class="admin-input" placeholder="ví dụ: Nguyễn Thị Lan hoặc Trần Văn Nam">
+          <label for="admin-guest-fullname" class="admin-label">2. Họ và tên đầy đủ (cho danh sách & tự điền form
+            RSVP):</label>
+          <input type="text" id="admin-guest-fullname" class="admin-input"
+            placeholder="ví dụ: Nguyễn Thị Lan hoặc Trần Văn Nam">
         </div>
 
         <!-- Mục 3: Tên hiển thị trên thiệp -->
@@ -1022,7 +1116,8 @@
           <label for="admin-guest-slug" class="admin-label">5. Đường link cá nhân hóa (Có thể tự sửa tùy ý):</label>
           <div class="admin-link-input-wrapper">
             <span class="admin-domain-prefix">/</span>
-            <input type="text" id="admin-guest-slug" class="admin-input admin-slug-input" placeholder="Thiep_cuoi_gui_chi_lan">
+            <input type="text" id="admin-guest-slug" class="admin-input admin-slug-input"
+              placeholder="Thiep_cuoi_gui_chi_lan">
           </div>
           <p class="admin-hint-text">🔗 Khách mở link này sẽ thấy thiệp mời trang trọng dành riêng cho mình.</p>
         </div>
@@ -1045,7 +1140,8 @@
             <button type="button" id="admin-btn-copy-result-link" class="admin-btn-primary">
               📋 Sao Chép Link
             </button>
-            <a id="admin-link-preview-result" href="#" target="_blank" class="admin-btn-secondary text-center" style="display:inline-flex;align-items:center;justify-content:center;text-decoration:none;">
+            <a id="admin-link-preview-result" href="#" target="_blank" class="admin-btn-secondary text-center"
+              style="display:inline-flex;align-items:center;justify-content:center;text-decoration:none;">
               👁️ Mở Xem Thử
             </a>
           </div>
@@ -1054,13 +1150,17 @@
 
       <!-- TAB 2: DANH SÁCH THIỆP ĐÃ TẠO -->
       <div id="tab-pane-guest-list" class="admin-tab-pane" style="display:none;">
-        <div class="admin-list-top-bar" style="display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap;">
+        <div class="admin-list-top-bar"
+          style="display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap;">
           <span class="admin-list-summary">Tổng cộng: <b id="admin-total-guests-count">0</b> khách mời</span>
           <div style="display:flex; gap:8px;">
-            <button type="button" id="admin-btn-copy-all-links" class="admin-toolbar-btn admin-btn-settings" style="font-size:11.5px;">
+            <button type="button" id="admin-btn-copy-all-links" class="admin-toolbar-btn admin-btn-settings"
+              style="font-size:11.5px;">
               📋 Sao Chép Tất Cả
             </button>
-            <button type="button" id="admin-btn-clear-all-guests" class="admin-toolbar-btn" style="font-size:11.5px; background:#be123c; color:white; border-color:#be123c;" title="Xóa toàn bộ danh sách khách mời">
+            <button type="button" id="admin-btn-clear-all-guests" class="admin-toolbar-btn"
+              style="font-size:11.5px; background:#be123c; color:white; border-color:#be123c;"
+              title="Xóa toàn bộ danh sách khách mời">
               🗑️ Xóa Tất Cả
             </button>
           </div>
@@ -1105,18 +1205,22 @@
 
       <div class="admin-form-group">
         <label for="admin-map-url-input" class="admin-label">📍 Đường dẫn Google Maps:</label>
-        <input type="url" id="admin-map-url-input" class="admin-input" placeholder="https://maps.app.goo.gl/... hoặc https://goo.gl/maps/...">
+        <input type="url" id="admin-map-url-input" class="admin-input"
+          placeholder="https://maps.app.goo.gl/... hoặc https://goo.gl/maps/...">
         <p class="admin-hint-text">
-          💡 Mở ứng dụng Google Maps &gt; Tìm địa điểm &gt; Bấm <b>Chia sẻ</b> &gt; <b>Sao chép liên kết</b> rồi dán vào đây.<br>
+          💡 Mở ứng dụng Google Maps &gt; Tìm địa điểm &gt; Bấm <b>Chia sẻ</b> &gt; <b>Sao chép liên kết</b> rồi dán vào
+          đây.<br>
           ⚠️ <i>Nếu để trống ô này, khi khách bấm vào nút Bản Đồ trên thiệp sẽ không phản ứng gì.</i>
         </p>
       </div>
 
       <div class="flex gap-2 mb-4">
-        <button type="button" id="admin-map-test-btn" class="admin-btn-secondary" style="font-size:12px;padding:8px 12px;">
+        <button type="button" id="admin-map-test-btn" class="admin-btn-secondary"
+          style="font-size:12px;padding:8px 12px;">
           🧪 Mở Thử Link
         </button>
-        <button type="button" id="admin-map-clear-btn" class="admin-btn-secondary" style="font-size:12px;padding:8px 12px;color:#c0392b;">
+        <button type="button" id="admin-map-clear-btn" class="admin-btn-secondary"
+          style="font-size:12px;padding:8px 12px;color:#c0392b;">
           🗑️ Xóa Link (Để trống)
         </button>
       </div>

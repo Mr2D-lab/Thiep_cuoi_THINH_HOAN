@@ -1028,7 +1028,7 @@ function initMusicPlayer() {
       audio.play().then(() => {
         isPlaying = true;
         musicBtn.classList.add('is-playing');
-        showToast('Đang phát nhạc nền ♪');
+        showToast('Đang phát nhạc nền ♪', 1000);
       }).catch((err) => {
         console.warn('Lỗi khi phát nhạc:', err);
       });
@@ -1036,13 +1036,13 @@ function initMusicPlayer() {
       audio.pause();
       isPlaying = false;
       musicBtn.classList.remove('is-playing');
-      showToast('Đã tạm dừng nhạc');
+      showToast('Đã tạm dừng nhạc', 1000);
     }
   }
 
   musicBtn.addEventListener('click', () => {
     if (isEditingMode()) {
-      showToast('🔇 Chế độ chỉnh sửa: Đã tắt nhạc nền');
+      showToast('🔇 Chế độ chỉnh sửa: Đã tắt nhạc nền', 1000);
       return;
     }
     toggleMusic();
@@ -1349,7 +1349,7 @@ function applyToastCenterStyles(toast, isShow) {
 }
 
 let toastTimeout = null;
-function showToast(message) {
+function showToast(message, duration = 3500) {
   let toast = document.getElementById('toast-notice');
   if (!toast) {
     toast = document.createElement('div');
@@ -1366,7 +1366,7 @@ function showToast(message) {
   toastTimeout = setTimeout(() => {
     toast.classList.remove('show');
     applyToastCenterStyles(toast, false);
-  }, 3500);
+  }, duration);
 }
 
 /* =====================================================
@@ -1954,7 +1954,9 @@ function initVisualAdminModule() {
   const submitBtn = document.getElementById('admin-login-submit');
   const pwdGroup = document.getElementById('admin-password-group');
 
+  const toolbarContainer = document.getElementById('admin-toolbar-container');
   const toolbar = document.getElementById('admin-toolbar');
+  const toggleBtn = document.getElementById('admin-toggle-btn');
   const btnSave = document.getElementById('admin-btn-save');
   const btnGithub = document.getElementById('admin-btn-github');
   const btnDownload = document.getElementById('admin-btn-download');
@@ -2577,7 +2579,10 @@ function initVisualAdminModule() {
       window.__stopWeddingMusic();
     }
     document.body.classList.add('admin-mode-active');
-    if (toolbar) toolbar.style.display = 'flex';
+    if (toolbarContainer) toolbarContainer.style.display = 'flex';
+    // Toolbar bắt đầu ẩn, chờ người dùng nhấn nút toggle
+    if (toolbar) toolbar.classList.remove('toolbar-visible');
+    if (toggleBtn) toggleBtn.classList.remove('toolbar-open');
 
     // Đảm bảo hiển thị cả hai cột bố mẹ để admin có thể thêm/sửa
     const rowFathers = document.querySelector('.parents-row-fathers');
@@ -3053,11 +3058,21 @@ function initVisualAdminModule() {
     });
   }
 
+  // 6b. Nút toggle đóng/mở thanh công cụ Admin
+  if (toggleBtn) {
+    toggleBtn.addEventListener('click', () => {
+      const isOpen = toolbar.classList.toggle('toolbar-visible');
+      toggleBtn.classList.toggle('toolbar-open', isOpen);
+    });
+  }
+
   // 7. Thoát Chế Độ Admin
   if (btnExit) {
     btnExit.addEventListener('click', () => {
       document.body.classList.remove('admin-mode-active');
-      if (toolbar) toolbar.style.display = 'none';
+      if (toolbarContainer) toolbarContainer.style.display = 'none';
+      if (toolbar) toolbar.classList.remove('toolbar-visible');
+      if (toggleBtn) toggleBtn.classList.remove('toolbar-open');
       document.querySelectorAll('[data-bind]').forEach(el => {
         el.removeAttribute('contenteditable');
         el.classList.remove('admin-field-autogen');
