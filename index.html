@@ -167,7 +167,7 @@
         <h1 class="font-display text-4xl text-rose leading-tight tracking-wide font-medium"
           data-bind="couple-hero-groom">Đăng Thịnh
         </h1>
-        <p class="font-sans text-muted text-[11px] tracking-[0.3em] uppercase mt-3" data-bind="wedding-date-dots">22 . 11 . 2026</p>
+        <p class="font-sans text-muted text-[11px] tracking-[0.3em] uppercase mt-3 wedding-date-master-row"><span data-bind="wedding-date-day" class="px-1 cursor-pointer">22</span><span class="admin-field-autogen-inline select-none text-muted/60"> . </span><span data-bind="wedding-date-month" class="px-1 cursor-pointer">11</span><span class="admin-field-autogen-inline select-none text-muted/60"> . </span><span data-bind="wedding-date-year" class="px-1 cursor-pointer">2026</span></p>
       </div>
 
       <!-- Center photo with refined frame -->
@@ -231,11 +231,8 @@
           Thịnh ❤ Hoàn Nguyễn</h3>
 
         <!-- Time & Date -->
-        <p class="font-sans text-dark text-sm mb-1 wedding-time-row">
-          <span class="admin-field-autogen-inline select-none font-medium">Tổ chức vào lúc </span><span data-bind="wedding-time-hour" class="font-semibold text-rose px-1 cursor-pointer">11</span><span class="admin-field-autogen-inline select-none font-medium"> giờ </span><span data-bind="wedding-time-minute" class="font-semibold text-rose px-1 cursor-pointer">11</span>
-        </p>
-        <p class="font-display text-rose text-2xl font-bold tracking-widest my-1 wedding-date-row">
-          <span data-bind="wedding-date-day" class="px-1 cursor-pointer">22</span><span class="admin-field-autogen-inline select-none text-muted/60"> . </span><span data-bind="wedding-date-month" class="px-1 cursor-pointer">11</span><span class="admin-field-autogen-inline select-none text-muted/60"> . </span><span data-bind="wedding-date-year" class="px-1 cursor-pointer">2026</span>
+        <p class="font-sans text-dark text-sm mb-2 wedding-time-row">
+          <span class="admin-field-autogen-inline select-none font-medium">Tổ chức vào lúc </span><span data-bind="wedding-time-hour" class="font-semibold text-rose px-1 cursor-pointer">11</span><span class="admin-field-autogen-inline select-none font-medium"> giờ </span><span data-bind="wedding-time-minute" class="font-semibold text-rose px-1 cursor-pointer">11</span><span class="admin-field-autogen-inline select-none font-medium"> phút</span>
         </p>
         <p class="font-display text-dark text-base font-semibold mb-1" data-bind="wedding-date-full">Chủ Nhật, ngày 22 tháng 11 năm 2026</p>
         <p class="font-script text-muted text-sm italic mb-4" data-bind="wedding-lunar-date">(Tức ngày 10 tháng 07 năm
@@ -998,8 +995,8 @@
   </div>
 
   <!-- Scripts (Cache buster chống lưu đệm) -->
-  <script src="config.js?v=20260926_toolbar_and_single_date_fix"></script>
-  <script src="script.js?v=20260926_toolbar_and_single_date_fix"></script>
+  <script src="config.js?v=20260926_date_hero_and_minute_fix"></script>
+  <script src="script.js?v=20260926_date_hero_and_minute_fix"></script>
 </body>
 
 </html>

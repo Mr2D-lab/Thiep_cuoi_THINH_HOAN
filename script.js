@@ -1915,11 +1915,11 @@ function initVisualAdminModule() {
       document.title = `${val} & ${WEDDING_CONFIG.groom?.name || ''} — Thiệp Cưới 2026`;
     }
 
-    // 3. Phân tích ngày cưới khi người dùng gõ (Đồng bộ theo thời gian thực từ Thiệp Mời Chính)
+    // 3. Phân tích ngày cưới khi người dùng gõ (Đồng bộ theo thời gian thực từ Đầu trang thiệp / Hero)
     else if (key === 'wedding-date-day' || key === 'wedding-date-month' || key === 'wedding-date-year') {
-      const dEl = document.querySelector('.wedding-date-row [data-bind="wedding-date-day"]') || document.querySelector('[data-bind="wedding-date-day"]');
-      const mEl = document.querySelector('.wedding-date-row [data-bind="wedding-date-month"]') || document.querySelector('[data-bind="wedding-date-month"]');
-      const yEl = document.querySelector('.wedding-date-row [data-bind="wedding-date-year"]') || document.querySelector('[data-bind="wedding-date-year"]');
+      const dEl = document.querySelector('.wedding-date-master-row [data-bind="wedding-date-day"]') || document.querySelector('[data-bind="wedding-date-day"]');
+      const mEl = document.querySelector('.wedding-date-master-row [data-bind="wedding-date-month"]') || document.querySelector('[data-bind="wedding-date-month"]');
+      const yEl = document.querySelector('.wedding-date-master-row [data-bind="wedding-date-year"]') || document.querySelector('[data-bind="wedding-date-year"]');
       const d = dEl ? dEl.innerText.trim() : '';
       const m = mEl ? mEl.innerText.trim() : '';
       const y = yEl ? yEl.innerText.trim() : '';
@@ -2553,9 +2553,9 @@ function initVisualAdminModule() {
     const bAddr = getText('bride-address'); if (bAddr !== null) baseConfig.bride.address = bAddr;
 
     // Ngày cưới & Giờ cưới (Tự động nhận diện chuỗi ngày giờ gõ tay)
-    const dValEl = document.querySelector('.wedding-date-row [data-bind="wedding-date-day"]') || document.querySelector('[data-bind="wedding-date-day"]');
-    const mValEl = document.querySelector('.wedding-date-row [data-bind="wedding-date-month"]') || document.querySelector('[data-bind="wedding-date-month"]');
-    const yValEl = document.querySelector('.wedding-date-row [data-bind="wedding-date-year"]') || document.querySelector('[data-bind="wedding-date-year"]');
+    const dValEl = document.querySelector('.wedding-date-master-row [data-bind="wedding-date-day"]') || document.querySelector('[data-bind="wedding-date-day"]');
+    const mValEl = document.querySelector('.wedding-date-master-row [data-bind="wedding-date-month"]') || document.querySelector('[data-bind="wedding-date-month"]');
+    const yValEl = document.querySelector('.wedding-date-master-row [data-bind="wedding-date-year"]') || document.querySelector('[data-bind="wedding-date-year"]');
     const dVal = dValEl ? dValEl.innerText.trim() : getText('wedding-date-day');
     const mVal = mValEl ? mValEl.innerText.trim() : getText('wedding-date-month');
     const yVal = yValEl ? yValEl.innerText.trim() : getText('wedding-date-year');
