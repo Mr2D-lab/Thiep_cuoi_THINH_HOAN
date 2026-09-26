@@ -884,8 +884,21 @@
         <p class="admin-modal-desc">Chọn ảnh mới từ thiết bị hoặc dán đường dẫn ảnh</p>
       </div>
 
-      <div class="admin-image-preview-wrapper">
-        <img id="admin-image-preview" src="" alt="Xem trước ảnh" class="admin-preview-img">
+      <div class="admin-image-preview-wrapper" id="admin-image-preview-wrapper">
+        <!-- Huy hiệu định danh (chỉ hiện khi chỉnh ảnh QR) -->
+        <div class="admin-qr-preview-badge" id="admin-qr-preview-badge" style="display:none;">
+          <span id="admin-qr-preview-badge-text" class="bank-card-admin-badge" style="display:inline-block !important;">🤵 Mừng Cưới Chú Rể</span>
+        </div>
+
+        <!-- Khung QR mô phỏng chuẩn xác 100% theo .bank-qr-frame -->
+        <div class="admin-qr-frame-box" id="admin-qr-frame-box">
+          <img id="admin-image-preview" src="" alt="Xem trước ảnh" class="admin-preview-img">
+        </div>
+
+        <!-- Nhãn giải thích trực quan -->
+        <div class="admin-qr-preview-hint" id="admin-qr-preview-hint" style="display:none;">
+          <span>💡 Khung mô phỏng hiển thị thực tế khi mở phong bao (144 × 144px)</span>
+        </div>
       </div>
 
       <div class="admin-form-group">
@@ -1074,8 +1087,8 @@
   </div>
 
   <!-- Scripts (Cache buster chống lưu đệm) -->
-  <script src="config.js?v=20260926_qr_offset"></script>
-  <script src="script.js?v=20260926_qr_offset"></script>
+  <script src="config.js?v=20260926_qr_preview_match"></script>
+  <script src="script.js?v=20260926_qr_preview_match"></script>
 </body>
 
 </html>

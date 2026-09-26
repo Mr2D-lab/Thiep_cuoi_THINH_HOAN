@@ -1787,6 +1787,10 @@ function initVisualAdminModule() {
 
   const imgModal = document.getElementById('admin-image-modal');
   const imgPreview = document.getElementById('admin-image-preview');
+  const imgPreviewWrapper = document.getElementById('admin-image-preview-wrapper');
+  const qrPreviewBadge = document.getElementById('admin-qr-preview-badge');
+  const qrPreviewBadgeText = document.getElementById('admin-qr-preview-badge-text');
+  const qrPreviewHint = document.getElementById('admin-qr-preview-hint');
   const imgFileInput = document.getElementById('admin-image-file');
   const imgUrlInput = document.getElementById('admin-image-url');
   const imgApplyBtn = document.getElementById('admin-image-apply');
@@ -2539,8 +2543,30 @@ function initVisualAdminModule() {
             btn.classList.remove('active');
           }
         });
+        if (imgPreviewWrapper) {
+          imgPreviewWrapper.classList.add('is-qr-mode');
+        }
+        if (qrPreviewBadge) {
+          qrPreviewBadge.style.display = 'block';
+          if (qrPreviewBadgeText) {
+            const isBride = imgBindKey === 'bank-qr-bride' || activeImgTarget.getAttribute('data-bind-src') === 'bank-qr-bride-img';
+            qrPreviewBadgeText.innerText = isBride ? '👰 Mừng Cưới Cô Dâu' : '🤵 Mừng Cưới Chú Rể';
+          }
+        }
+        if (qrPreviewHint) {
+          qrPreviewHint.style.display = 'block';
+        }
       } else {
         qrZoomGroup.style.display = 'none';
+        if (imgPreviewWrapper) {
+          imgPreviewWrapper.classList.remove('is-qr-mode');
+        }
+        if (qrPreviewBadge) {
+          qrPreviewBadge.style.display = 'none';
+        }
+        if (qrPreviewHint) {
+          qrPreviewHint.style.display = 'none';
+        }
         if (imgPreview) {
           imgPreview.style.transform = 'none';
         }

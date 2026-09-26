@@ -1761,6 +1761,15 @@ body.admin-mode-active .bank-card-admin-badge {
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.admin-qr-frame-box {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .admin-preview-img {
@@ -1769,6 +1778,54 @@ body.admin-mode-active .bank-card-admin-badge {
   object-fit: contain;
   transition: transform 0.2s ease;
   transform-origin: center center;
+}
+
+/* KHI CHỈNH SỬA MÃ QR: Khung preview mô phỏng giống hệt 100% ô .bank-qr-frame khi mở phong bao */
+.admin-image-preview-wrapper.is-qr-mode {
+  background: #FAF8F5;
+  border: 1px solid #EFEAE6;
+  border-radius: 16px;
+  padding: 16px 12px 14px 12px;
+  flex-direction: column;
+  max-height: none;
+}
+
+.admin-image-preview-wrapper.is-qr-mode .admin-qr-preview-badge {
+  margin-bottom: 10px;
+  display: block;
+}
+
+.admin-image-preview-wrapper.is-qr-mode .admin-qr-frame-box {
+  width: 144px;
+  height: 144px;
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+  background: #FFFFFF;
+  border: 1px solid #EEEEEE;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.admin-image-preview-wrapper.is-qr-mode .admin-preview-img {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: none !important;
+  max-height: none !important;
+  object-fit: contain !important;
+  transition: transform 0.2s ease;
+  transform-origin: center center;
+}
+
+.admin-image-preview-wrapper.is-qr-mode .admin-qr-preview-hint {
+  margin-top: 10px;
+  font-size: 11px;
+  color: #8C7A7E;
+  font-style: italic;
+  display: block;
 }
 
 /* Honeypot hidden input */
