@@ -1,5 +1,5 @@
 /* ==========================================================================
-   BẢNG CẤU HÌNH THIỆP CƯỚI 2026 (Cập nhật: 1790388816126)
+   BẢNG CẤU HÌNH THIỆP CƯỚI 2026 (Cập nhật: 1790391493519)
    ========================================================================== */
 
 const WEDDING_CONFIG = {
@@ -53,14 +53,14 @@ const WEDDING_CONFIG = {
       "address": "Nhà bà Đặng Thị Tuyết, xóm Đại Đồng, xã Bạch Hà, tỉnh Nghệ An (xóm 2, Đại Sơn, Đô Lương cũ)"
     },
     "ceremony": {
-      "locationName": "Tư gia Nhà Gái",
+      "locationName": "Tư gia Nhà Gái 01",
       "address": "Xóm Văn Tân, xã Thuần Trung, tỉnh Nghệ An (xóm văn Tân, Nhân Sơn, Đô Lương cũ)",
       "title": "LỄ VU QUY",
       "time": "08:00",
       "dateText": "Chủ Nhật, 22/11/2026"
     },
     "reception": {
-      "locationName": "Tư gia Nhà Trai",
+      "locationName": "Tư gia Nhà Trai 01",
       "address": "Xóm Đại Đồng, xã Bạch Hà, tỉnh Nghệ An (xóm 2, Đại Sơn, Đô Lương cũ)",
       "title": "TIỆC CƯỚI",
       "time": "17:30",
@@ -72,12 +72,12 @@ const WEDDING_CONFIG = {
       "subtitle": "WE'RE GETTING MARRIED"
     },
     "invitation": {
-      "groomFamilyTitle": "Nhà Trai",
-      "brideFamilyTitle": "Nhà Gái",
+      "groomFamilyTitle": "NHÀ TRAI",
+      "brideFamilyTitle": "NHÀ GÁI",
       "heading": "TRÂN TRỌNG KÍNH MỜI",
       "guestLabel": "Quý khách cùng gia đình",
       "subheading": "(Tới dự Lễ Thành Hôn của chúng tôi)",
-      "timePrefix": "Tổ chức vào lúc",
+      "timePrefix": "Tổ chức",
       "blessing": "\"Sự hiện diện của Quý khách là niềm vinh hạnh lớn lao của gia đình chúng tôi!\""
     },
     "poem": "Tình yêu không cần hoàn hảo,\nchỉ cần chân thành.\nChúng tôi đã tìm thấy nhau\ngiữa muôn vàn người,\nvà hôm nay xin được chia sẻ\nniềm hạnh phúc này cùng bạn.",
@@ -124,10 +124,10 @@ const WEDDING_CONFIG = {
     "countdown": {
       "subtitle": "SAVE THE DATE",
       "heading": "Đếm Ngược Ngày Cưới",
-      "daysLabel": "Ngày",
-      "hoursLabel": "Giờ",
-      "minutesLabel": "Phút",
-      "secondsLabel": "Giây"
+      "daysLabel": "NGÀY",
+      "hoursLabel": "GIỜ",
+      "minutesLabel": "PHÚT",
+      "secondsLabel": "GIÂY"
     },
     "eventsHeader": {
       "subtitle": "EVENTS",
@@ -139,9 +139,9 @@ const WEDDING_CONFIG = {
       "note": ""
     },
     "rsvp": {
-      "subtitle": "PHẢN HỒI THAM DỰ",
+      "subtitle": "",
       "heading": "Xác Nhận Tham Dự",
-      "prompt": "Xin vui lòng xác nhận trước ngày 15/08/2026 để chúng tôi chu toàn đón tiếp",
+      "prompt": "",
       "nameField": {
         "label": "Họ và tên *",
         "placeholder": "Nhập họ và tên của bạn"
@@ -152,7 +152,7 @@ const WEDDING_CONFIG = {
         "noOption": "Rất tiếc, tôi không thể tham dự 😢"
       },
       "guestOfField": {
-        "label": "",
+        "label": "Bạn là khách của? *",
         "brideOption": "Cô dâu",
         "groomOption": "Chú rể"
       },
@@ -209,5 +209,5 @@ const WEDDING_CONFIG = {
 
 if (typeof window !== 'undefined') {
   window.WEDDING_CONFIG = WEDDING_CONFIG;
-  window._weddingConfigBuildTime = "1790388816126";
+  window._weddingConfigBuildTime = "1790391493519";
 }
