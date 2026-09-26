@@ -129,7 +129,12 @@ function applyWeddingConfig() {
     'bride-mother': cfg.bride?.mother,
     'bride-address': cfg.bride?.address,
     'wedding-date-dots': formatDateDots(weddingDate),
+    'wedding-date-day': weddingDate ? pad(weddingDate.getDate()) : '22',
+    'wedding-date-month': weddingDate ? pad(weddingDate.getMonth() + 1) : '11',
+    'wedding-date-year': weddingDate ? String(weddingDate.getFullYear()) : '2026',
     'wedding-date-full': formatDateFull(weddingDate),
+    'wedding-time-hour': cfg.weddingTime ? pad(cfg.weddingTime.split(':')[0]) : '11',
+    'wedding-time-minute': cfg.weddingTime ? pad(cfg.weddingTime.split(':')[1] || '00') : '11',
     'wedding-time-text': cfg.weddingTime ? `Tổ chức vào lúc ${formatTimeText(cfg.weddingTime)}` : '',
     'wedding-lunar-date': cfg.lunarDate ? `(${cfg.lunarDate})` : '',
     'story-wedding-date': formatMonthYear(weddingDate),
@@ -1884,6 +1889,31 @@ function initVisualAdminModule() {
     }
 
     // 3. Phân tích ngày cưới khi người dùng gõ
+    else if (key === 'wedding-date-day' || key === 'wedding-date-month' || key === 'wedding-date-year') {
+      const dEl = document.querySelector('[data-bind="wedding-date-day"]');
+      const mEl = document.querySelector('[data-bind="wedding-date-month"]');
+      const yEl = document.querySelector('[data-bind="wedding-date-year"]');
+      const d = dEl ? dEl.innerText.trim() : '';
+      const m = mEl ? mEl.innerText.trim() : '';
+      const y = yEl ? yEl.innerText.trim() : '';
+      if (d && m && y && !isNaN(d) && !isNaN(m) && !isNaN(y)) {
+        const iso = `${y}-${pad(m)}-${pad(d)}`;
+        WEDDING_CONFIG.weddingDate = iso;
+        const testD = parseLocalDate(iso);
+        if (testD && !isNaN(testD.getTime())) {
+          const fullEl = document.querySelector('[data-bind="wedding-date-full"]');
+          if (fullEl) fullEl.innerText = formatDateFull(testD);
+          document.querySelectorAll('[data-bind="wedding-date-day"]').forEach(other => { if (other !== dEl) other.innerText = pad(d); });
+          document.querySelectorAll('[data-bind="wedding-date-month"]').forEach(other => { if (other !== mEl) other.innerText = pad(m); });
+          document.querySelectorAll('[data-bind="wedding-date-year"]').forEach(other => { if (other !== yEl) other.innerText = String(y); });
+          document.querySelectorAll('[data-bind="wedding-date-dots"]').forEach(other => { other.innerText = formatDateDots(testD); });
+          const cerDateEl = document.querySelector('[data-bind="event-ceremony-date"]');
+          if (cerDateEl) cerDateEl.innerText = formatDateShort(testD);
+          const recDateEl = document.querySelector('[data-bind="event-reception-date"]');
+          if (recDateEl) recDateEl.innerText = formatDateShort(testD);
+        }
+      }
+    }
     else if (key === 'wedding-date-dots') {
       document.querySelectorAll('[data-bind="wedding-date-dots"]').forEach(other => {
         if (other !== el) other.innerText = val;
@@ -1901,6 +1931,15 @@ function initVisualAdminModule() {
     }
 
     // 4. Phân tích giờ cưới khi người dùng gõ
+    else if (key === 'wedding-time-hour' || key === 'wedding-time-minute') {
+      const hEl = document.querySelector('[data-bind="wedding-time-hour"]');
+      const mEl = document.querySelector('[data-bind="wedding-time-minute"]');
+      const h = hEl ? hEl.innerText.trim() : '';
+      const m = mEl ? mEl.innerText.trim() : '';
+      if (h !== '' && m !== '' && !isNaN(h) && !isNaN(m)) {
+        WEDDING_CONFIG.weddingTime = `${pad(h)}:${pad(m)}`;
+      }
+    }
     else if (key === 'wedding-time-text') {
       const parsedTime = parseUserTimeString(val);
       if (parsedTime) {
@@ -1988,7 +2027,17 @@ function initVisualAdminModule() {
   }
 
   // Danh sách trường tự động sinh (không cho phép nhập con trỏ chuột)
-  const AUTO_GENERATED_BINDS = ['couple-names-invite', 'couple-footer'];
+  const AUTO_GENERATED_BINDS = [
+    'couple-names-invite',
+    'couple-footer',
+    'wedding-date-full',
+    'countdown-days-label',
+    'countdown-hours-label',
+    'countdown-minutes-label',
+    'countdown-seconds-label',
+    'event-ceremony-date',
+    'event-reception-date'
+  ];
 
   // Bảng placeholder cho các trường rỗng khi bật Admin Mode
   const EMPTY_FIELD_PLACEHOLDERS = {
@@ -2488,23 +2537,36 @@ function initVisualAdminModule() {
     const bAddr = getText('bride-address'); if (bAddr !== null) baseConfig.bride.address = bAddr;
 
     // Ngày cưới & Giờ cưới (Tự động nhận diện chuỗi ngày giờ gõ tay)
-    const dateDots = getText('wedding-date-dots');
-    const dateFull = getText('wedding-date-full');
-    const parsedDate = parseUserDateString(dateDots) || parseUserDateString(dateFull);
-    if (parsedDate) {
-      baseConfig.weddingDate = parsedDate;
+    const dVal = getText('wedding-date-day');
+    const mVal = getText('wedding-date-month');
+    const yVal = getText('wedding-date-year');
+    if (dVal && mVal && yVal && !isNaN(dVal) && !isNaN(mVal) && !isNaN(yVal)) {
+      baseConfig.weddingDate = `${yVal}-${pad(mVal)}-${pad(dVal)}`;
+    } else {
+      const dateDots = getText('wedding-date-dots');
+      const dateFull = getText('wedding-date-full');
+      const parsedDate = parseUserDateString(dateDots) || parseUserDateString(dateFull);
+      if (parsedDate) {
+        baseConfig.weddingDate = parsedDate;
+      }
     }
 
-    const timeText = getText('wedding-time-text');
-    if (timeText !== null) {
-      const parsedTime = parseUserTimeString(timeText);
-      if (parsedTime) {
-        baseConfig.weddingTime = parsedTime;
-      }
-      const match = timeText.match(/^(.*?)(?:vào lúc|\d{1,2}\s*(?:giờ|h|:))/i);
-      if (match && match[1] && match[1].trim()) {
-        if (!baseConfig.texts.invitation) baseConfig.texts.invitation = {};
-        baseConfig.texts.invitation.timePrefix = match[1].trim();
+    const hVal = getText('wedding-time-hour');
+    const minVal = getText('wedding-time-minute');
+    if (hVal !== null && minVal !== null && hVal !== '' && minVal !== '' && !isNaN(hVal) && !isNaN(minVal)) {
+      baseConfig.weddingTime = `${pad(hVal)}:${pad(minVal)}`;
+    } else {
+      const timeText = getText('wedding-time-text');
+      if (timeText !== null) {
+        const parsedTime = parseUserTimeString(timeText);
+        if (parsedTime) {
+          baseConfig.weddingTime = parsedTime;
+        }
+        const match = timeText.match(/^(.*?)(?:vào lúc|\d{1,2}\s*(?:giờ|h|:))/i);
+        if (match && match[1] && match[1].trim()) {
+          if (!baseConfig.texts.invitation) baseConfig.texts.invitation = {};
+          baseConfig.texts.invitation.timePrefix = match[1].trim();
+        }
       }
     }
 

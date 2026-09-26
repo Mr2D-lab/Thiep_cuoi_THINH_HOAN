@@ -1216,6 +1216,13 @@ body.admin-mode-active .admin-field-autogen {
   pointer-events: auto !important;
 }
 
+body.admin-mode-active .admin-field-autogen-inline {
+  cursor: not-allowed !important;
+  user-select: none !important;
+  pointer-events: auto !important;
+  outline: none !important;
+}
+
 body.admin-mode-active [data-bind].admin-field-autogen:hover {
   outline-color: #6B7280 !important;
   background-color: rgba(0, 0, 0, 0.04) !important;
