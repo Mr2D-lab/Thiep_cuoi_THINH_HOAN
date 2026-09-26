@@ -1,5 +1,5 @@
 /* ==========================================================================
-   BẢNG CẤU HÌNH THIỆP CƯỚI 2026 (Cập nhật: 1790420461816)
+   BẢNG CẤU HÌNH THIỆP CƯỚI 2026 (Cập nhật: 1790420703940)
    ========================================================================== */
 
 const WEDDING_CONFIG = {
@@ -154,7 +154,7 @@ const WEDDING_CONFIG = {
         "noOption": "Rất tiếc, tôi không thể tham dự 😢"
       },
       "guestOfField": {
-        "label": "Bạn là khách của? *",
+        "label": "Là khách của ? *",
         "brideOption": "Cô dâu",
         "groomOption": "Chú rể"
       },
@@ -229,5 +229,5 @@ const WEDDING_CONFIG = {
 
 if (typeof window !== 'undefined') {
   window.WEDDING_CONFIG = WEDDING_CONFIG;
-  window._weddingConfigBuildTime = "1790420461816";
+  window._weddingConfigBuildTime = "1790420703940";
 }
