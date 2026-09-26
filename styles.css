@@ -1432,6 +1432,17 @@ body.admin-mode-active img:hover {
   box-shadow: 0 0 0 3px #8B263E;
 }
 
+body.admin-mode-active [data-bind-href] {
+  cursor: pointer !important;
+  position: relative;
+  transition: all 0.2s;
+}
+
+body.admin-mode-active [data-bind-href]:hover {
+  filter: brightness(0.95);
+  box-shadow: 0 0 0 2px #8B263E !important;
+}
+
 /* Badge định danh thẻ ngân hàng mừng cưới - Chỉ hiển thị trong Chế độ Admin */
 .bank-card-admin-badge {
   display: none !important;

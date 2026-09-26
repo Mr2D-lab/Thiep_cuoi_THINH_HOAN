@@ -245,13 +245,18 @@ function applyWeddingConfig() {
 
     const cerMap = document.querySelector('[data-bind-href="event-ceremony-map"]');
     if (cerMap) {
-      const mapUrl = resolveMapUrl(ceremonyData.mapUrl, ceremonyData.locationName, ceremonyData.address);
-      if (mapUrl) {
+      const mapUrl = (ceremonyData.mapUrl || '').trim();
+      cerMap.setAttribute('data-map-url', mapUrl);
+      if (mapUrl && /^https?:\/\//i.test(mapUrl)) {
         cerMap.href = mapUrl;
-        cerMap.style.display = '';
+        cerMap.target = '_blank';
+        cerMap.rel = 'noopener noreferrer';
       } else {
-        cerMap.style.display = 'none';
+        cerMap.href = 'javascript:void(0)';
+        cerMap.removeAttribute('target');
+        cerMap.removeAttribute('rel');
       }
+      cerMap.style.display = '';
     }
   }
 
@@ -275,15 +280,38 @@ function applyWeddingConfig() {
 
     const recMap = document.querySelector('[data-bind-href="event-reception-map"]');
     if (recMap) {
-      const mapUrl = resolveMapUrl(receptionData.mapUrl, receptionData.locationName, receptionData.address);
-      if (mapUrl) {
+      const mapUrl = (receptionData.mapUrl || '').trim();
+      recMap.setAttribute('data-map-url', mapUrl);
+      if (mapUrl && /^https?:\/\//i.test(mapUrl)) {
         recMap.href = mapUrl;
-        recMap.style.display = '';
+        recMap.target = '_blank';
+        recMap.rel = 'noopener noreferrer';
       } else {
-        recMap.style.display = 'none';
+        recMap.href = 'javascript:void(0)';
+        recMap.removeAttribute('target');
+        recMap.removeAttribute('rel');
       }
+      recMap.style.display = '';
     }
   }
+
+  // Khách bấm vào nút Bản Đồ: nếu không có link thì không phản ứng gì
+  const cerMapBtn = document.querySelector('[data-bind-href="event-ceremony-map"]');
+  const recMapBtn = document.querySelector('[data-bind-href="event-reception-map"]');
+  [cerMapBtn, recMapBtn].filter(Boolean).forEach((btn) => {
+    if (!btn.dataset.mapClickBound) {
+      btn.dataset.mapClickBound = 'true';
+      btn.addEventListener('click', (e) => {
+        if (document.body.classList.contains('admin-mode-active')) return;
+        const url = (btn.getAttribute('data-map-url') || '').trim();
+        if (!url || !/^https?:\/\//i.test(url)) {
+          e.preventDefault();
+          e.stopPropagation();
+          // Nếu không có link thì khi khách nhấn vào bản đồ sẽ không phản ứng gì
+        }
+      });
+    }
+  });
 
   // 4. Toàn bộ văn bản trên web (Texts configuration)
   const txt = cfg.texts || {};
@@ -292,6 +320,7 @@ function applyWeddingConfig() {
   if (txt.invitation?.brideFamilyTitle !== undefined) bindings['invitation-bride-family-title'] = txt.invitation.brideFamilyTitle;
   if (txt.invitation?.heading !== undefined) bindings['invitation-heading'] = txt.invitation.heading;
   if (txt.invitation?.guestLabel !== undefined) bindings['invitation-guest-label'] = txt.invitation.guestLabel;
+  if (txt.invitation?.guestSuffix !== undefined) bindings['invitation-guest-suffix'] = txt.invitation.guestSuffix;
   if (txt.invitation?.subheading !== undefined) bindings['invitation-subheading'] = txt.invitation.subheading;
   if (txt.invitation?.blessing !== undefined) bindings['invitation-blessing'] = txt.invitation.blessing;
   if (txt.invitation?.timePrefix !== undefined && cfg.weddingTime) {
@@ -506,6 +535,27 @@ function applyWeddingConfig() {
   document.querySelectorAll('[data-bind]').forEach((el) => {
     const key = el.getAttribute('data-bind');
     const val = bindings[key];
+
+    // Bảo toàn thẻ span chứa tên khách mời ở màn hình mở đầu
+    if (key === 'opening-subtitle') {
+      const slotEl = el.querySelector('#opening-guest-slot');
+      const curSlotText = slotEl ? slotEl.textContent : '';
+      const prefixText = val !== undefined && val !== null && String(val).trim() ? String(val).trim() : 'Trân trọng kính mời';
+      el.innerHTML = `<span class="admin-field-autogen-inline select-none">${prefixText}</span><span id="opening-guest-slot" class="admin-field-autogen-inline select-none font-semibold text-rose">${curSlotText}</span>`;
+      return;
+    }
+
+    // Bảo toàn thẻ span danh xưng trong lời chúc phúc chân trang
+    if (key === 'invitation-blessing') {
+      const curPronounEl = el.querySelector('[data-bind-pronoun="blessing-pronoun"]');
+      const curPronoun = curPronounEl ? curPronounEl.textContent : (window._currentGuestPronoun || 'Quý khách');
+      let blessingText = val !== undefined && val !== null ? String(val) : el.textContent;
+      if (blessingText.includes('Quý khách')) {
+        blessingText = blessingText.replace('Quý khách', `<span class="admin-field-autogen-inline select-none font-semibold text-rose" data-bind-pronoun="blessing-pronoun" title="🔒 Danh xưng sẽ tự động đổi theo khách">${curPronoun}</span>`);
+      }
+      el.innerHTML = blessingText;
+      return;
+    }
 
     if (val !== undefined && val !== null) {
       if (String(val).trim() !== '') {
@@ -1163,9 +1213,10 @@ function initRsvpForm() {
     const rsvpTexts = (typeof WEDDING_CONFIG !== 'undefined' && WEDDING_CONFIG.texts?.rsvp) || {};
     const modalCfg = rsvpTexts.thankYouModal || {};
 
+    const curPronoun = window._currentGuestPronoun || '';
     const toastMsg = isYes
-      ? (rsvpTexts.thankYouToast || modalCfg.messageYes || 'cảm ơn đã xác nhận, chúng tôi rất vui khi được đón tiếp Quý khách')
-      : (modalCfg.messageNo || 'Cảm ơn đã phản hồi, hẹn gặp lại Quý khách trong dịp sớm nhất!');
+      ? (rsvpTexts.thankYouToast || modalCfg.messageYes || (curPronoun ? `Cảm ơn ${curPronoun.toLowerCase()} đã xác nhận, gia đình rất vui khi được đón tiếp ${curPronoun}!` : 'cảm ơn đã xác nhận, chúng tôi rất vui khi được đón tiếp Quý khách'))
+      : (modalCfg.messageNo || (curPronoun ? `Cảm ơn ${curPronoun.toLowerCase()} đã phản hồi, hẹn gặp lại ${curPronoun} trong dịp sớm nhất!` : 'Cảm ơn đã phản hồi, hẹn gặp lại Quý khách trong dịp sớm nhất!'));
     
     showToast(toastMsg);
     showThankYouModal({ isYes });
@@ -1327,9 +1378,12 @@ function showThankYouModal({ isYes }) {
   const msgEl = document.getElementById('rsvp-modal-message');
   const closeBtn = document.getElementById('rsvp-modal-close');
 
+  const guestPronoun = window._currentGuestPronoun || '';
+  const politeTitle = guestPronoun ? `CẢM ƠN ${guestPronoun.toUpperCase()}!` : (isYes ? 'CẢM ƠN QUÝ KHÁCH' : 'CẢM ƠN ĐÃ PHẢN HỒI');
+
   if (iconEl) iconEl.textContent = isYes ? '💖' : '💌';
   if (titleEl) {
-    titleEl.textContent = modalCfg.title || (isYes ? 'CẢM ƠN QUÝ KHÁCH' : 'CẢM ƠN ĐÃ PHẢN HỒI');
+    titleEl.textContent = modalCfg.title || politeTitle;
   }
 
   // Ẩn dòng tên khách theo yêu cầu: không cần cảm ơn + tên khách
@@ -1339,9 +1393,15 @@ function showThankYouModal({ isYes }) {
 
   if (msgEl) {
     if (isYes) {
-      msgEl.textContent = modalCfg.messageYes || cfg.thankYouToast || 'cảm ơn đã xác nhận, chúng tôi rất vui khi được đón tiếp Quý khách';
+      const defaultYes = guestPronoun
+        ? `Cảm ơn ${guestPronoun.toLowerCase()} đã xác nhận, gia đình rất vui khi được đón tiếp ${guestPronoun}! ❤️`
+        : 'cảm ơn đã xác nhận, chúng tôi rất vui khi được đón tiếp Quý khách';
+      msgEl.textContent = modalCfg.messageYes || cfg.thankYouToast || defaultYes;
     } else {
-      msgEl.textContent = modalCfg.messageNo || 'Cảm ơn đã phản hồi, hẹn gặp lại Quý khách trong dịp sớm nhất!';
+      const defaultNo = guestPronoun
+        ? `Cảm ơn ${guestPronoun.toLowerCase()} đã phản hồi, hẹn gặp lại ${guestPronoun} trong dịp sớm nhất!`
+        : 'Cảm ơn đã phản hồi, hẹn gặp lại Quý khách trong dịp sớm nhất!';
+      msgEl.textContent = modalCfg.messageNo || defaultNo;
     }
   }
 
@@ -1560,14 +1620,99 @@ function initPersonalizedGuestLink() {
     }
   }
 
+  // Helper trích xuất danh xưng tiếng Việt từ tên hiển thị hoặc cấu hình khách
+  function extractGuestPronoun(dName, guestObj) {
+    if (guestObj && guestObj.pronoun) return guestObj.pronoun.trim();
+    if (!dName) return '';
+    const firstWord = dName.trim().split(/\s+/)[0].toLowerCase();
+    
+    // Bảng chuẩn hóa danh xưng tiếng Việt (hỗ trợ cả có dấu và không dấu từ URL slug)
+    const pronounMap = {
+      'anh': 'Anh',
+      'chi': 'Chị',
+      'chị': 'Chị',
+      'em': 'Em',
+      'bac': 'Bác',
+      'bác': 'Bác',
+      'chu': 'Chú',
+      'chú': 'Chú',
+      'co': 'Cô',
+      'cô': 'Cô',
+      'di': 'Dì',
+      'dì': 'Dì',
+      'cau': 'Cậu',
+      'cậu': 'Cậu',
+      'mo': 'Mợ',
+      'mợ': 'Mợ'
+    };
+
+    return pronounMap[firstWord] || '';
+  }
+
+  // Cập nhật giao diện RSVP và thiệp mời theo danh xưng khách mời
+  function applyPronounUI(pronounVal, dNameVal) {
+    window._currentGuestPronoun = pronounVal || '';
+
+    // 1. Màn hình mở đầu
+    const openingSlot = document.getElementById('opening-guest-slot');
+    if (openingSlot) {
+      openingSlot.textContent = dNameVal ? `: ${dNameVal}` : '';
+    } else {
+      const openingSub = document.querySelector('[data-bind="opening-subtitle"]');
+      if (openingSub && dNameVal) {
+        openingSub.textContent = `Trân trọng kính mời: ${dNameVal}`;
+      }
+    }
+
+    // 2. Thiệp mời chính: Danh xưng & Tên khách (khóa con trỏ)
+    const invitePronoun = document.querySelector('[data-bind-pronoun="invitation-guest-pronoun"]');
+    if (invitePronoun) {
+      invitePronoun.textContent = dNameVal || 'Quý khách';
+    }
+    // Fallback nếu dùng markup cũ data-bind="invitation-guest-label"
+    const inviteGuest = document.querySelector('[data-bind="invitation-guest-label"]');
+    if (inviteGuest && dNameVal) {
+      const suffixEl = document.querySelector('[data-bind="invitation-guest-suffix"]');
+      const suffixText = suffixEl ? suffixEl.textContent : 'cùng gia đình';
+      inviteGuest.textContent = `${dNameVal} ${suffixText}`.trim();
+    }
+
+    // 3. Lời chúc phúc chân trang
+    const blessingPronoun = document.querySelector('[data-bind-pronoun="blessing-pronoun"]');
+    if (blessingPronoun) {
+      blessingPronoun.textContent = pronounVal || 'Quý khách';
+    }
+
+    // 4. Form RSVP: Lựa chọn Có / Không thay thế "Tôi"
+    const rsvpYesPronoun = document.querySelector('[data-bind-pronoun="rsvp-yes-pronoun"]');
+    const rsvpNoPronoun = document.querySelector('[data-bind-pronoun="rsvp-no-pronoun"]');
+    if (pronounVal) {
+      if (rsvpYesPronoun) {
+        rsvpYesPronoun.innerHTML = `<span class="admin-field-autogen-inline select-none">${pronounVal}</span> sẽ đến chung vui 😊`;
+      }
+      if (rsvpNoPronoun) {
+        rsvpNoPronoun.innerHTML = `Rất tiếc, <span class="admin-field-autogen-inline select-none">${pronounVal.toLowerCase()}</span> không thể tham dự 😢`;
+      }
+    } else {
+      if (rsvpYesPronoun) {
+        rsvpYesPronoun.innerHTML = `<span class="admin-field-autogen-inline select-none">Tôi</span> sẽ đến chung vui 😊`;
+      }
+      if (rsvpNoPronoun) {
+        rsvpNoPronoun.innerHTML = `Rất tiếc, <span class="admin-field-autogen-inline select-none">tôi</span> không thể tham dự 😢`;
+      }
+    }
+  }
+
   // Nếu không có slug hợp lệ thì dừng lại, giữ nguyên nội dung mặc định của thiệp
   if (!slug) {
+    applyPronounUI('', '');
     applyQrGuestVisibility('');
     return;
   }
 
   // Lọc an toàn: nếu slug là tên file html hoặc đường dẫn ổ đĩa thì bỏ qua ngay
   if (/\.(html|htm|php|js|css|json)$/i.test(slug) || slug.includes(':') || slug.includes('/')) {
+    applyPronounUI('', '');
     applyQrGuestVisibility('');
     return;
   }
@@ -1599,21 +1744,13 @@ function initPersonalizedGuestLink() {
   }
 
   if (!displayName) {
+    applyPronounUI('', '');
     applyQrGuestVisibility('');
     return;
   }
 
-  // 1. Màn hình mở đầu
-  const openingSub = document.querySelector('[data-bind="opening-subtitle"]');
-  if (openingSub) {
-    openingSub.textContent = `Trân trọng kính mời: ${displayName}`;
-  }
-
-  // 2. Thiệp mời chính
-  const inviteGuest = document.querySelector('[data-bind="invitation-guest-label"]');
-  if (inviteGuest) {
-    inviteGuest.textContent = `${displayName} cùng gia đình`;
-  }
+  const guestPronoun = extractGuestPronoun(displayName, matchedGuest);
+  applyPronounUI(guestPronoun, displayName);
 
   // 3. Form RSVP họ tên
   const rsvpNameInput = document.querySelector('.vs-attendance-name');
@@ -1730,11 +1867,13 @@ function initVisualAdminModule() {
     'countdown-minutes-label',
     'countdown-seconds-label',
     'event-ceremony-date',
-    'event-reception-date'
+    'event-reception-date',
+    'opening-subtitle'
   ];
 
   // Bảng placeholder cho các trường rỗng khi bật Admin Mode
   const EMPTY_FIELD_PLACEHOLDERS = {
+    'invitation-guest-suffix': 'cùng gia đình',
     'groom-father': 'Bố Chú Rể',
     'groom-mother': 'Mẹ Chú Rể',
     'groom-address': 'Địa chỉ Nhà Trai',
@@ -1806,6 +1945,15 @@ function initVisualAdminModule() {
 
   let activeImgTarget = null;
   let countdownTimerId = null;
+
+  const mapModal = document.getElementById('admin-map-modal');
+  const mapEventNameEl = document.getElementById('admin-map-modal-event-name');
+  const mapUrlInput = document.getElementById('admin-map-url-input');
+  const mapTestBtn = document.getElementById('admin-map-test-btn');
+  const mapClearBtn = document.getElementById('admin-map-clear-btn');
+  const mapCloseBtn = document.getElementById('admin-map-close-btn');
+  const mapSaveBtn = document.getElementById('admin-map-save-btn');
+  let activeMapTargetBtn = null;
 
   // SHA-256 hash của mật khẩu mặc định 'hoanthinh2026'
   const DEFAULT_PWD_HASH = 'c1c599c19243acfbbc89730b5551795c22cbbdd8d67f7321a6e0b39bb566f28d';
@@ -2445,12 +2593,46 @@ function initVisualAdminModule() {
       img.addEventListener('click', handleImgClick);
     });
 
+    // Bắt sự kiện click vào nút bản đồ để mở modal cài đặt link Google Maps
+    document.querySelectorAll('[data-bind-href="event-ceremony-map"], [data-bind-href="event-reception-map"]').forEach(btn => {
+      btn.removeEventListener('click', handleMapBtnClickAdmin);
+      btn.addEventListener('click', handleMapBtnClickAdmin);
+    });
+
     // Bật hiển thị cả 2 thẻ mã QR mừng cưới để admin có thể sửa và thay ảnh
     applyQrGuestVisibility('');
 
     if (showWelcomeToast) {
       showAdminToast('🛠️ Đã bật Chế độ Sửa Trực Quan! Nhấp trực tiếp vào chữ hoặc ảnh để sửa.');
     }
+  }
+
+  function openAdminMapModal(targetBtn) {
+    activeMapTargetBtn = targetBtn;
+    const bindHref = targetBtn.getAttribute('data-bind-href');
+    const isCeremony = bindHref === 'event-ceremony-map';
+    const eventName = isCeremony ? 'Lễ Vu Quy (Nhà Gái)' : 'Tiệc Cưới (Nhà Trai)';
+
+    if (mapEventNameEl) {
+      mapEventNameEl.textContent = `Sự kiện: ${eventName}`;
+    }
+
+    let currentUrl = targetBtn.getAttribute('data-map-url') || '';
+    if (!currentUrl) {
+      const cfgVenues = (typeof WEDDING_CONFIG !== 'undefined' && WEDDING_CONFIG.venues) || {};
+      currentUrl = isCeremony ? (cfgVenues.ceremony?.mapUrl || '') : (cfgVenues.reception?.mapUrl || '');
+    }
+    if (mapUrlInput) {
+      mapUrlInput.value = currentUrl;
+    }
+    openModal(mapModal);
+  }
+
+  function handleMapBtnClickAdmin(e) {
+    if (!document.body.classList.contains('admin-mode-active')) return;
+    e.preventDefault();
+    e.stopPropagation();
+    openAdminMapModal(this);
   }
 
   function formatQrOffsetLabel(val) {
@@ -2758,6 +2940,69 @@ function initVisualAdminModule() {
 
   if (imgCloseBtn) {
     imgCloseBtn.addEventListener('click', () => closeModal(imgModal));
+  }
+
+  // Tương tác với Modal cài đặt link Google Maps
+  if (mapTestBtn) {
+    mapTestBtn.addEventListener('click', () => {
+      const url = (mapUrlInput?.value || '').trim();
+      if (!url) {
+        showAdminToast('⚠️ Chưa nhập link Google Maps để mở thử.');
+        return;
+      }
+      if (!/^https?:\/\//i.test(url)) {
+        showAdminToast('⚠️ Link bản đồ phải bắt đầu bằng http:// hoặc https://');
+        return;
+      }
+      window.open(url, '_blank', 'noopener,noreferrer');
+    });
+  }
+
+  if (mapClearBtn) {
+    mapClearBtn.addEventListener('click', () => {
+      if (mapUrlInput) mapUrlInput.value = '';
+      showAdminToast('🗑️ Đã xóa link. Bấm [Lưu Bản Đồ] để áp dụng.');
+    });
+  }
+
+  if (mapCloseBtn) {
+    mapCloseBtn.addEventListener('click', () => closeModal(mapModal));
+  }
+
+  if (mapSaveBtn) {
+    mapSaveBtn.addEventListener('click', () => {
+      if (!activeMapTargetBtn) {
+        closeModal(mapModal);
+        return;
+      }
+      const newUrl = (mapUrlInput?.value || '').trim();
+      const bindHref = activeMapTargetBtn.getAttribute('data-bind-href');
+      const isCeremony = bindHref === 'event-ceremony-map';
+
+      activeMapTargetBtn.setAttribute('data-map-url', newUrl);
+      if (newUrl && /^https?:\/\//i.test(newUrl)) {
+        activeMapTargetBtn.href = newUrl;
+        activeMapTargetBtn.target = '_blank';
+        activeMapTargetBtn.rel = 'noopener noreferrer';
+      } else {
+        activeMapTargetBtn.href = 'javascript:void(0)';
+        activeMapTargetBtn.removeAttribute('target');
+        activeMapTargetBtn.removeAttribute('rel');
+      }
+
+      if (typeof WEDDING_CONFIG === 'undefined') window.WEDDING_CONFIG = {};
+      if (!WEDDING_CONFIG.venues) WEDDING_CONFIG.venues = {};
+      if (isCeremony) {
+        if (!WEDDING_CONFIG.venues.ceremony) WEDDING_CONFIG.venues.ceremony = {};
+        WEDDING_CONFIG.venues.ceremony.mapUrl = newUrl;
+      } else {
+        if (!WEDDING_CONFIG.venues.reception) WEDDING_CONFIG.venues.reception = {};
+        WEDDING_CONFIG.venues.reception.mapUrl = newUrl;
+      }
+
+      closeModal(mapModal);
+      showAdminToast('✓ Đã áp dụng link bản đồ! Nhớ bấm [💾 Lưu Thay Đổi] ở góc dưới để lưu vĩnh viễn.');
+    });
   }
 
   // 7. Thoát Chế Độ Admin
@@ -3133,6 +3378,11 @@ function initVisualAdminModule() {
         baseConfig.venues.ceremony.address = cleanCer.replace(/^[,:\s]+|[,:\s]+$/g, '');
       }
     }
+    const cerMapEl = document.querySelector('[data-bind-href="event-ceremony-map"]');
+    if (cerMapEl) {
+      const mapHref = cerMapEl.getAttribute('data-map-url') || (cerMapEl.getAttribute('href') && !cerMapEl.getAttribute('href').startsWith('javascript:') ? cerMapEl.getAttribute('href') : '');
+      baseConfig.venues.ceremony.mapUrl = (mapHref || '').trim();
+    }
 
     // Sự kiện 2: Tiệc Cưới
     if (!baseConfig.venues.reception) baseConfig.venues.reception = {};
@@ -3151,6 +3401,11 @@ function initVisualAdminModule() {
         baseConfig.venues.reception.address = cleanRec.replace(/^[,:\s]+|[,:\s]+$/g, '');
       }
     }
+    const recMapEl = document.querySelector('[data-bind-href="event-reception-map"]');
+    if (recMapEl) {
+      const mapHref = recMapEl.getAttribute('data-map-url') || (recMapEl.getAttribute('href') && !recMapEl.getAttribute('href').startsWith('javascript:') ? recMapEl.getAttribute('href') : '');
+      baseConfig.venues.reception.mapUrl = (mapHref || '').trim();
+    }
 
     // Văn bản thiệp
     if (!baseConfig.texts.hero) baseConfig.texts.hero = {};
@@ -3158,6 +3413,7 @@ function initVisualAdminModule() {
 
     const invHeading = getText('invitation-heading'); if (invHeading !== null) baseConfig.texts.invitation.heading = invHeading;
     const invGuest = getText('invitation-guest-label'); if (invGuest !== null) baseConfig.texts.invitation.guestLabel = invGuest;
+    const invSuffix = getText('invitation-guest-suffix'); if (invSuffix !== null) baseConfig.texts.invitation.guestSuffix = invSuffix;
     const invSub = getText('invitation-subheading'); if (invSub !== null) baseConfig.texts.invitation.subheading = invSub;
     const invBless = getText('invitation-blessing'); if (invBless !== null) baseConfig.texts.invitation.blessing = invBless;
 

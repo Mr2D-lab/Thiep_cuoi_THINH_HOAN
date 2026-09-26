@@ -63,7 +63,7 @@
         <div class="opening-content">
           <!-- Header Subtitle & Title -->
           <div class="opening-header">
-            <p class="opening-badge" data-bind="opening-subtitle">Trân trọng kính mời</p>
+            <p class="opening-badge" data-bind="opening-subtitle"><span class="admin-field-autogen-inline select-none">Trân trọng kính mời</span><span id="opening-guest-slot" class="admin-field-autogen-inline select-none font-semibold text-rose"></span></p>
             <h1 class="opening-title" data-bind="opening-title">WEDDING INVITATION</h1>
             <div class="opening-divider">
               <span class="opening-divider-line"></span>
@@ -231,7 +231,7 @@
         <!-- Main Invitation Heading -->
         <h2 class="font-display text-2xl text-dark font-semibold tracking-wide mb-2" data-bind="invitation-heading">TRÂN
           TRỌNG KÍNH MỜI</h2>
-        <p class="font-sans text-dark text-sm font-medium mb-1" data-bind="invitation-guest-label">Bạn cùng gia đình</p>
+        <p class="font-sans text-dark text-sm font-medium mb-1"><span class="admin-field-autogen-inline select-none font-semibold text-rose" data-bind-pronoun="invitation-guest-pronoun" title="🔒 Danh xưng & tên khách mời sẽ tự động đổi khi gửi thiệp">Quý khách</span> <span data-bind="invitation-guest-suffix" title="Nhấp để sửa (ví dụ: cùng gia đình, và người thương...)">cùng gia đình</span></p>
         <p class="font-script text-muted text-base italic mb-6" data-bind="invitation-subheading">(Tới dự Lễ Thành Hôn
           của chúng tôi)</p>
 
@@ -258,7 +258,7 @@
         <!-- Closing blessing -->
         <p class="font-script text-rose text-base italic leading-relaxed max-w-sm mx-auto"
           data-bind="invitation-blessing">
-          "Sự hiện diện của Quý khách là niềm vinh hạnh lớn lao của gia đình chúng tôi!"
+          "Sự hiện diện của <span class="admin-field-autogen-inline select-none font-semibold text-rose" data-bind-pronoun="blessing-pronoun" title="🔒 Danh xưng sẽ tự động đổi theo khách">Quý khách</span> là niềm vinh hạnh lớn lao của gia đình chúng tôi!"
         </p>
       </div>
     </section>
@@ -449,9 +449,10 @@
             Tư gia Nhà Gái<br>Xóm Văn Tân, xã Thuần Trung, tỉnh Nghệ An (xóm văn Tân, Nhân Sơn, Đô Lương cũ)
           </p>
           <div class="mt-4">
-            <a href="https://maps.app.goo.gl/WVzH7wLVSeba2MYT6" target="_blank" rel="noopener noreferrer"
+            <a href="javascript:void(0)" rel="noopener noreferrer"
               data-bind-href="event-ceremony-map"
-              class="inline-flex items-center gap-1.5 px-4 py-1.5 border border-[#6C3B5E] text-[#6C3B5E] font-semibold rounded-full text-[10px] tracking-[0.1em] uppercase hover:bg-[#6C3B5E] hover:text-white transition-all shadow-sm">
+              class="inline-flex items-center gap-1.5 px-4 py-1.5 border border-[#6C3B5E] text-[#6C3B5E] font-semibold rounded-full text-[10px] tracking-[0.1em] uppercase hover:bg-[#6C3B5E] hover:text-white transition-all shadow-sm cursor-pointer"
+              title="Chạm để xem bản đồ chỉ đường">
               <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                   d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
@@ -474,9 +475,10 @@
             Tư gia Nhà Trai<br>Xóm Đại Đồng, xã Bạch Hà, tỉnh Nghệ An (xóm 2, Đại Sơn, Đô Lương cũ)
           </p>
           <div class="mt-4">
-            <a href="https://maps.google.com/?q=X%C3%B3m+%C4%90%E1%BA%A1i+%C4%90%E1%BB%93ng+x%C3%A3+B%E1%BA%A1ch+H%C3%A0+t%E1%BB%89nh+Ngh%E1%BB%87+An" target="_blank" rel="noopener noreferrer"
+            <a href="javascript:void(0)" rel="noopener noreferrer"
               data-bind-href="event-reception-map"
-              class="inline-flex items-center gap-1.5 px-4 py-1.5 border border-[#6C3B5E] text-[#6C3B5E] font-semibold rounded-full text-[10px] tracking-[0.1em] uppercase hover:bg-[#6C3B5E] hover:text-white transition-all shadow-sm">
+              class="inline-flex items-center gap-1.5 px-4 py-1.5 border border-[#6C3B5E] text-[#6C3B5E] font-semibold rounded-full text-[10px] tracking-[0.1em] uppercase hover:bg-[#6C3B5E] hover:text-white transition-all shadow-sm cursor-pointer"
+              title="Chạm để xem bản đồ chỉ đường">
               <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                   d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
@@ -516,11 +518,11 @@
           <div class="flex flex-col gap-2">
             <label class="radio-option checked">
               <input type="radio" name="decision" value="yes" checked required>
-              <span data-bind="rsvp-attendance-yes">Có, sẽ đến chung vui 😊</span>
+              <span data-bind="rsvp-attendance-yes" data-bind-pronoun="rsvp-yes-pronoun"><span class="admin-field-autogen-inline select-none font-semibold text-rose">Tôi</span> sẽ đến chung vui 😊</span>
             </label>
             <label class="radio-option">
               <input type="radio" name="decision" value="no">
-              <span data-bind="rsvp-attendance-no">Rất tiếc, không thể tham dự 😢</span>
+              <span data-bind="rsvp-attendance-no" data-bind-pronoun="rsvp-no-pronoun">Rất tiếc, <span class="admin-field-autogen-inline select-none font-semibold text-rose">tôi</span> không thể tham dự 😢</span>
             </label>
           </div>
         </div>
@@ -1087,9 +1089,43 @@
     </div>
   </div>
 
+  <!-- 6. Google Maps Link Setting Modal -->
+  <div id="admin-map-modal" class="admin-modal-overlay" style="display:none;" role="dialog" aria-modal="true">
+    <div class="admin-modal-card">
+      <div class="admin-modal-header">
+        <div class="admin-modal-icon">🗺️</div>
+        <h3 class="admin-modal-title">CÀI ĐẶT LINK BẢN ĐỒ</h3>
+        <p class="admin-modal-desc" id="admin-map-modal-event-name">Sự kiện: Lễ Vu Quy (Nhà Gái)</p>
+      </div>
+
+      <div class="admin-form-group">
+        <label for="admin-map-url-input" class="admin-label">📍 Đường dẫn Google Maps:</label>
+        <input type="url" id="admin-map-url-input" class="admin-input" placeholder="https://maps.app.goo.gl/... hoặc https://goo.gl/maps/...">
+        <p class="admin-hint-text">
+          💡 Mở ứng dụng Google Maps &gt; Tìm địa điểm &gt; Bấm <b>Chia sẻ</b> &gt; <b>Sao chép liên kết</b> rồi dán vào đây.<br>
+          ⚠️ <i>Nếu để trống ô này, khi khách bấm vào nút Bản Đồ trên thiệp sẽ không phản ứng gì.</i>
+        </p>
+      </div>
+
+      <div class="flex gap-2 mb-4">
+        <button type="button" id="admin-map-test-btn" class="admin-btn-secondary" style="font-size:12px;padding:8px 12px;">
+          🧪 Mở Thử Link
+        </button>
+        <button type="button" id="admin-map-clear-btn" class="admin-btn-secondary" style="font-size:12px;padding:8px 12px;color:#c0392b;">
+          🗑️ Xóa Link (Để trống)
+        </button>
+      </div>
+
+      <div class="admin-btn-row">
+        <button type="button" id="admin-map-close-btn" class="admin-btn-secondary">Hủy</button>
+        <button type="button" id="admin-map-save-btn" class="admin-btn-primary">💾 Lưu Bản Đồ</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Scripts (Cache buster chống lưu đệm) -->
-  <script src="config.js?v=20260926_qr_zoom_250"></script>
-  <script src="script.js?v=20260926_qr_zoom_250"></script>
+  <script src="config.js?v=20260926_custom_details"></script>
+  <script src="script.js?v=20260926_custom_details"></script>
 </body>
 
 </html>

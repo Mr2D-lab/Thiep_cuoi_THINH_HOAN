@@ -59,14 +59,16 @@ const WEDDING_CONFIG = {
       "address": "Xóm Văn Tân, xã Thuần Trung, tỉnh Nghệ An (xóm văn Tân, Nhân Sơn, Đô Lương cũ)",
       "title": "LỄ VU QUY",
       "time": "08:00",
-      "dateText": "Thứ Bảy, 10/10/2026"
+      "dateText": "Thứ Bảy, 10/10/2026",
+      "mapUrl": ""
     },
     "reception": {
       "locationName": "Tư gia Nhà Trai",
       "address": "Xóm Đại Đồng, xã Bạch Hà, tỉnh Nghệ An (xóm 2, Đại Sơn, Đô Lương cũ)",
       "title": "TIỆC CƯỚI",
       "time": "17:30",
-      "dateText": "Thứ Bảy, 10/10/2026"
+      "dateText": "Thứ Bảy, 10/10/2026",
+      "mapUrl": ""
     }
   },
   "texts": {
@@ -78,6 +80,7 @@ const WEDDING_CONFIG = {
       "brideFamilyTitle": "NHÀ GÁI",
       "heading": "TRÂN TRỌNG KÍNH MỜI",
       "guestLabel": "Quý khách cùng gia đình",
+      "guestSuffix": "cùng gia đình",
       "subheading": "(Tới dự Lễ Thành Hôn của chúng tôi)",
       "timePrefix": "Tổ chức",
       "blessing": "\"Sự hiện diện của Quý khách là niềm vinh hạnh lớn lao của gia đình chúng tôi!\""
