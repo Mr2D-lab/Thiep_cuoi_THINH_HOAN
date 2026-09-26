@@ -551,7 +551,7 @@ function applyWeddingConfig() {
       const curPronoun = curPronounEl ? curPronounEl.textContent : (window._currentGuestPronoun || 'Quý khách');
       let blessingText = val !== undefined && val !== null ? String(val) : el.textContent;
       if (blessingText.includes('Quý khách')) {
-        blessingText = blessingText.replace('Quý khách', `<span class="admin-field-autogen-inline select-none font-semibold text-rose" data-bind-pronoun="blessing-pronoun" title="🔒 Danh xưng sẽ tự động đổi theo khách">${curPronoun}</span>`);
+        blessingText = blessingText.replace('Quý khách', `<span class="admin-field-autogen-inline select-none font-normal" data-bind-pronoun="blessing-pronoun" title="🔒 Danh xưng sẽ tự động đổi theo khách">${curPronoun}</span>`);
       }
       el.innerHTML = blessingText;
       return;
