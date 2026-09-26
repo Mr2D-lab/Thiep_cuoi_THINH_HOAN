@@ -23,3 +23,9 @@ tool_chinh_thiep.py
 *.private
 huong_dan*
 notes*
+
+# Cấu hình trợ lý AI & quyền hạn (Agent configuration & permissions)
+.agents/
+.agent/
+AGENTS.md
+GEMINI.md
