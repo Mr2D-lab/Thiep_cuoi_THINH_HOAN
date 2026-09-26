@@ -402,6 +402,8 @@ function applyWeddingConfig() {
 
   const groomScale = bankGroom.qrScale !== undefined ? bankGroom.qrScale : (cfg.bankAccount?.qrScale !== undefined ? cfg.bankAccount.qrScale : 1.35);
   const brideScale = bankBride.qrScale !== undefined ? bankBride.qrScale : 1.35;
+  const groomOffsetY = bankGroom.qrOffsetY !== undefined ? bankGroom.qrOffsetY : (cfg.bankAccount?.qrOffsetY !== undefined ? cfg.bankAccount.qrOffsetY : 0);
+  const brideOffsetY = bankBride.qrOffsetY !== undefined ? bankBride.qrOffsetY : 0;
 
   const qrGroomImg = document.querySelector('[data-img-bind="bank-qr-groom"]') || document.querySelector('[data-img-bind="bank-qr"]');
   if (qrGroomImg) {
@@ -409,7 +411,8 @@ function applyWeddingConfig() {
     qrGroomImg.src = groomQrSrc;
     qrGroomImg.setAttribute('src', groomQrSrc);
     qrGroomImg.dataset.qrScale = groomScale;
-    qrGroomImg.style.transform = `scale(${groomScale})`;
+    qrGroomImg.dataset.qrOffsetY = groomOffsetY;
+    qrGroomImg.style.transform = `translateY(${groomOffsetY}px) scale(${groomScale})`;
     qrGroomImg.style.transformOrigin = 'center center';
   }
 
@@ -419,7 +422,8 @@ function applyWeddingConfig() {
     qrBrideImg.src = brideQrSrc;
     qrBrideImg.setAttribute('src', brideQrSrc);
     qrBrideImg.dataset.qrScale = brideScale;
-    qrBrideImg.style.transform = `scale(${brideScale})`;
+    qrBrideImg.dataset.qrOffsetY = brideOffsetY;
+    qrBrideImg.style.transform = `translateY(${brideOffsetY}px) scale(${brideScale})`;
     qrBrideImg.style.transformOrigin = 'center center';
   }
 
@@ -1792,6 +1796,9 @@ function initVisualAdminModule() {
   const qrZoomRange = document.getElementById('admin-qr-zoom-range');
   const qrZoomVal = document.getElementById('admin-qr-zoom-val');
   const qrPresetBtns = document.querySelectorAll('.qr-zoom-preset-btn');
+  const qrOffsetRange = document.getElementById('admin-qr-offset-range');
+  const qrOffsetVal = document.getElementById('admin-qr-offset-val');
+  const qrOffsetPresetBtns = document.querySelectorAll('.qr-offset-preset-btn');
 
   let activeImgTarget = null;
   let countdownTimerId = null;
@@ -2455,10 +2462,41 @@ function initVisualAdminModule() {
     const isQr = imgBindKey === 'bank-qr' || imgBindKey === 'bank-qr-groom' || imgBindKey === 'bank-qr-bride' ||
       activeImgTarget.getAttribute('data-bind-src') === 'bank-qr-groom-img' || activeImgTarget.getAttribute('data-bind-src') === 'bank-qr-bride-img';
 
+  function formatQrOffsetLabel(val) {
+    const num = parseInt(val, 10) || 0;
+    if (num > 0) return `+${num}px (Xuống)`;
+    if (num < 0) return `${num}px (Lên)`;
+    return '0px (Giữa)';
+  }
+
+  function updateQrPreviewTransform() {
+    const scale = qrZoomRange ? (parseInt(qrZoomRange.value, 10) / 100) : 1.35;
+    const offsetY = qrOffsetRange ? (parseInt(qrOffsetRange.value, 10) || 0) : 0;
+    if (imgPreview) {
+      imgPreview.style.transform = `translateY(${offsetY}px) scale(${scale})`;
+      imgPreview.style.transformOrigin = 'center center';
+    }
+  }
+
+  function handleImgClick(e) {
+    if (!document.body.classList.contains('admin-mode-active')) return;
+    e.stopPropagation();
+    activeImgTarget = this;
+    const currentSrc = activeImgTarget.getAttribute('src') || activeImgTarget.src || '';
+    if (imgPreview) imgPreview.src = currentSrc;
+    if (imgUrlInput) imgUrlInput.value = currentSrc.startsWith('data:') ? '' : currentSrc;
+    if (imgFileInput) imgFileInput.value = '';
+
+    const imgBindKey = activeImgTarget.getAttribute('data-img-bind') || activeImgTarget.id || '';
+    const isQr = imgBindKey === 'bank-qr' || imgBindKey === 'bank-qr-groom' || imgBindKey === 'bank-qr-bride' ||
+      activeImgTarget.getAttribute('data-bind-src') === 'bank-qr-groom-img' || activeImgTarget.getAttribute('data-bind-src') === 'bank-qr-bride-img';
+
     if (qrZoomGroup) {
       if (isQr) {
         qrZoomGroup.style.display = 'block';
         let currentScale = 1.35;
+        let currentOffsetY = 0;
+
         if (activeImgTarget.dataset.qrScale) {
           currentScale = parseFloat(activeImgTarget.dataset.qrScale) || 1.35;
         } else if (imgBindKey === 'bank-qr-bride' || activeImgTarget.getAttribute('data-bind-src') === 'bank-qr-bride-img') {
@@ -2472,15 +2510,43 @@ function initVisualAdminModule() {
             currentScale = WEDDING_CONFIG.bankAccount.qrScale;
           }
         }
+
+        if (activeImgTarget.dataset.qrOffsetY !== undefined) {
+          currentOffsetY = parseInt(activeImgTarget.dataset.qrOffsetY, 10) || 0;
+        } else if (imgBindKey === 'bank-qr-bride' || activeImgTarget.getAttribute('data-bind-src') === 'bank-qr-bride-img') {
+          if (WEDDING_CONFIG?.bankAccount?.bride?.qrOffsetY !== undefined) {
+            currentOffsetY = WEDDING_CONFIG.bankAccount.bride.qrOffsetY;
+          }
+        } else {
+          if (WEDDING_CONFIG?.bankAccount?.groom?.qrOffsetY !== undefined) {
+            currentOffsetY = WEDDING_CONFIG.bankAccount.groom.qrOffsetY;
+          } else if (WEDDING_CONFIG?.bankAccount?.qrOffsetY !== undefined) {
+            currentOffsetY = WEDDING_CONFIG.bankAccount.qrOffsetY;
+          }
+        }
+
         const pct = Math.round(currentScale * 100);
         if (qrZoomRange) qrZoomRange.value = pct;
         if (qrZoomVal) qrZoomVal.innerText = pct + '%';
+
+        if (qrOffsetRange) qrOffsetRange.value = currentOffsetY;
+        if (qrOffsetVal) qrOffsetVal.innerText = formatQrOffsetLabel(currentOffsetY);
+
         if (imgPreview) {
-          imgPreview.style.transform = `scale(${currentScale})`;
+          imgPreview.style.transform = `translateY(${currentOffsetY}px) scale(${currentScale})`;
           imgPreview.style.transformOrigin = 'center center';
         }
+
         qrPresetBtns.forEach((btn) => {
           if (parseInt(btn.getAttribute('data-scale'), 10) === pct) {
+            btn.classList.add('active');
+          } else {
+            btn.classList.remove('active');
+          }
+        });
+
+        qrOffsetPresetBtns.forEach((btn) => {
+          if (parseInt(btn.getAttribute('data-offset'), 10) === currentOffsetY) {
             btn.classList.add('active');
           } else {
             btn.classList.remove('active');
@@ -2502,10 +2568,7 @@ function initVisualAdminModule() {
     qrZoomRange.addEventListener('input', () => {
       const val = parseInt(qrZoomRange.value, 10);
       if (qrZoomVal) qrZoomVal.innerText = val + '%';
-      if (imgPreview) {
-        imgPreview.style.transform = `scale(${val / 100})`;
-        imgPreview.style.transformOrigin = 'center center';
-      }
+      updateQrPreviewTransform();
       qrPresetBtns.forEach((btn) => {
         if (parseInt(btn.getAttribute('data-scale'), 10) === val) {
           btn.classList.add('active');
@@ -2521,11 +2584,35 @@ function initVisualAdminModule() {
       const val = parseInt(btn.getAttribute('data-scale'), 10);
       if (qrZoomRange) qrZoomRange.value = val;
       if (qrZoomVal) qrZoomVal.innerText = val + '%';
-      if (imgPreview) {
-        imgPreview.style.transform = `scale(${val / 100})`;
-        imgPreview.style.transformOrigin = 'center center';
-      }
+      updateQrPreviewTransform();
       qrPresetBtns.forEach((b) => b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+  });
+
+  // Tương tác điều chỉnh vị trí lên/xuống QR trong Modal
+  if (qrOffsetRange) {
+    qrOffsetRange.addEventListener('input', () => {
+      const val = parseInt(qrOffsetRange.value, 10) || 0;
+      if (qrOffsetVal) qrOffsetVal.innerText = formatQrOffsetLabel(val);
+      updateQrPreviewTransform();
+      qrOffsetPresetBtns.forEach((btn) => {
+        if (parseInt(btn.getAttribute('data-offset'), 10) === val) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+    });
+  }
+
+  qrOffsetPresetBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const val = parseInt(btn.getAttribute('data-offset'), 10);
+      if (qrOffsetRange) qrOffsetRange.value = val;
+      if (qrOffsetVal) qrOffsetVal.innerText = formatQrOffsetLabel(val);
+      updateQrPreviewTransform();
+      qrOffsetPresetBtns.forEach((b) => b.classList.remove('active'));
       btn.classList.add('active');
     });
   });
@@ -2586,20 +2673,25 @@ function initVisualAdminModule() {
 
       let hasChanged = false;
 
-      // Xử lý zoom QR
-      if (isQr && qrZoomRange) {
-        const newScale = parseFloat(qrZoomRange.value) / 100;
+      // Xử lý zoom và căn chỉnh vị trí lên/xuống QR
+      if (isQr) {
+        const newScale = qrZoomRange ? (parseFloat(qrZoomRange.value) / 100) : 1.35;
+        const newOffsetY = qrOffsetRange ? (parseInt(qrOffsetRange.value, 10) || 0) : 0;
         activeImgTarget.dataset.qrScale = newScale;
-        activeImgTarget.style.transform = `scale(${newScale})`;
+        activeImgTarget.dataset.qrOffsetY = newOffsetY;
+        activeImgTarget.style.transform = `translateY(${newOffsetY}px) scale(${newScale})`;
         activeImgTarget.style.transformOrigin = 'center center';
 
         if (imgBindKey === 'bank-qr-bride' || activeImgTarget.getAttribute('data-bind-src') === 'bank-qr-bride-img') {
           if (!WEDDING_CONFIG.bankAccount.bride) WEDDING_CONFIG.bankAccount.bride = {};
           WEDDING_CONFIG.bankAccount.bride.qrScale = newScale;
+          WEDDING_CONFIG.bankAccount.bride.qrOffsetY = newOffsetY;
         } else {
           if (!WEDDING_CONFIG.bankAccount.groom) WEDDING_CONFIG.bankAccount.groom = {};
           WEDDING_CONFIG.bankAccount.groom.qrScale = newScale;
+          WEDDING_CONFIG.bankAccount.groom.qrOffsetY = newOffsetY;
           WEDDING_CONFIG.bankAccount.qrScale = newScale;
+          WEDDING_CONFIG.bankAccount.qrOffsetY = newOffsetY;
         }
         hasChanged = true;
       }
@@ -3201,7 +3293,7 @@ function initVisualAdminModule() {
     baseConfig.images.bankQrBride = qrBrideSrc;
     baseConfig.bankAccount.bride.qrCodeUrl = qrBrideSrc;
 
-    // Thu thập tỉ lệ zoom QR
+    // Thu thập tỉ lệ zoom và vị trí offset QR
     const qrGroomEl = document.querySelector('[data-img-bind="bank-qr-groom"], [data-img-bind="bank-qr"]');
     if (qrGroomEl && qrGroomEl.dataset.qrScale) {
       baseConfig.bankAccount.groom.qrScale = parseFloat(qrGroomEl.dataset.qrScale) || 1.35;
@@ -3213,6 +3305,16 @@ function initVisualAdminModule() {
       baseConfig.bankAccount.qrScale = 1.35;
     }
 
+    if (qrGroomEl && qrGroomEl.dataset.qrOffsetY !== undefined) {
+      baseConfig.bankAccount.groom.qrOffsetY = parseInt(qrGroomEl.dataset.qrOffsetY, 10) || 0;
+      baseConfig.bankAccount.qrOffsetY = baseConfig.bankAccount.groom.qrOffsetY;
+    } else if (baseConfig.bankAccount?.groom?.qrOffsetY !== undefined) {
+      // Giữ nguyên giá trị
+    } else {
+      baseConfig.bankAccount.groom.qrOffsetY = 0;
+      baseConfig.bankAccount.qrOffsetY = 0;
+    }
+
     const qrBrideEl = document.querySelector('[data-img-bind="bank-qr-bride"]');
     if (qrBrideEl && qrBrideEl.dataset.qrScale) {
       baseConfig.bankAccount.bride.qrScale = parseFloat(qrBrideEl.dataset.qrScale) || 1.35;
@@ -3220,6 +3322,14 @@ function initVisualAdminModule() {
       // Giữ nguyên giá trị
     } else {
       baseConfig.bankAccount.bride.qrScale = 1.35;
+    }
+
+    if (qrBrideEl && qrBrideEl.dataset.qrOffsetY !== undefined) {
+      baseConfig.bankAccount.bride.qrOffsetY = parseInt(qrBrideEl.dataset.qrOffsetY, 10) || 0;
+    } else if (baseConfig.bankAccount?.bride?.qrOffsetY !== undefined) {
+      // Giữ nguyên giá trị
+    } else {
+      baseConfig.bankAccount.bride.qrOffsetY = 0;
     }
 
     const galleryImgs = [];

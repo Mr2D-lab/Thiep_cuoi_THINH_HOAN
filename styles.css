@@ -751,8 +751,9 @@ body {
   transform-origin: center center;
 }
 
-/* Preset buttons in Admin QR Zoom */
-.qr-zoom-preset-btn {
+/* Preset buttons in Admin QR Zoom & Offset */
+.qr-zoom-preset-btn,
+.qr-offset-preset-btn {
   padding: 4px 10px;
   font-size: 11px;
   font-weight: 600;
@@ -765,7 +766,9 @@ body {
 }
 
 .qr-zoom-preset-btn:hover,
-.qr-zoom-preset-btn.active {
+.qr-zoom-preset-btn.active,
+.qr-offset-preset-btn:hover,
+.qr-offset-preset-btn.active {
   background: #8B263E;
   color: #FFFFFF;
   border-color: #8B263E;
