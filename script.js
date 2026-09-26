@@ -2,6 +2,8 @@
    Thiệp Cưới 2026 - Interactive Scripts
    =================================================== */
 
+const dayNames = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
+
 function _initWeddingApp() {
   if (window._appInitialized) return;
   window._appInitialized = true;
@@ -9,27 +11,27 @@ function _initWeddingApp() {
     try { history.scrollRestoration = 'manual'; } catch (e) {}
   }
   window.scrollTo(0, 0);
-  applyWeddingConfig();
-  initPersonalizedGuestLink();
-  initOpeningScreen();
-  initBlossomCanvas();
-  initCountdown();
-  initMusicPlayer();
-  initEnvelopeGift();
-  initRsvpForm();
-  initLightbox();
-  initAnimations();
-  initVisualAdminModule();
 
-  // TỐI ƯU 4: Nạp ngầm cấu hình mới nhất từ đám mây (Live Cloud Data Fetch)
-  // Khách mời hoặc thiết bị khác sẽ thấy thay đổi sau 1-2s mà không phải đợi Vercel build 1 phút
-  fetchLatestCloudConfig();
-}
+  const safeRun = (name, fn) => {
+    try {
+      fn();
+    } catch (err) {
+      console.error(`[AppInit] Lỗi khi chạy ${name}:`, err);
+    }
+  };
 
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', _initWeddingApp);
-} else {
-  _initWeddingApp();
+  safeRun('applyWeddingConfig', applyWeddingConfig);
+  safeRun('initPersonalizedGuestLink', initPersonalizedGuestLink);
+  safeRun('initOpeningScreen', initOpeningScreen);
+  safeRun('initBlossomCanvas', initBlossomCanvas);
+  safeRun('initCountdown', initCountdown);
+  safeRun('initMusicPlayer', initMusicPlayer);
+  safeRun('initEnvelopeGift', initEnvelopeGift);
+  safeRun('initRsvpForm', initRsvpForm);
+  safeRun('initLightbox', initLightbox);
+  safeRun('initAnimations', initAnimations);
+  safeRun('initVisualAdminModule', initVisualAdminModule);
+  safeRun('fetchLatestCloudConfig', fetchLatestCloudConfig);
 }
 
 /* =====================================================
@@ -43,8 +45,6 @@ function parseLocalDate(dateStr) {
   }
   return new Date(dateStr);
 }
-
-const dayNames = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
 
 function pad(num) {
   return String(num).padStart(2, '0');
@@ -2449,19 +2449,6 @@ function initVisualAdminModule() {
     }
   }
 
-  function handleImgClick(e) {
-    if (!document.body.classList.contains('admin-mode-active')) return;
-    e.stopPropagation();
-    activeImgTarget = this;
-    const currentSrc = activeImgTarget.getAttribute('src') || activeImgTarget.src || '';
-    if (imgPreview) imgPreview.src = currentSrc;
-    if (imgUrlInput) imgUrlInput.value = currentSrc.startsWith('data:') ? '' : currentSrc;
-    if (imgFileInput) imgFileInput.value = '';
-
-    const imgBindKey = activeImgTarget.getAttribute('data-img-bind') || activeImgTarget.id || '';
-    const isQr = imgBindKey === 'bank-qr' || imgBindKey === 'bank-qr-groom' || imgBindKey === 'bank-qr-bride' ||
-      activeImgTarget.getAttribute('data-bind-src') === 'bank-qr-groom-img' || activeImgTarget.getAttribute('data-bind-src') === 'bank-qr-bride-img';
-
   function formatQrOffsetLabel(val) {
     const num = parseInt(val, 10) || 0;
     if (num > 0) return `+${num}px (Xuống)`;
@@ -4153,6 +4140,15 @@ function initVisualAdminModule() {
   // 12. Kích hoạt định tuyến & kiểm tra hash sau khi toàn bộ module đã sẵn sàng
   window.addEventListener('hashchange', handleRoute);
   handleRoute();
+}
+
+/* =====================================================
+   Bootstrapper - Đảm bảo toàn bộ tài nguyên và script đã định nghĩa xong
+   ===================================================== */
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', _initWeddingApp);
+} else {
+  _initWeddingApp();
 }
 
 
