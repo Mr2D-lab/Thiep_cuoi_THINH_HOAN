@@ -170,7 +170,7 @@ const WEDDING_CONFIG = {
       },
       "buttonText": "GỬI XÁC NHẬN",
       "googleSheetUrl": "https://script.google.com/macros/s/AKfycbz9G_rcNxmxzrM2jIhAkvNmp2EwSpYyPXlj7uH43YqAIiKezv359aUxjbiTEakj6eY_BA/exec",
-      "backupGoogleSheetUrl": "https://script.google.com/macros/s/AKfycb_313a6a0258a755c733387a71146e628511a6e011ff853bec618955e38a76324e_BA/exec",
+      "backupGoogleSheetUrl": "https://script.google.com/macros/s/AKfycb_7cbc7df10dc2f3c7b5f911e18d5d8881bbd8d43b9de148a89a91bb01bd100bd5_BA/exec",
       "thankYouToast": "cảm ơn đã xác nhận, chúng tôi rất vui khi được đón tiếp Quý khách! ❤️",
       "thankYouModal": {
         "enabled": true,
