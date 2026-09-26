@@ -1054,11 +1054,16 @@
 
       <!-- TAB 2: DANH SÁCH THIỆP ĐÃ TẠO -->
       <div id="tab-pane-guest-list" class="admin-tab-pane" style="display:none;">
-        <div class="admin-list-top-bar">
+        <div class="admin-list-top-bar" style="display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap;">
           <span class="admin-list-summary">Tổng cộng: <b id="admin-total-guests-count">0</b> khách mời</span>
-          <button type="button" id="admin-btn-copy-all-links" class="admin-toolbar-btn admin-btn-settings" style="font-size:11.5px;">
-            📋 Sao Chép Tất Cả
-          </button>
+          <div style="display:flex; gap:8px;">
+            <button type="button" id="admin-btn-copy-all-links" class="admin-toolbar-btn admin-btn-settings" style="font-size:11.5px;">
+              📋 Sao Chép Tất Cả
+            </button>
+            <button type="button" id="admin-btn-clear-all-guests" class="admin-toolbar-btn" style="font-size:11.5px; background:#be123c; color:white; border-color:#be123c;" title="Xóa toàn bộ danh sách khách mời">
+              🗑️ Xóa Tất Cả
+            </button>
+          </div>
         </div>
 
         <div class="admin-table-container">

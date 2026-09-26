@@ -1736,72 +1736,73 @@ function initPersonalizedGuestLink() {
     return;
   }
 
+  // 1. Tìm trong localStorage hiện tại
   let matchedGuest = null;
+  let guestList = [];
   try {
-    const guestList = JSON.parse(localStorage.getItem('wedding_guest_list') || '[]');
-    matchedGuest = guestList.find(g => {
-      const gSlug = (g.slug || '').replace(/^\/+|\/+$/g, '').toLowerCase();
-      const currentSlug = slug.toLowerCase();
-      return gSlug === currentSlug || gSlug === currentSlug.replace(/^thiep_cuoi_gui_/, '');
-    });
-  } catch (e) {}
-
-  let displayName = '';
-  let fullName = '';
-  let guestOf = '';
-
-  if (matchedGuest) {
-    displayName = matchedGuest.displayName || '';
-    fullName = matchedGuest.fullName || displayName;
-    guestOf = matchedGuest.guestOf || '';
-  } else {
-    let raw = decodeURIComponent(slug);
-    raw = raw.replace(/^thiep_cuoi_gui_/i, '').replace(/^thiep_cuoi_/i, '').replace(/^thiep_/i, '');
-    raw = raw.replace(/[_-]+/g, ' ').trim();
-    displayName = raw.replace(/\b\w/g, l => l.toUpperCase());
-    fullName = displayName;
-  }
-
-  if (!displayName) {
-    applyPronounUI('', '');
-    applyQrGuestVisibility('');
-    return;
-  }
-
-  const guestPronoun = extractGuestPronoun(displayName, matchedGuest);
-  applyPronounUI(guestPronoun, displayName);
-
-  // 3. Form RSVP họ tên
-  const rsvpNameInput = document.querySelector('.vs-attendance-name');
-  if (rsvpNameInput) {
-    rsvpNameInput.value = fullName || displayName;
-  }
-
-  // 4. Form RSVP: Tự động tick chọn Cô dâu / Chú rể
-  if (guestOf) {
-    const radio = document.querySelector(`input[name="guest_of"][value="${guestOf}"]`);
-    if (radio) {
-      radio.checked = true;
-      document.querySelectorAll('input[name="guest_of"]').forEach(r => {
-        const opt = r.closest('.radio-option');
-        if (opt) {
-          if (r.checked) opt.classList.add('checked');
-          else opt.classList.remove('checked');
-        }
+    guestList = JSON.parse(localStorage.getItem('wedding_guest_list') || '[]');
+    if (Array.isArray(guestList)) {
+      matchedGuest = guestList.find(g => {
+        const gSlug = (g.slug || '').replace(/^\/+|\/+$/g, '').toLowerCase();
+        const currentSlug = slug.toLowerCase();
+        return gSlug === currentSlug || gSlug === currentSlug.replace(/^thiep_cuoi_gui_/, '');
       });
     }
+  } catch (e) {}
+
+  // Hàm áp dụng dữ liệu một khách mời cụ thể lên giao diện
+  function renderGuestData(guest) {
+    if (!guest) {
+      applyPronounUI('', '');
+      applyQrGuestVisibility('');
+      const rsvpInput = document.querySelector('.vs-attendance-name');
+      if (rsvpInput) rsvpInput.value = '';
+      return;
+    }
+    const dName = guest.displayName || '';
+    const p = guest.pronoun || extractGuestPronoun(dName, guest);
+    const f = guest.fullName || dName;
+    const gOf = guest.guestOf || '';
+
+    applyPronounUI(p, dName);
+    applyQrGuestVisibility(gOf);
+
+    const rsvpNameInput = document.querySelector('.vs-attendance-name');
+    if (rsvpNameInput) {
+      rsvpNameInput.value = f;
+    }
+
+    if (gOf) {
+      const radio = document.querySelector(`input[name="guest_of"][value="${gOf}"]`);
+      if (radio) {
+        radio.checked = true;
+        document.querySelectorAll('input[name="guest_of"]').forEach(r => {
+          const opt = r.closest('.radio-option');
+          if (opt) {
+            if (r.checked) opt.classList.add('checked');
+            else opt.classList.remove('checked');
+          }
+        });
+      }
+    }
+    window._currentGuestOf = gOf;
   }
 
-  // 5. Điều hướng hiển thị thông tin QR Mừng Cưới theo đối tượng khách
-  window._currentGuestOf = guestOf || '';
-  applyQrGuestVisibility(guestOf);
+  // 2. Nếu tìm thấy khách hợp lệ trong danh sách local -> Áp dụng ngay
+  if (matchedGuest) {
+    renderGuestData(matchedGuest);
+  } else {
+    // KHÔNG tìm thấy khách trong danh sách (đã bị xóa hoặc không tồn tại)
+    // Tuyệt đối KHÔNG tự động suy đoán/tạo tên khách từ slug URL
+    renderGuestData(null);
+  }
 
-  // 6. Tải ngầm danh sách khách mời từ guests.json nếu máy khách mở link từ xa (chưa có trong localStorage)
-  if (slug && !matchedGuest && typeof fetch === 'function') {
-    fetch('guests.json')
+  // 3. Luôn fetch('guests.json?t=...') để đồng bộ phiên bản mới nhất từ máy chủ
+  if (slug && typeof fetch === 'function' && (window.location.protocol === 'http:' || window.location.protocol === 'https:')) {
+    fetch('guests.json?t=' + Date.now())
       .then(res => res.ok ? res.json() : [])
       .then(list => {
-        if (Array.isArray(list) && list.length > 0) {
+        if (Array.isArray(list)) {
           try {
             localStorage.setItem('wedding_guest_list', JSON.stringify(list));
           } catch (e) {}
@@ -1811,31 +1812,16 @@ function initPersonalizedGuestLink() {
             return gSlug === currentSlug || gSlug === currentSlug.replace(/^thiep_cuoi_gui_/, '');
           });
           if (found) {
-            const p = found.pronoun || extractGuestPronoun(found.displayName, found);
-            const d = found.displayName || '';
-            const f = found.fullName || d;
-            applyPronounUI(p, d);
-            applyQrGuestVisibility(found.guestOf || '');
-            const rsvpInput = document.querySelector('.vs-attendance-name');
-            if (rsvpInput) rsvpInput.value = f;
-            if (found.guestOf) {
-              const radio = document.querySelector(`input[name="guest_of"][value="${found.guestOf}"]`);
-              if (radio) {
-                radio.checked = true;
-                document.querySelectorAll('input[name="guest_of"]').forEach(r => {
-                  const opt = r.closest('.radio-option');
-                  if (opt) {
-                    if (r.checked) opt.classList.add('checked');
-                    else opt.classList.remove('checked');
-                  }
-                });
-              }
-            }
+            renderGuestData(found);
+          } else {
+            // Khách này KHÔNG tồn tại hoặc ĐÃ BỊ XÓA khỏi guests.json
+            // Lập tức đưa về thiệp mặc định, loại bỏ hoàn toàn thông tin cá nhân hóa
+            renderGuestData(null);
           }
         }
       })
       .catch(err => {
-        console.warn('Không thể tải ngầm guests.json:', err);
+        console.warn('Không thể kiểm tra guests.json:', err);
       });
   }
 }
@@ -4077,6 +4063,7 @@ function initVisualAdminModule() {
   const guestTbody = document.getElementById('admin-guest-tbody');
   const guestEmptyMsg = document.getElementById('admin-guest-empty-msg');
   const btnCopyAllLinks = document.getElementById('admin-btn-copy-all-links');
+  const btnClearAllGuests = document.getElementById('admin-btn-clear-all-guests');
 
   const labelBride = document.getElementById('label-guest-bride');
   const labelGroom = document.getElementById('label-guest-groom');
@@ -4403,6 +4390,24 @@ function initVisualAdminModule() {
       navigator.clipboard.writeText(text).then(() => {
         showAdminToast('✓ Đã sao chép toàn bộ danh sách link khách mời!');
       });
+    });
+  }
+
+  // Nút [🗑️ Xóa Tất Cả] khách mời
+  if (btnClearAllGuests) {
+    btnClearAllGuests.addEventListener('click', () => {
+      const list = getLocalGuests();
+      if (list.length === 0) {
+        alert('Danh sách khách mời hiện đang trống!');
+        return;
+      }
+      if (!confirm(`Bạn có chắc chắn muốn xóa TOÀN BỘ ${list.length} khách mời không?\nThao tác này sẽ xóa tất cả đường link thiệp riêng và không thể hoàn tác!`)) {
+        return;
+      }
+      saveLocalGuests([]);
+      syncGuestsToGitHub([]);
+      renderGuestTable();
+      showAdminToast('🗑️ Đã xóa toàn bộ danh sách khách mời thành công!');
     });
   }
 
