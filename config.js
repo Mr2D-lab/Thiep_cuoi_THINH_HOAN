@@ -1,5 +1,5 @@
 /* ==========================================================================
-   BẢNG CẤU HÌNH THIỆP CƯỚI 2026 (Cập nhật: 1790388735370)
+   BẢNG CẤU HÌNH THIỆP CƯỚI 2026 (Cập nhật: 1790388816126)
    ========================================================================== */
 
 const WEDDING_CONFIG = {
@@ -53,14 +53,14 @@ const WEDDING_CONFIG = {
       "address": "Nhà bà Đặng Thị Tuyết, xóm Đại Đồng, xã Bạch Hà, tỉnh Nghệ An (xóm 2, Đại Sơn, Đô Lương cũ)"
     },
     "ceremony": {
-      "locationName": "Tư gia Nhà Gái,,,,,,,,",
+      "locationName": "Tư gia Nhà Gái",
       "address": "Tư gia Nhà Gái, Xóm Văn Tân, xã Thuần Trung, tỉnh Nghệ An (xóm văn Tân, Nhân Sơn, Đô Lương cũ",
       "title": "LỄ VU QUY",
       "time": "08:00",
       "dateText": "Chủ Nhật, 22/11/2026"
     },
     "reception": {
-      "locationName": "Tư gia Nhà Trai,,,,,,,,",
+      "locationName": "Tư gia Nhà Trai",
       "address": "Tư gia Nhà Trai, Xóm Đại Đồng, xã Bạch Hà, tỉnh Nghệ An (xóm 2, Đại Sơn, Đô Lương cũ)",
       "title": "TIỆC CƯỚI",
       "time": "17:30",
@@ -139,9 +139,9 @@ const WEDDING_CONFIG = {
       "note": ""
     },
     "rsvp": {
-      "subtitle": "",
+      "subtitle": "PHẢN HỒI THAM DỰ",
       "heading": "Xác Nhận Tham Dự",
-      "prompt": "",
+      "prompt": "Xin vui lòng xác nhận trước ngày 15/08/2026 để chúng tôi chu toàn đón tiếp",
       "nameField": {
         "label": "Họ và tên *",
         "placeholder": "Nhập họ và tên của bạn"
@@ -209,5 +209,5 @@ const WEDDING_CONFIG = {
 
 if (typeof window !== 'undefined') {
   window.WEDDING_CONFIG = WEDDING_CONFIG;
-  window._weddingConfigBuildTime = "1790388735370";
+  window._weddingConfigBuildTime = "1790388816126";
 }
