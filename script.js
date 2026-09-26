@@ -4484,79 +4484,16 @@ function initVisualAdminModule() {
     });
   }
 
-  // Nút [🔄 Khôi Phục] (Reset / Revert từ Git)
+  // Nút [🔄 Khôi Phục] (Tải lại trang, huỷ các chỉnh sửa chưa lưu)
   if (btnRevert) {
-    btnRevert.addEventListener('click', async () => {
-      if (!confirm('Bạn có chắc chắn muốn hủy các chỉnh sửa chưa lưu và khôi phục lại dữ liệu gần nhất từ GitHub không?')) return;
-
+    btnRevert.addEventListener('click', () => {
+      if (!confirm('Tải lại trang sẽ huỷ mọi chỉnh sửa chưa lưu và khôi phục về phiên bản trên server. Tiếp tục?')) return;
       try {
         localStorage.removeItem('wedding_config_local_draft');
         localStorage.removeItem('wedding_config_draft_time');
-        sessionStorage.removeItem('wedding_config_sha'); // Xóa SHA cache để tránh lỗi 409 khi lưu sau
+        sessionStorage.removeItem('wedding_config_sha');
       } catch (e) {}
-
-      const ghSettings = loadGitHubSettings();
-
-      // Fallback: chưa cài GitHub token → reload trang để lấy config.js gốc từ server
-      if (!ghSettings.repo || !ghSettings.token) {
-        showAdminToast('⚠️ Chưa cài GitHub Token — Đang tải lại trang để khôi phục...');
-        setTimeout(() => window.location.reload(), 1500);
-        return;
-      }
-
-      showAdminToast('⏳ Đang khôi phục dữ liệu gần nhất từ GitHub...');
-
-      try {
-        let loadedConfig = null;
-        const branch = ghSettings.branch || 'main';
-        const apiUrl = `https://api.github.com/repos/${ghSettings.repo}/contents/config.js?ref=${encodeURIComponent(branch)}`;
-        const res = await fetch(apiUrl, {
-          headers: {
-            'Authorization': `Bearer ${ghSettings.token}`,
-            'Accept': 'application/vnd.github+json'
-          }
-        });
-        if (res.ok) {
-          const data = await res.json();
-          const decodedCode = decodeURIComponent(escape(atob(data.content)));
-          const fn = new Function(decodedCode + '; return typeof WEDDING_CONFIG !== "undefined" ? WEDDING_CONFIG : null;');
-          loadedConfig = fn();
-        }
-
-        if (loadedConfig) {
-          window.WEDDING_CONFIG = loadedConfig;
-        }
-
-        // FIX: Tắt contenteditable trước để applyWeddingConfig() có thể ghi vào DOM
-        // (applyWeddingConfig() bỏ qua các field đang contenteditable="true")
-        document.querySelectorAll('[data-bind]').forEach(el => {
-          el.removeAttribute('contenteditable');
-        });
-
-        if (typeof applyWeddingConfig === 'function') {
-          applyWeddingConfig();
-        }
-
-        // Bật lại contenteditable đúng cách — bỏ qua auto-generated fields
-        document.querySelectorAll('[data-bind]').forEach(el => {
-          const key = el.getAttribute('data-bind');
-          if (typeof AUTO_GENERATED_BINDS !== 'undefined' && AUTO_GENERATED_BINDS.includes(key)) {
-            el.setAttribute('contenteditable', 'false');
-            el.classList.add('admin-field-autogen');
-          } else {
-            el.setAttribute('contenteditable', 'true');
-            el.setAttribute('spellcheck', 'false');
-          }
-        });
-
-        showAdminToast(loadedConfig
-          ? '🔄 Đã khôi phục lại dữ liệu gốc từ GitHub thành công!'
-          : '⚠️ Không tìm thấy config trên GitHub — Đã khôi phục từ bộ nhớ hiện tại.');
-      } catch (err) {
-        console.error('Lỗi khi khôi phục:', err);
-        showAdminToast('❌ Lỗi: ' + err.message + ' — Đang tải lại trang...');
-        setTimeout(() => window.location.reload(), 2000);
-      }
+      window.location.reload();
     });
   }
 
