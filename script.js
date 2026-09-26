@@ -139,9 +139,15 @@ function applyWeddingConfig() {
     'wedding-lunar-date': cfg.lunarDate ? `(${cfg.lunarDate})` : '',
     'story-wedding-date': formatMonthYear(weddingDate),
     'rsvp-deadline-text': `Xin vui lòng xác nhận trước ngày ${formatRsvpDeadline(weddingDate, cfg.rsvpDaysBefore)} để chúng tôi chu toàn đón tiếp`,
-    'bank-account-holder': cfg.bankAccount?.accountHolder,
-    'bank-name': cfg.bankAccount?.bankName,
-    'bank-account-number': formatAccountNumber(cfg.bankAccount?.accountNumber),
+    'bank-groom-account-holder': (cfg.bankAccount?.groom?.accountHolder || cfg.bankAccount?.accountHolder || cfg.groom?.name || 'Đăng Thịnh'),
+    'bank-groom-name': (cfg.bankAccount?.groom?.bankName || cfg.bankAccount?.bankName || 'BIDV'),
+    'bank-groom-account-number': formatAccountNumber(cfg.bankAccount?.groom?.accountNumber || cfg.bankAccount?.accountNumber || '8823 9681 72'),
+    'bank-bride-account-holder': (cfg.bankAccount?.bride?.accountHolder || cfg.bride?.name || 'Hoàn Nguyễn'),
+    'bank-bride-name': (cfg.bankAccount?.bride?.bankName || 'BIDV'),
+    'bank-bride-account-number': formatAccountNumber(cfg.bankAccount?.bride?.accountNumber || '8823 9681 72'),
+    'bank-account-holder': cfg.bankAccount?.accountHolder || 'Đăng Thịnh',
+    'bank-name': cfg.bankAccount?.bankName || 'BIDV',
+    'bank-account-number': formatAccountNumber(cfg.bankAccount?.accountNumber || '8823 9681 72'),
   };
 
   // Helper tạo link Google Maps tự động nếu người dùng không nhập link riêng
@@ -338,9 +344,30 @@ function applyWeddingConfig() {
     chibiEl.src = imgCfg.openingChibi || cfg.openingScreen.coupleImage;
   }
 
-  const qrImg = document.querySelector('[data-img-bind="bank-qr"]') || document.querySelector('[data-bind-src="bank-qr-img"]');
-  if (qrImg && (imgCfg.bankQr || cfg.bankAccount?.qrCodeUrl)) {
-    qrImg.src = imgCfg.bankQr || cfg.bankAccount.qrCodeUrl;
+  const bankGroom = cfg.bankAccount?.groom || cfg.bankAccount || {};
+  const bankBride = cfg.bankAccount?.bride || {};
+
+  const qrGroomImg = document.querySelector('[data-img-bind="bank-qr-groom"]') || document.querySelector('[data-img-bind="bank-qr"]');
+  if (qrGroomImg) {
+    const groomQrSrc = imgCfg.bankQrGroom || bankGroom.qrCodeUrl || imgCfg.bankQr || 'images/qr LEDANGTHINH.jpg';
+    qrGroomImg.src = groomQrSrc;
+    qrGroomImg.setAttribute('src', groomQrSrc);
+  }
+
+  const qrBrideImg = document.querySelector('[data-img-bind="bank-qr-bride"]');
+  if (qrBrideImg) {
+    const brideQrSrc = imgCfg.bankQrBride || bankBride.qrCodeUrl || 'images/qr LEDANGTHINH.jpg';
+    qrBrideImg.src = brideQrSrc;
+    qrBrideImg.setAttribute('src', brideQrSrc);
+  }
+
+  const copyGroomBtn = document.getElementById('copy-bank-groom-btn') || document.getElementById('copy-bank-btn');
+  if (copyGroomBtn) {
+    copyGroomBtn.setAttribute('data-account', (bankGroom.accountNumber || '8823968172').replace(/\s+/g, ''));
+  }
+  const copyBrideBtn = document.getElementById('copy-bank-bride-btn');
+  if (copyBrideBtn) {
+    copyBrideBtn.setAttribute('data-account', (bankBride.accountNumber || '8823968172').replace(/\s+/g, ''));
   }
 
   if (Array.isArray(imgCfg.gallery)) {
@@ -901,10 +928,11 @@ function initEnvelopeGift() {
     });
   }
 
-  if (copyBtn) {
-    copyBtn.addEventListener('click', () => {
-      const cfgAcc = typeof WEDDING_CONFIG !== 'undefined' ? (WEDDING_CONFIG.bankAccount?.accountNumber || '') : '';
-      const accNum = (copyBtn.getAttribute('data-account') || cfgAcc).replace(/\s+/g, '');
+  function handleCopyAccount(btn, fallbackAcc) {
+    if (!btn) return;
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const accNum = (btn.getAttribute('data-account') || fallbackAcc || '').replace(/\s+/g, '');
       if (!accNum) return;
       navigator.clipboard.writeText(accNum).then(() => {
         showToast('✓ Đã sao chép số tài khoản: ' + accNum);
@@ -913,6 +941,17 @@ function initEnvelopeGift() {
       });
     });
   }
+
+  const copyGroomBtn = document.getElementById('copy-bank-groom-btn');
+  const copyBrideBtn = document.getElementById('copy-bank-bride-btn');
+  const copyLegacyBtn = document.getElementById('copy-bank-btn');
+
+  const groomAcc = typeof WEDDING_CONFIG !== 'undefined' ? (WEDDING_CONFIG.bankAccount?.groom?.accountNumber || WEDDING_CONFIG.bankAccount?.accountNumber || '') : '';
+  const brideAcc = typeof WEDDING_CONFIG !== 'undefined' ? (WEDDING_CONFIG.bankAccount?.bride?.accountNumber || '') : '';
+
+  handleCopyAccount(copyGroomBtn, groomAcc);
+  handleCopyAccount(copyBrideBtn, brideAcc);
+  handleCopyAccount(copyLegacyBtn, groomAcc);
 }
 
 /* =====================================================
@@ -1055,7 +1094,8 @@ function initLightbox() {
   galleryImages.forEach((img) => {
     img.style.cursor = 'zoom-in';
     img.addEventListener('click', () => {
-      lightboxImg.src = img.src;
+      if (document.body.classList.contains('admin-mode-active')) return;
+      lightboxImg.src = img.getAttribute('src') || img.src;
       lightboxImg.alt = img.alt || 'Ảnh cưới';
       overlay.classList.add('active');
       document.body.style.overflow = 'hidden';
@@ -1416,10 +1456,14 @@ function initPersonalizedGuestLink() {
   }
 
   // Nếu không có slug hợp lệ thì dừng lại, giữ nguyên nội dung mặc định của thiệp
-  if (!slug) return;
+  if (!slug) {
+    applyQrGuestVisibility('');
+    return;
+  }
 
   // Lọc an toàn: nếu slug là tên file html hoặc đường dẫn ổ đĩa thì bỏ qua ngay
   if (/\.(html|htm|php|js|css|json)$/i.test(slug) || slug.includes(':') || slug.includes('/')) {
+    applyQrGuestVisibility('');
     return;
   }
 
@@ -1449,7 +1493,10 @@ function initPersonalizedGuestLink() {
     fullName = displayName;
   }
 
-  if (!displayName) return;
+  if (!displayName) {
+    applyQrGuestVisibility('');
+    return;
+  }
 
   // 1. Màn hình mở đầu
   const openingSub = document.querySelector('[data-bind="opening-subtitle"]');
@@ -1482,6 +1529,47 @@ function initPersonalizedGuestLink() {
         }
       });
     }
+  }
+
+  // 5. Điều hướng hiển thị thông tin QR Mừng Cưới theo đối tượng khách
+  window._currentGuestOf = guestOf || '';
+  applyQrGuestVisibility(guestOf);
+}
+
+/**
+ * Điều hướng hiển thị thông tin QR Mừng Cưới theo đối tượng khách:
+ * - 'groom': chỉ hiển thị thẻ tài khoản & QR Chú rể
+ * - 'bride': chỉ hiển thị thẻ tài khoản & QR Cô dâu
+ * - rỗng / admin: hiển thị cả 2 thẻ tài khoản & QR Chú rể và Cô dâu
+ */
+function applyQrGuestVisibility(guestOf) {
+  const cardGroom = document.getElementById('bank-card-groom');
+  const cardBride = document.getElementById('bank-card-bride');
+  const grid = document.getElementById('bank-cards-grid');
+  if (!cardGroom || !cardBride) return;
+
+  // Nếu đang ở Chế độ Nhà phát triển (#admin), luôn hiển thị cả 2 thẻ để chỉnh sửa
+  if (document.body.classList.contains('admin-mode-active')) {
+    cardGroom.style.display = '';
+    cardBride.style.display = '';
+    if (grid) grid.style.gridTemplateColumns = '';
+    return;
+  }
+
+  const normalized = (guestOf || '').trim().toLowerCase();
+  if (normalized === 'groom') {
+    cardGroom.style.display = '';
+    cardBride.style.display = 'none';
+    if (grid) grid.style.gridTemplateColumns = '1fr';
+  } else if (normalized === 'bride') {
+    cardGroom.style.display = 'none';
+    cardBride.style.display = '';
+    if (grid) grid.style.gridTemplateColumns = '1fr';
+  } else {
+    // Không xác định (link gốc): hiển thị cả 2 thẻ
+    cardGroom.style.display = '';
+    cardBride.style.display = '';
+    if (grid) grid.style.gridTemplateColumns = '';
   }
 }
 
@@ -1516,7 +1604,13 @@ function initVisualAdminModule() {
     'rsvp-heading': 'Xác Nhận Tham Dự',
     'rsvp-deadline-text': 'Xin vui lòng xác nhận trước ngày...',
     'rsvp-attendance-label': 'Tiêu đề xác nhận tham gia',
-    'rsvp-guestof-label': 'Tiêu đề khách của ai'
+    'rsvp-guestof-label': 'Tiêu đề khách của ai',
+    'bank-groom-account-holder': 'Tên chủ TK Chú Rể',
+    'bank-groom-name': 'Ngân hàng Chú Rể',
+    'bank-groom-account-number': 'Số tài khoản Chú Rể',
+    'bank-bride-account-holder': 'Tên chủ TK Cô Dâu',
+    'bank-bride-name': 'Ngân hàng Cô Dâu',
+    'bank-bride-account-number': 'Số tài khoản Cô Dâu'
   };
 
   const loginModal = document.getElementById('admin-login-modal');
@@ -2057,6 +2151,45 @@ function initVisualAdminModule() {
     }
 
     // 11. Ngân hàng & Mừng cưới
+    else if (key === 'bank-groom-account-holder') {
+      if (!WEDDING_CONFIG.bankAccount) WEDDING_CONFIG.bankAccount = {};
+      if (!WEDDING_CONFIG.bankAccount.groom) WEDDING_CONFIG.bankAccount.groom = {};
+      WEDDING_CONFIG.bankAccount.groom.accountHolder = val;
+      WEDDING_CONFIG.bankAccount.accountHolder = val;
+    }
+    else if (key === 'bank-groom-name') {
+      if (!WEDDING_CONFIG.bankAccount) WEDDING_CONFIG.bankAccount = {};
+      if (!WEDDING_CONFIG.bankAccount.groom) WEDDING_CONFIG.bankAccount.groom = {};
+      WEDDING_CONFIG.bankAccount.groom.bankName = val;
+      WEDDING_CONFIG.bankAccount.bankName = val;
+    }
+    else if (key === 'bank-groom-account-number') {
+      if (!WEDDING_CONFIG.bankAccount) WEDDING_CONFIG.bankAccount = {};
+      if (!WEDDING_CONFIG.bankAccount.groom) WEDDING_CONFIG.bankAccount.groom = {};
+      const cleanNum = val.replace(/\s+/g, '');
+      WEDDING_CONFIG.bankAccount.groom.accountNumber = cleanNum;
+      WEDDING_CONFIG.bankAccount.accountNumber = cleanNum;
+      const copyGroom = document.getElementById('copy-bank-groom-btn') || document.getElementById('copy-bank-btn');
+      if (copyGroom) copyGroom.setAttribute('data-account', cleanNum);
+    }
+    else if (key === 'bank-bride-account-holder') {
+      if (!WEDDING_CONFIG.bankAccount) WEDDING_CONFIG.bankAccount = {};
+      if (!WEDDING_CONFIG.bankAccount.bride) WEDDING_CONFIG.bankAccount.bride = {};
+      WEDDING_CONFIG.bankAccount.bride.accountHolder = val;
+    }
+    else if (key === 'bank-bride-name') {
+      if (!WEDDING_CONFIG.bankAccount) WEDDING_CONFIG.bankAccount = {};
+      if (!WEDDING_CONFIG.bankAccount.bride) WEDDING_CONFIG.bankAccount.bride = {};
+      WEDDING_CONFIG.bankAccount.bride.bankName = val;
+    }
+    else if (key === 'bank-bride-account-number') {
+      if (!WEDDING_CONFIG.bankAccount) WEDDING_CONFIG.bankAccount = {};
+      if (!WEDDING_CONFIG.bankAccount.bride) WEDDING_CONFIG.bankAccount.bride = {};
+      const cleanNum = val.replace(/\s+/g, '');
+      WEDDING_CONFIG.bankAccount.bride.accountNumber = cleanNum;
+      const copyBride = document.getElementById('copy-bank-bride-btn');
+      if (copyBride) copyBride.setAttribute('data-account', cleanNum);
+    }
     else if (key === 'bank-account-holder') WEDDING_CONFIG.bankAccount.accountHolder = val;
     else if (key === 'bank-name') WEDDING_CONFIG.bankAccount.bankName = val;
     else if (key === 'bank-account-number') WEDDING_CONFIG.bankAccount.accountNumber = val.replace(/\s+/g, '');
@@ -2158,6 +2291,9 @@ function initVisualAdminModule() {
       img.addEventListener('click', handleImgClick);
     });
 
+    // Bật hiển thị cả 2 thẻ mã QR mừng cưới để admin có thể sửa và thay ảnh
+    applyQrGuestVisibility('');
+
     if (showWelcomeToast) {
       showAdminToast('🛠️ Đã bật Chế độ Sửa Trực Quan! Nhấp trực tiếp vào chữ hoặc ảnh để sửa.');
     }
@@ -2167,8 +2303,9 @@ function initVisualAdminModule() {
     if (!document.body.classList.contains('admin-mode-active')) return;
     e.stopPropagation();
     activeImgTarget = this;
-    if (imgPreview) imgPreview.src = activeImgTarget.src;
-    if (imgUrlInput) imgUrlInput.value = activeImgTarget.getAttribute('src') || '';
+    const currentSrc = activeImgTarget.getAttribute('src') || activeImgTarget.src || '';
+    if (imgPreview) imgPreview.src = currentSrc;
+    if (imgUrlInput) imgUrlInput.value = currentSrc.startsWith('data:') ? '' : currentSrc;
     if (imgFileInput) imgFileInput.value = '';
     openModal(imgModal);
   }
@@ -2217,6 +2354,7 @@ function initVisualAdminModule() {
       if (activeImgTarget && imgUrlInput && imgUrlInput.value.trim()) {
         const newSrc = imgUrlInput.value.trim();
         activeImgTarget.src = newSrc;
+        activeImgTarget.setAttribute('src', newSrc);
 
         if (typeof WEDDING_CONFIG === 'undefined') window.WEDDING_CONFIG = {};
         if (!WEDDING_CONFIG.images) WEDDING_CONFIG.images = {};
@@ -2237,10 +2375,18 @@ function initVisualAdminModule() {
           if (WEDDING_CONFIG.bride) WEDDING_CONFIG.bride.image = newSrc;
         } else if (imgBindKey === 'countdown') {
           WEDDING_CONFIG.images.countdown = newSrc;
-        } else if (imgBindKey === 'bank-qr' || activeImgTarget.getAttribute('data-bind-src') === 'bank-qr-img') {
+        } else if (imgBindKey === 'bank-qr' || imgBindKey === 'bank-qr-groom' || activeImgTarget.getAttribute('data-bind-src') === 'bank-qr-groom-img') {
+          WEDDING_CONFIG.images.bankQrGroom = newSrc;
           WEDDING_CONFIG.images.bankQr = newSrc;
           if (!WEDDING_CONFIG.bankAccount) WEDDING_CONFIG.bankAccount = {};
+          if (!WEDDING_CONFIG.bankAccount.groom) WEDDING_CONFIG.bankAccount.groom = {};
           WEDDING_CONFIG.bankAccount.qrCodeUrl = newSrc;
+          WEDDING_CONFIG.bankAccount.groom.qrCodeUrl = newSrc;
+        } else if (imgBindKey === 'bank-qr-bride' || activeImgTarget.getAttribute('data-bind-src') === 'bank-qr-bride-img') {
+          WEDDING_CONFIG.images.bankQrBride = newSrc;
+          if (!WEDDING_CONFIG.bankAccount) WEDDING_CONFIG.bankAccount = {};
+          if (!WEDDING_CONFIG.bankAccount.bride) WEDDING_CONFIG.bankAccount.bride = {};
+          WEDDING_CONFIG.bankAccount.bride.qrCodeUrl = newSrc;
         } else if (imgBindKey && imgBindKey.startsWith('gallery-')) {
           const idx = parseInt(imgBindKey.replace('gallery-', ''), 10);
           if (!Array.isArray(WEDDING_CONFIG.images.gallery)) {
@@ -2277,6 +2423,7 @@ function initVisualAdminModule() {
         }
       });
       applyWeddingConfig();
+      applyQrGuestVisibility(window._currentGuestOf || '');
       history.replaceState(null, null, window.location.pathname + window.location.search);
       showAdminToast('Đã thoát Chế độ Nhà Phát Triển.');
     });
@@ -2753,43 +2900,61 @@ function initVisualAdminModule() {
     if (!baseConfig.texts.footer) baseConfig.texts.footer = {};
     const fThank = getText('footer-thankyou'); if (fThank !== null) baseConfig.texts.footer.thankYou = fThank;
 
-    // Thu thập 100% hình ảnh trên trang
-    const heroEl = document.querySelector('[data-img-bind="hero"]');
-    if (heroEl && heroEl.getAttribute('src')) baseConfig.images.hero = heroEl.getAttribute('src');
+    // Thu thập thông tin tài khoản ngân hàng mừng cưới
+    if (!baseConfig.bankAccount) baseConfig.bankAccount = {};
+    if (!baseConfig.bankAccount.groom) baseConfig.bankAccount.groom = {};
+    if (!baseConfig.bankAccount.bride) baseConfig.bankAccount.bride = {};
 
-    const groomEl = document.querySelector('[data-img-bind="groom"]');
-    if (groomEl && groomEl.getAttribute('src')) {
-      baseConfig.images.groom = groomEl.getAttribute('src');
-      baseConfig.groom.image = groomEl.getAttribute('src');
+    const gHolder = getText('bank-groom-account-holder'); if (gHolder !== null) { baseConfig.bankAccount.groom.accountHolder = gHolder; baseConfig.bankAccount.accountHolder = gHolder; }
+    const gBank = getText('bank-groom-name'); if (gBank !== null) { baseConfig.bankAccount.groom.bankName = gBank; baseConfig.bankAccount.bankName = gBank; }
+    const gNum = getText('bank-groom-account-number'); if (gNum !== null) { baseConfig.bankAccount.groom.accountNumber = gNum.replace(/\s+/g, ''); baseConfig.bankAccount.accountNumber = gNum.replace(/\s+/g, ''); }
+
+    const bHolder = getText('bank-bride-account-holder'); if (bHolder !== null) baseConfig.bankAccount.bride.accountHolder = bHolder;
+    const bBank = getText('bank-bride-name'); if (bBank !== null) baseConfig.bankAccount.bride.bankName = bBank;
+    const bNum = getText('bank-bride-account-number'); if (bNum !== null) baseConfig.bankAccount.bride.accountNumber = bNum.replace(/\s+/g, '');
+
+    // Thu thập 100% hình ảnh trên trang (An toàn, không bị ghi đè thuộc tính cũ)
+    function readImg(selector, currentConfigVal) {
+      const el = document.querySelector(selector);
+      if (!el) return currentConfigVal || '';
+      const attr = el.getAttribute('src');
+      if (attr && !attr.startsWith('blob:')) return attr;
+      if (el.src && !el.src.startsWith('blob:')) return el.src;
+      return currentConfigVal || '';
     }
 
-    const brideEl = document.querySelector('[data-img-bind="bride"]');
-    if (brideEl && brideEl.getAttribute('src')) {
-      baseConfig.images.bride = brideEl.getAttribute('src');
-      baseConfig.bride.image = brideEl.getAttribute('src');
-    }
+    if (!baseConfig.images) baseConfig.images = {};
 
-    const cdEl = document.querySelector('[data-img-bind="countdown"]');
-    if (cdEl && cdEl.getAttribute('src')) baseConfig.images.countdown = cdEl.getAttribute('src');
+    baseConfig.images.hero = readImg('[data-img-bind="hero"]', baseConfig.images.hero);
 
-    const chibiImg = document.getElementById('opening-chibi-img') || document.querySelector('[data-img-bind="opening-chibi"]');
-    if (chibiImg && chibiImg.getAttribute('src')) {
-      baseConfig.images.openingChibi = chibiImg.getAttribute('src');
-      baseConfig.openingScreen.coupleImage = chibiImg.getAttribute('src');
-    }
+    const groomImgSrc = readImg('[data-img-bind="groom"]', baseConfig.images.groom);
+    baseConfig.images.groom = groomImgSrc;
+    baseConfig.groom.image = groomImgSrc;
 
-    const qrEl = document.querySelector('[data-img-bind="bank-qr"]') || document.querySelector('[data-bind-src="bank-qr-img"]');
-    if (qrEl && qrEl.getAttribute('src')) {
-      baseConfig.images.bankQr = qrEl.getAttribute('src');
-      baseConfig.bankAccount.qrCodeUrl = qrEl.getAttribute('src');
-    }
+    const brideImgSrc = readImg('[data-img-bind="bride"]', baseConfig.images.bride);
+    baseConfig.images.bride = brideImgSrc;
+    baseConfig.bride.image = brideImgSrc;
+
+    baseConfig.images.countdown = readImg('[data-img-bind="countdown"]', baseConfig.images.countdown);
+
+    const chibiSrc = readImg('#opening-chibi-img, [data-img-bind="opening-chibi"]', baseConfig.images.openingChibi);
+    baseConfig.images.openingChibi = chibiSrc;
+    baseConfig.openingScreen.coupleImage = chibiSrc;
+
+    const qrGroomSrc = readImg('[data-img-bind="bank-qr-groom"], [data-img-bind="bank-qr"]', baseConfig.images.bankQrGroom || baseConfig.images.bankQr);
+    baseConfig.images.bankQrGroom = qrGroomSrc;
+    baseConfig.images.bankQr = qrGroomSrc;
+    baseConfig.bankAccount.groom.qrCodeUrl = qrGroomSrc;
+    baseConfig.bankAccount.qrCodeUrl = qrGroomSrc;
+
+    const qrBrideSrc = readImg('[data-img-bind="bank-qr-bride"]', baseConfig.images.bankQrBride);
+    baseConfig.images.bankQrBride = qrBrideSrc;
+    baseConfig.bankAccount.bride.qrCodeUrl = qrBrideSrc;
 
     const galleryImgs = [];
     for (let i = 0; i < 6; i++) {
-      const gEl = document.querySelector(`[data-img-bind="gallery-${i}"]`);
-      if (gEl && gEl.getAttribute('src')) {
-        galleryImgs.push(gEl.getAttribute('src'));
-      }
+      const gSrc = readImg(`[data-img-bind="gallery-${i}"]`, (baseConfig.images.gallery && baseConfig.images.gallery[i]) || '');
+      if (gSrc) galleryImgs.push(gSrc);
     }
     if (galleryImgs.length > 0) {
       baseConfig.images.gallery = galleryImgs;
