@@ -635,22 +635,31 @@
               <!-- Thẻ Chú Rể -->
               <div id="bank-card-groom" class="bg-white border border-[#EEEEEE] rounded-2xl p-6 shadow-md relative text-center w-full max-w-sm mx-auto">
                 <span class="bank-card-admin-badge inline-block px-3 py-1 bg-rose/10 text-rose text-[11px] font-bold rounded-full mb-3 tracking-wider uppercase">🤵 Mừng Cưới Chú Rể</span>
-                <div class="p-2 bg-gray-50 rounded-xl mb-4 inline-block border border-gray-100 mx-auto">
+                <div class="bank-qr-frame relative w-36 h-36 mx-auto rounded-xl overflow-hidden bg-white border border-gray-100 shadow-sm flex items-center justify-center cursor-pointer mb-3" title="Chạm để tải mã QR về máy">
                   <img
+                    id="bank-qr-groom-img"
                     src="images/qr LEDANGTHINH.jpg"
-                    alt="VietQR Mừng Cưới Chú Rể" loading="lazy" decoding="async" class="w-36 h-36 mx-auto rounded-lg cursor-pointer" data-bind-src="bank-qr-groom-img" data-img-bind="bank-qr-groom" title="Nhấp vào ảnh để thay đổi mã QR Chú rể">
+                    alt="VietQR Mừng Cưới Chú Rể" loading="lazy" decoding="async" class="bank-qr-img w-full h-full object-contain transition-transform duration-200" data-bind-src="bank-qr-groom-img" data-img-bind="bank-qr-groom" title="Nhấp vào ảnh để thay đổi mã QR Chú rể">
                 </div>
                 <p class="font-display text-dark text-base font-semibold mb-0.5" data-bind="bank-groom-account-holder">Đăng Thịnh</p>
                 <p class="font-sans text-rose text-xs tracking-wider uppercase font-semibold" data-bind="bank-groom-name">BIDV</p>
 
-                <div class="flex items-center justify-center gap-2 mt-2">
-                  <span class="font-sans text-dark text-base tracking-widest font-semibold" data-bind="bank-groom-account-number">8823 9681 72</span>
-                  <button type="button" id="copy-bank-groom-btn" data-account="8823968172" class="copy-badge" title="Sao chép số tài khoản Chú rể">
-                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                    </svg>
-                    Sao chép
-                  </button>
+                <div class="mt-2">
+                  <span class="font-sans text-dark text-base tracking-widest font-semibold block mb-2" data-bind="bank-groom-account-number">8823 9681 72</span>
+                  <div class="flex items-center justify-center gap-2">
+                    <button type="button" id="copy-bank-groom-btn" data-account="8823968172" class="copy-badge" title="Sao chép số tài khoản Chú rể">
+                      <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                      </svg>
+                      Sao chép STK
+                    </button>
+                    <button type="button" id="download-bank-groom-btn" class="download-badge" title="Tải ảnh mã QR đầy đủ về máy">
+                      <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                      </svg>
+                      Tải mã QR
+                    </button>
+                  </div>
                 </div>
                 <p class="text-[11px] text-muted italic mt-3" data-bind="gift-qr-instruction">Quét mã QR bằng ứng dụng ngân hàng bất kỳ</p>
               </div>
@@ -658,22 +667,31 @@
               <!-- Thẻ Cô Dâu -->
               <div id="bank-card-bride" class="bg-white border border-[#EEEEEE] rounded-2xl p-6 shadow-md relative text-center w-full max-w-sm mx-auto">
                 <span class="bank-card-admin-badge inline-block px-3 py-1 bg-rose/10 text-rose text-[11px] font-bold rounded-full mb-3 tracking-wider uppercase">👰 Mừng Cưới Cô Dâu</span>
-                <div class="p-2 bg-gray-50 rounded-xl mb-4 inline-block border border-gray-100 mx-auto">
+                <div class="bank-qr-frame relative w-36 h-36 mx-auto rounded-xl overflow-hidden bg-white border border-gray-100 shadow-sm flex items-center justify-center cursor-pointer mb-3" title="Chạm để tải mã QR về máy">
                   <img
+                    id="bank-qr-bride-img"
                     src="images/qr LEDANGTHINH.jpg"
-                    alt="VietQR Mừng Cưới Cô Dâu" loading="lazy" decoding="async" class="w-36 h-36 mx-auto rounded-lg cursor-pointer" data-bind-src="bank-qr-bride-img" data-img-bind="bank-qr-bride" title="Nhấp vào ảnh để thay đổi mã QR Cô dâu">
+                    alt="VietQR Mừng Cưới Cô Dâu" loading="lazy" decoding="async" class="bank-qr-img w-full h-full object-contain transition-transform duration-200" data-bind-src="bank-qr-bride-img" data-img-bind="bank-qr-bride" title="Nhấp vào ảnh để thay đổi mã QR Cô dâu">
                 </div>
                 <p class="font-display text-dark text-base font-semibold mb-0.5" data-bind="bank-bride-account-holder">Hoàn Nguyễn</p>
                 <p class="font-sans text-rose text-xs tracking-wider uppercase font-semibold" data-bind="bank-bride-name">BIDV</p>
 
-                <div class="flex items-center justify-center gap-2 mt-2">
-                  <span class="font-sans text-dark text-base tracking-widest font-semibold" data-bind="bank-bride-account-number">8823 9681 72</span>
-                  <button type="button" id="copy-bank-bride-btn" data-account="8823968172" class="copy-badge" title="Sao chép số tài khoản Cô dâu">
-                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                    </svg>
-                    Sao chép
-                  </button>
+                <div class="mt-2">
+                  <span class="font-sans text-dark text-base tracking-widest font-semibold block mb-2" data-bind="bank-bride-account-number">8823 9681 72</span>
+                  <div class="flex items-center justify-center gap-2">
+                    <button type="button" id="copy-bank-bride-btn" data-account="8823968172" class="copy-badge" title="Sao chép số tài khoản Cô dâu">
+                      <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                      </svg>
+                      Sao chép STK
+                    </button>
+                    <button type="button" id="download-bank-bride-btn" class="download-badge" title="Tải ảnh mã QR đầy đủ về máy">
+                      <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                      </svg>
+                      Tải mã QR
+                    </button>
+                  </div>
                 </div>
                 <p class="text-[11px] text-muted italic mt-3" data-bind="gift-qr-instruction">Quét mã QR bằng ứng dụng ngân hàng bất kỳ</p>
               </div>
@@ -880,6 +898,24 @@
         <input type="text" id="admin-image-url" class="admin-input" placeholder="https://... hoặc images/ten-anh.jpg">
       </div>
 
+      <!-- Khung tùy chỉnh tỉ lệ thu phóng mã QR (Chỉ hiện khi chỉnh ảnh QR) -->
+      <div id="admin-qr-zoom-group" class="admin-form-group" style="display:none;background:#FAF8F5;border:1px solid #EFEAE6;padding:12px;border-radius:12px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+          <label for="admin-qr-zoom-range" class="admin-label" style="margin-bottom:0;font-weight:700;">🔍 Tỉ lệ thu phóng (Crop ẩn viền chữ, căn giữa QR):</label>
+          <span id="admin-qr-zoom-val" style="font-weight:700;color:#8B263E;font-size:13px;">135%</span>
+        </div>
+        <input type="range" id="admin-qr-zoom-range" min="100" max="200" step="5" value="135" class="admin-input" style="cursor:pointer;padding:0;height:8px;">
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;">
+          <button type="button" class="qr-zoom-preset-btn" data-scale="100">Gốc (100%)</button>
+          <button type="button" class="qr-zoom-preset-btn" data-scale="120">Gần (120%)</button>
+          <button type="button" class="qr-zoom-preset-btn active" data-scale="135">Chuẩn VietQR (135%)</button>
+          <button type="button" class="qr-zoom-preset-btn" data-scale="150">Cận cảnh (150%)</button>
+        </div>
+        <p class="admin-hint-text" style="margin-top:6px;margin-bottom:0;">
+          💡 Phóng to để ẩn chữ số tài khoản/logo ngân hàng thừa trên ảnh. Ảnh gốc vẫn giữ nguyên để khách tải về máy.
+        </p>
+      </div>
+
       <div class="admin-btn-row">
         <button type="button" id="admin-image-close" class="admin-btn-secondary">Hủy</button>
         <button type="button" id="admin-image-apply" class="admin-btn-primary">Áp Dụng Ảnh</button>
@@ -1023,8 +1059,8 @@
   </div>
 
   <!-- Scripts (Cache buster chống lưu đệm) -->
-  <script src="config.js?v=20260926_badge_center_fix"></script>
-  <script src="script.js?v=20260926_badge_center_fix"></script>
+  <script src="config.js?v=20260926_qr_zoom_download"></script>
+  <script src="script.js?v=20260926_qr_zoom_download"></script>
 </body>
 
 </html>

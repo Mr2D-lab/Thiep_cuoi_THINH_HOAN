@@ -552,8 +552,10 @@ body {
   -webkit-backdrop-filter: blur(16px) !important;
   z-index: 2147483647 !important;
   opacity: 0 !important;
-  pointer-events: none !important; /* Không bao giờ chặn click */
-  display: none !important; /* Ẩn hoàn toàn khỏi render tree khi chưa show */
+  pointer-events: none !important;
+  /* Không bao giờ chặn click */
+  display: none !important;
+  /* Ẩn hoàn toàn khỏi render tree khi chưa show */
   transition: opacity 0.25s ease, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
   align-items: center !important;
   justify-content: center !important;
@@ -568,7 +570,8 @@ body {
   display: flex !important;
   transform: translate(-50%, -50%) scale(1) !important;
   opacity: 1 !important;
-  pointer-events: none !important; /* Cho phép click xuyên qua để người dùng thao tác thoải mái */
+  pointer-events: none !important;
+  /* Cho phép click xuyên qua để người dùng thao tác thoải mái */
 }
 
 /* =====================================================
@@ -624,8 +627,13 @@ body {
 }
 
 @keyframes modalPulse {
-  0% { transform: scale(1); }
-  100% { transform: scale(1.12); }
+  0% {
+    transform: scale(1);
+  }
+
+  100% {
+    transform: scale(1.12);
+  }
 }
 
 .rsvp-modal-title {
@@ -697,6 +705,72 @@ body {
   color: #FFFFFF;
 }
 
+/* Download QR Button */
+.download-badge {
+  background: rgba(192, 57, 43, 0.08);
+  color: #c0392b;
+  border: 1px solid rgba(192, 57, 43, 0.25);
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.2s;
+  text-decoration: none;
+}
+
+.download-badge:hover {
+  background: #c0392b;
+  color: #FFFFFF;
+}
+
+/* Square QR Frame with Zoom & Crop */
+.bank-qr-frame {
+  width: 144px;
+  height: 144px;
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+  background: #FFFFFF;
+  border: 1px solid #EEEEEE;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 12px auto;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.bank-qr-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transition: transform 0.2s ease;
+  transform-origin: center center;
+}
+
+/* Preset buttons in Admin QR Zoom */
+.qr-zoom-preset-btn {
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  background: #F3F4F6;
+  color: #4B5563;
+  border: 1px solid #E5E7EB;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.qr-zoom-preset-btn:hover,
+.qr-zoom-preset-btn.active {
+  background: #8B263E;
+  color: #FFFFFF;
+  border-color: #8B263E;
+}
+
 /* Responsive tweaks */
 @media (max-width: 640px) {
   .invitation-wrapper {
@@ -732,8 +806,8 @@ body.opening-locked {
   opacity: 1;
   visibility: visible;
   transition: opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1),
-              visibility 0.85s ease,
-              transform 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+    visibility 0.85s ease,
+    transform 0.85s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .opening-overlay.is-closing {
@@ -769,8 +843,15 @@ body.opening-locked {
 }
 
 @keyframes ambient-pulse {
-  0% { transform: scale(0.9) translate(-20px, -20px); opacity: 0.6; }
-  100% { transform: scale(1.15) translate(20px, 20px); opacity: 0.9; }
+  0% {
+    transform: scale(0.9) translate(-20px, -20px);
+    opacity: 0.6;
+  }
+
+  100% {
+    transform: scale(1.15) translate(20px, 20px);
+    opacity: 0.9;
+  }
 }
 
 /* Card Container */
@@ -791,8 +872,8 @@ body.opening-locked {
   border-radius: 28px;
   border: 1px solid rgba(108, 59, 94, 0.14);
   box-shadow: 0 24px 60px -15px rgba(108, 59, 94, 0.22),
-              0 0 0 5px rgba(255, 255, 255, 0.8) inset,
-              0 0 30px rgba(232, 208, 192, 0.25);
+    0 0 0 5px rgba(255, 255, 255, 0.8) inset,
+    0 0 30px rgba(232, 208, 192, 0.25);
   padding: 30px 22px 24px;
   text-align: center;
   overflow: hidden;
@@ -801,8 +882,15 @@ body.opening-locked {
 }
 
 @keyframes card-appear {
-  0% { opacity: 0; transform: translateY(30px) scale(0.95); }
-  100% { opacity: 1; transform: translateY(0) scale(1); }
+  0% {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 /* Corner Accents */
@@ -813,24 +901,28 @@ body.opening-locked {
   border-color: rgba(108, 59, 94, 0.3);
   pointer-events: none;
 }
+
 .corner-decor.top-left {
   top: 14px;
   left: 14px;
   border-top: 1.5px solid rgba(108, 59, 94, 0.3);
   border-left: 1.5px solid rgba(108, 59, 94, 0.3);
 }
+
 .corner-decor.top-right {
   top: 14px;
   right: 14px;
   border-top: 1.5px solid rgba(108, 59, 94, 0.3);
   border-right: 1.5px solid rgba(108, 59, 94, 0.3);
 }
+
 .corner-decor.bottom-left {
   bottom: 14px;
   left: 14px;
   border-bottom: 1.5px solid rgba(108, 59, 94, 0.3);
   border-left: 1.5px solid rgba(108, 59, 94, 0.3);
 }
+
 .corner-decor.bottom-right {
   bottom: 14px;
   right: 14px;
@@ -907,8 +999,15 @@ body.opening-locked {
 }
 
 @keyframes halo-pulse {
-  0% { transform: scale(0.92); opacity: 0.6; }
-  100% { transform: scale(1.08); opacity: 1; }
+  0% {
+    transform: scale(0.92);
+    opacity: 0.6;
+  }
+
+  100% {
+    transform: scale(1.08);
+    opacity: 1;
+  }
 }
 
 .chibi-img {
@@ -929,15 +1028,20 @@ body.opening-locked {
 }
 
 @keyframes chibi-breathe {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translateY(0) rotate(0deg);
   }
+
   25% {
     transform: translateY(-8px) rotate(-1.5deg) scale(1.015);
   }
+
   50% {
     transform: translateY(0) rotate(0deg);
   }
+
   75% {
     transform: translateY(-5px) rotate(1.5deg) scale(1.01);
   }
@@ -949,10 +1053,21 @@ body.opening-locked {
 }
 
 @keyframes chibi-jump {
-  0% { transform: translateY(0) scale(1); }
-  35% { transform: translateY(-24px) scale(1.1) rotate(-3deg); }
-  65% { transform: translateY(-10px) scale(1.05) rotate(2deg); }
-  100% { transform: translateY(0) scale(1.08); }
+  0% {
+    transform: translateY(0) scale(1);
+  }
+
+  35% {
+    transform: translateY(-24px) scale(1.1) rotate(-3deg);
+  }
+
+  65% {
+    transform: translateY(-10px) scale(1.05) rotate(2deg);
+  }
+
+  100% {
+    transform: translateY(0) scale(1.08);
+  }
 }
 
 /* Floating FX Elements */
@@ -1003,18 +1118,45 @@ body.opening-locked {
 }
 
 @keyframes fx-float-1 {
-  0%, 100% { transform: translateY(0) scale(0.9); opacity: 0.6; }
-  50% { transform: translateY(-12px) scale(1.15) rotate(8deg); opacity: 1; }
+
+  0%,
+  100% {
+    transform: translateY(0) scale(0.9);
+    opacity: 0.6;
+  }
+
+  50% {
+    transform: translateY(-12px) scale(1.15) rotate(8deg);
+    opacity: 1;
+  }
 }
 
 @keyframes fx-float-2 {
-  0%, 100% { transform: translateY(0) scale(0.85); opacity: 0.5; }
-  50% { transform: translateY(-10px) scale(1.1) rotate(-8deg); opacity: 0.95; }
+
+  0%,
+  100% {
+    transform: translateY(0) scale(0.85);
+    opacity: 0.5;
+  }
+
+  50% {
+    transform: translateY(-10px) scale(1.1) rotate(-8deg);
+    opacity: 0.95;
+  }
 }
 
 @keyframes fx-sparkle {
-  0%, 100% { transform: scale(0.6) rotate(0deg); opacity: 0.3; }
-  50% { transform: scale(1.2) rotate(45deg); opacity: 1; }
+
+  0%,
+  100% {
+    transform: scale(0.6) rotate(0deg);
+    opacity: 0.3;
+  }
+
+  50% {
+    transform: scale(1.2) rotate(45deg);
+    opacity: 1;
+  }
 }
 
 /* Couple Names & Date */
@@ -1039,8 +1181,15 @@ body.opening-locked {
 }
 
 @keyframes heart-beat {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.25); }
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.25);
+  }
 }
 
 .opening-wedding-date {
@@ -1088,8 +1237,15 @@ body.opening-locked {
 }
 
 @keyframes seal-pulse {
-  0% { transform: scale(0.95); opacity: 0.9; }
-  100% { transform: scale(1.25); opacity: 0; }
+  0% {
+    transform: scale(0.95);
+    opacity: 0.9;
+  }
+
+  100% {
+    transform: scale(1.25);
+    opacity: 0;
+  }
 }
 
 .seal-button-inner {
@@ -1108,13 +1264,13 @@ body.opening-locked {
   font-weight: 500;
   letter-spacing: 0.08em;
   box-shadow: 0 10px 25px -4px rgba(108, 59, 94, 0.45),
-              0 0 0 2px rgba(255, 255, 255, 0.3) inset;
+    0 0 0 2px rgba(255, 255, 255, 0.3) inset;
   transition: all 0.3s ease;
 }
 
 .btn-wax-seal:hover .seal-button-inner {
   box-shadow: 0 14px 30px -4px rgba(108, 59, 94, 0.55),
-              0 0 0 2.5px rgba(255, 255, 255, 0.5) inset;
+    0 0 0 2.5px rgba(255, 255, 255, 0.5) inset;
 }
 
 .seal-svg-envelope {
@@ -1154,6 +1310,7 @@ body.opening-locked {
     transform: translate(0, 0) scale(1);
     opacity: 1;
   }
+
   100% {
     transform: translate(var(--tx), var(--ty)) rotate(var(--rot)) scale(var(--scale));
     opacity: 0;
@@ -1166,17 +1323,21 @@ body.opening-locked {
     padding: 24px 16px 20px;
     border-radius: 24px;
   }
+
   .opening-chibi-stage {
     width: 190px;
     height: 190px;
     margin: 6px auto 10px;
   }
+
   .opening-title {
     font-size: 17px;
   }
+
   .opening-couple-names {
     font-size: 20px;
   }
+
   .seal-button-inner {
     padding: 12px 26px;
     font-size: 13.5px;
@@ -1303,6 +1464,7 @@ body.admin-mode-active .bank-card-admin-badge {
     transform: translate(-50%, 40px);
     opacity: 0;
   }
+
   to {
     transform: translate(-50%, 0);
     opacity: 1;
@@ -1334,8 +1496,17 @@ body.admin-mode-active .bank-card-admin-badge {
 }
 
 @keyframes livePulse {
-  0%, 100% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.3); opacity: 0.6; }
+
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  50% {
+    transform: scale(1.3);
+    opacity: 0.6;
+  }
 }
 
 .admin-toolbar-actions {
@@ -1415,8 +1586,13 @@ body.admin-mode-active .bank-card-admin-badge {
 }
 
 @keyframes adminFadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 .admin-modal-card {
@@ -1588,6 +1764,8 @@ body.admin-mode-active .bank-card-admin-badge {
   max-width: 100%;
   max-height: 220px;
   object-fit: contain;
+  transition: transform 0.2s ease;
+  transform-origin: center center;
 }
 
 /* Honeypot hidden input */
@@ -1607,9 +1785,11 @@ body.admin-mode-active .bank-card-admin-badge {
     padding: 6px 10px;
     gap: 8px;
   }
+
   .admin-toolbar-badge {
     display: none;
   }
+
   .admin-toolbar-btn {
     padding: 7px 11px;
     font-size: 11.5px;
@@ -2058,6 +2238,7 @@ body.admin-mode-active .bank-card-admin-badge {
     opacity: 0;
     transform: translateY(20px) scale(0.96);
   }
+
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
@@ -2167,6 +2348,7 @@ body.admin-mode-active .bank-card-admin-badge {
 .admin-sync-indicator.syncing {
   border-color: rgba(59, 130, 246, 0.4);
 }
+
 .admin-sync-indicator.syncing .admin-sync-progress-bar {
   background: linear-gradient(90deg, #3B82F6, #8B263E);
 }
@@ -2174,9 +2356,11 @@ body.admin-mode-active .bank-card-admin-badge {
 .admin-sync-indicator.syncing.stage-vercel {
   border-color: rgba(139, 38, 62, 0.45);
 }
+
 .admin-sync-indicator.syncing.stage-vercel .admin-sync-icon {
   background: #FDF2F4;
 }
+
 .admin-sync-indicator.syncing.stage-vercel .admin-sync-progress-bar {
   background: linear-gradient(90deg, #3B82F6, #EC4899, #8B263E);
 }
@@ -2185,12 +2369,15 @@ body.admin-mode-active .bank-card-admin-badge {
   border-color: rgba(16, 185, 129, 0.5);
   box-shadow: 0 12px 32px rgba(16, 185, 129, 0.15), 0 2px 8px rgba(0, 0, 0, 0.08);
 }
+
 .admin-sync-indicator.success .admin-sync-icon {
   background: #ECFDF5;
 }
+
 .admin-sync-indicator.success .admin-sync-title {
   color: #065F46;
 }
+
 .admin-sync-indicator.success .admin-sync-progress-bar {
   width: 100% !important;
   background: #10B981;
@@ -2200,15 +2387,19 @@ body.admin-mode-active .bank-card-admin-badge {
   border-color: rgba(239, 68, 68, 0.6);
   box-shadow: 0 12px 32px rgba(239, 68, 68, 0.2), 0 2px 8px rgba(0, 0, 0, 0.08);
 }
+
 .admin-sync-indicator.error .admin-sync-icon {
   background: #FEF2F2;
 }
+
 .admin-sync-indicator.error .admin-sync-title {
   color: #DC2626;
 }
+
 .admin-sync-indicator.error .admin-sync-subtitle {
   color: #991B1B;
 }
+
 .admin-sync-indicator.error .admin-sync-progress-bar {
   width: 100% !important;
   background: #EF4444;
@@ -2244,4 +2435,3 @@ body.admin-mode-active .bank-card-admin-badge {
   pointer-events: auto;
   transform: translateX(-50%) translateY(0);
 }
-

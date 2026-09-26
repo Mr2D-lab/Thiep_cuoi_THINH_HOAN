@@ -90,6 +90,59 @@ function formatAccountNumber(numStr) {
   return numStr.replace(/\s+/g, '').replace(/(\d{4})(?=\d)/g, '$1 ');
 }
 
+// Tải ảnh mã QR đầy đủ kích thước gốc (không bị crop) về thiết bị của khách
+function downloadQrImage(imgSrc, defaultFileName) {
+  if (!imgSrc) return;
+  const fileName = defaultFileName || 'Ma_QR_Mung_Cuoi.jpg';
+
+  const notify = (msg) => {
+    if (typeof showToast === 'function') {
+      showToast(msg);
+    }
+  };
+
+  // Nếu là Data URI (Base64)
+  if (imgSrc.startsWith('data:')) {
+    const link = document.createElement('a');
+    link.href = imgSrc;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    notify('✓ Đang tải mã QR đầy đủ về máy...');
+    return;
+  }
+
+  // Tải file qua Fetch Blob để đảm bảo lưu đúng tên và định dạng
+  fetch(imgSrc)
+    .then((res) => {
+      if (!res.ok) throw new Error('Network error');
+      return res.blob();
+    })
+    .then((blob) => {
+      const blobUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      setTimeout(() => window.URL.revokeObjectURL(blobUrl), 2500);
+      notify('✓ Đang tải mã QR đầy đủ về máy...');
+    })
+    .catch(() => {
+      // Fallback mở trực tiếp trong tab mới hoặc tải trực tiếp
+      const link = document.createElement('a');
+      link.href = imgSrc;
+      link.download = fileName;
+      link.target = '_blank';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      notify('✓ Đang mở mã QR đầy đủ...');
+    });
+}
+
 function applyWeddingConfig() {
   // Nạp bản nháp đã lưu tại máy này (nếu có)
   try {
@@ -347,11 +400,17 @@ function applyWeddingConfig() {
   const bankGroom = cfg.bankAccount?.groom || cfg.bankAccount || {};
   const bankBride = cfg.bankAccount?.bride || {};
 
+  const groomScale = bankGroom.qrScale !== undefined ? bankGroom.qrScale : (cfg.bankAccount?.qrScale !== undefined ? cfg.bankAccount.qrScale : 1.35);
+  const brideScale = bankBride.qrScale !== undefined ? bankBride.qrScale : 1.35;
+
   const qrGroomImg = document.querySelector('[data-img-bind="bank-qr-groom"]') || document.querySelector('[data-img-bind="bank-qr"]');
   if (qrGroomImg) {
     const groomQrSrc = imgCfg.bankQrGroom || bankGroom.qrCodeUrl || imgCfg.bankQr || 'images/qr LEDANGTHINH.jpg';
     qrGroomImg.src = groomQrSrc;
     qrGroomImg.setAttribute('src', groomQrSrc);
+    qrGroomImg.dataset.qrScale = groomScale;
+    qrGroomImg.style.transform = `scale(${groomScale})`;
+    qrGroomImg.style.transformOrigin = 'center center';
   }
 
   const qrBrideImg = document.querySelector('[data-img-bind="bank-qr-bride"]');
@@ -359,7 +418,49 @@ function applyWeddingConfig() {
     const brideQrSrc = imgCfg.bankQrBride || bankBride.qrCodeUrl || 'images/qr LEDANGTHINH.jpg';
     qrBrideImg.src = brideQrSrc;
     qrBrideImg.setAttribute('src', brideQrSrc);
+    qrBrideImg.dataset.qrScale = brideScale;
+    qrBrideImg.style.transform = `scale(${brideScale})`;
+    qrBrideImg.style.transformOrigin = 'center center';
   }
+
+  // Nút tải mã QR về máy (Toàn bộ kích thước gốc đầy đủ)
+  const downloadGroomBtn = document.getElementById('download-bank-groom-btn');
+  if (downloadGroomBtn && !downloadGroomBtn.dataset.bound) {
+    downloadGroomBtn.dataset.bound = 'true';
+    downloadGroomBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const currentSrc = qrGroomImg?.getAttribute('src') || qrGroomImg?.src || 'images/qr LEDANGTHINH.jpg';
+      const cleanName = (cfg.groom?.name || 'Chu_Re').replace(/\s+/g, '_');
+      downloadQrImage(currentSrc, `QR_Mung_Cuoi_${cleanName}.jpg`);
+    });
+  }
+
+  const downloadBrideBtn = document.getElementById('download-bank-bride-btn');
+  if (downloadBrideBtn && !downloadBrideBtn.dataset.bound) {
+    downloadBrideBtn.dataset.bound = 'true';
+    downloadBrideBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const currentSrc = qrBrideImg?.getAttribute('src') || qrBrideImg?.src || 'images/qr LEDANGTHINH.jpg';
+      const cleanName = (cfg.bride?.name || 'Co_Dau').replace(/\s+/g, '_');
+      downloadQrImage(currentSrc, `QR_Mung_Cuoi_${cleanName}.jpg`);
+    });
+  }
+
+  // Chạm trực tiếp vào khung QR để tải ảnh khi ở chế độ khách xem
+  document.querySelectorAll('.bank-qr-frame').forEach((frame) => {
+    if (!frame.dataset.boundDownload) {
+      frame.dataset.boundDownload = 'true';
+      frame.addEventListener('click', () => {
+        if (document.body.classList.contains('admin-mode-active')) return;
+        const targetImg = frame.querySelector('img');
+        if (!targetImg) return;
+        const isBride = targetImg.getAttribute('data-img-bind') === 'bank-qr-bride';
+        const currentSrc = targetImg.getAttribute('src') || targetImg.src || '';
+        const name = isBride ? (cfg.bride?.name || 'Co_Dau') : (cfg.groom?.name || 'Chu_Re');
+        downloadQrImage(currentSrc, `QR_Mung_Cuoi_${name.replace(/\s+/g, '_')}.jpg`);
+      });
+    }
+  });
 
   const copyGroomBtn = document.getElementById('copy-bank-groom-btn') || document.getElementById('copy-bank-btn');
   if (copyGroomBtn) {
@@ -1687,6 +1788,11 @@ function initVisualAdminModule() {
   const imgApplyBtn = document.getElementById('admin-image-apply');
   const imgCloseBtn = document.getElementById('admin-image-close');
 
+  const qrZoomGroup = document.getElementById('admin-qr-zoom-group');
+  const qrZoomRange = document.getElementById('admin-qr-zoom-range');
+  const qrZoomVal = document.getElementById('admin-qr-zoom-val');
+  const qrPresetBtns = document.querySelectorAll('.qr-zoom-preset-btn');
+
   let activeImgTarget = null;
   let countdownTimerId = null;
 
@@ -2344,8 +2450,85 @@ function initVisualAdminModule() {
     if (imgPreview) imgPreview.src = currentSrc;
     if (imgUrlInput) imgUrlInput.value = currentSrc.startsWith('data:') ? '' : currentSrc;
     if (imgFileInput) imgFileInput.value = '';
+
+    const imgBindKey = activeImgTarget.getAttribute('data-img-bind') || activeImgTarget.id || '';
+    const isQr = imgBindKey === 'bank-qr' || imgBindKey === 'bank-qr-groom' || imgBindKey === 'bank-qr-bride' ||
+      activeImgTarget.getAttribute('data-bind-src') === 'bank-qr-groom-img' || activeImgTarget.getAttribute('data-bind-src') === 'bank-qr-bride-img';
+
+    if (qrZoomGroup) {
+      if (isQr) {
+        qrZoomGroup.style.display = 'block';
+        let currentScale = 1.35;
+        if (activeImgTarget.dataset.qrScale) {
+          currentScale = parseFloat(activeImgTarget.dataset.qrScale) || 1.35;
+        } else if (imgBindKey === 'bank-qr-bride' || activeImgTarget.getAttribute('data-bind-src') === 'bank-qr-bride-img') {
+          if (WEDDING_CONFIG?.bankAccount?.bride?.qrScale !== undefined) {
+            currentScale = WEDDING_CONFIG.bankAccount.bride.qrScale;
+          }
+        } else {
+          if (WEDDING_CONFIG?.bankAccount?.groom?.qrScale !== undefined) {
+            currentScale = WEDDING_CONFIG.bankAccount.groom.qrScale;
+          } else if (WEDDING_CONFIG?.bankAccount?.qrScale !== undefined) {
+            currentScale = WEDDING_CONFIG.bankAccount.qrScale;
+          }
+        }
+        const pct = Math.round(currentScale * 100);
+        if (qrZoomRange) qrZoomRange.value = pct;
+        if (qrZoomVal) qrZoomVal.innerText = pct + '%';
+        if (imgPreview) {
+          imgPreview.style.transform = `scale(${currentScale})`;
+          imgPreview.style.transformOrigin = 'center center';
+        }
+        qrPresetBtns.forEach((btn) => {
+          if (parseInt(btn.getAttribute('data-scale'), 10) === pct) {
+            btn.classList.add('active');
+          } else {
+            btn.classList.remove('active');
+          }
+        });
+      } else {
+        qrZoomGroup.style.display = 'none';
+        if (imgPreview) {
+          imgPreview.style.transform = 'none';
+        }
+      }
+    }
+
     openModal(imgModal);
   }
+
+  // Tương tác điều chỉnh tỉ lệ thu phóng QR trong Modal
+  if (qrZoomRange) {
+    qrZoomRange.addEventListener('input', () => {
+      const val = parseInt(qrZoomRange.value, 10);
+      if (qrZoomVal) qrZoomVal.innerText = val + '%';
+      if (imgPreview) {
+        imgPreview.style.transform = `scale(${val / 100})`;
+        imgPreview.style.transformOrigin = 'center center';
+      }
+      qrPresetBtns.forEach((btn) => {
+        if (parseInt(btn.getAttribute('data-scale'), 10) === val) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+    });
+  }
+
+  qrPresetBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const val = parseInt(btn.getAttribute('data-scale'), 10);
+      if (qrZoomRange) qrZoomRange.value = val;
+      if (qrZoomVal) qrZoomVal.innerText = val + '%';
+      if (imgPreview) {
+        imgPreview.style.transform = `scale(${val / 100})`;
+        imgPreview.style.transformOrigin = 'center center';
+      }
+      qrPresetBtns.forEach((b) => b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+  });
 
   // 6. Xử lý Thay Đổi Hình Ảnh
   if (imgFileInput) {
@@ -2388,15 +2571,44 @@ function initVisualAdminModule() {
 
   if (imgApplyBtn) {
     imgApplyBtn.addEventListener('click', () => {
-      if (activeImgTarget && imgUrlInput && imgUrlInput.value.trim()) {
-        const newSrc = imgUrlInput.value.trim();
+      if (!activeImgTarget) {
+        closeModal(imgModal);
+        return;
+      }
+
+      const imgBindKey = activeImgTarget.getAttribute('data-img-bind') || activeImgTarget.id || '';
+      const isQr = imgBindKey === 'bank-qr' || imgBindKey === 'bank-qr-groom' || imgBindKey === 'bank-qr-bride' ||
+        activeImgTarget.getAttribute('data-bind-src') === 'bank-qr-groom-img' || activeImgTarget.getAttribute('data-bind-src') === 'bank-qr-bride-img';
+
+      if (typeof WEDDING_CONFIG === 'undefined') window.WEDDING_CONFIG = {};
+      if (!WEDDING_CONFIG.images) WEDDING_CONFIG.images = {};
+      if (!WEDDING_CONFIG.bankAccount) WEDDING_CONFIG.bankAccount = {};
+
+      let hasChanged = false;
+
+      // Xử lý zoom QR
+      if (isQr && qrZoomRange) {
+        const newScale = parseFloat(qrZoomRange.value) / 100;
+        activeImgTarget.dataset.qrScale = newScale;
+        activeImgTarget.style.transform = `scale(${newScale})`;
+        activeImgTarget.style.transformOrigin = 'center center';
+
+        if (imgBindKey === 'bank-qr-bride' || activeImgTarget.getAttribute('data-bind-src') === 'bank-qr-bride-img') {
+          if (!WEDDING_CONFIG.bankAccount.bride) WEDDING_CONFIG.bankAccount.bride = {};
+          WEDDING_CONFIG.bankAccount.bride.qrScale = newScale;
+        } else {
+          if (!WEDDING_CONFIG.bankAccount.groom) WEDDING_CONFIG.bankAccount.groom = {};
+          WEDDING_CONFIG.bankAccount.groom.qrScale = newScale;
+          WEDDING_CONFIG.bankAccount.qrScale = newScale;
+        }
+        hasChanged = true;
+      }
+
+      // Xử lý thay đổi nguồn ảnh (URL hoặc File)
+      const newSrc = imgUrlInput ? imgUrlInput.value.trim() : '';
+      if (newSrc && newSrc !== (activeImgTarget.getAttribute('src') || '')) {
         activeImgTarget.src = newSrc;
         activeImgTarget.setAttribute('src', newSrc);
-
-        if (typeof WEDDING_CONFIG === 'undefined') window.WEDDING_CONFIG = {};
-        if (!WEDDING_CONFIG.images) WEDDING_CONFIG.images = {};
-
-        const imgBindKey = activeImgTarget.getAttribute('data-img-bind') || activeImgTarget.id;
 
         if (imgBindKey === 'opening-chibi' || activeImgTarget.id === 'opening-chibi-img') {
           if (!WEDDING_CONFIG.openingScreen) WEDDING_CONFIG.openingScreen = {};
@@ -2415,13 +2627,11 @@ function initVisualAdminModule() {
         } else if (imgBindKey === 'bank-qr' || imgBindKey === 'bank-qr-groom' || activeImgTarget.getAttribute('data-bind-src') === 'bank-qr-groom-img') {
           WEDDING_CONFIG.images.bankQrGroom = newSrc;
           WEDDING_CONFIG.images.bankQr = newSrc;
-          if (!WEDDING_CONFIG.bankAccount) WEDDING_CONFIG.bankAccount = {};
           if (!WEDDING_CONFIG.bankAccount.groom) WEDDING_CONFIG.bankAccount.groom = {};
           WEDDING_CONFIG.bankAccount.qrCodeUrl = newSrc;
           WEDDING_CONFIG.bankAccount.groom.qrCodeUrl = newSrc;
         } else if (imgBindKey === 'bank-qr-bride' || activeImgTarget.getAttribute('data-bind-src') === 'bank-qr-bride-img') {
           WEDDING_CONFIG.images.bankQrBride = newSrc;
-          if (!WEDDING_CONFIG.bankAccount) WEDDING_CONFIG.bankAccount = {};
           if (!WEDDING_CONFIG.bankAccount.bride) WEDDING_CONFIG.bankAccount.bride = {};
           WEDDING_CONFIG.bankAccount.bride.qrCodeUrl = newSrc;
         } else if (imgBindKey && imgBindKey.startsWith('gallery-')) {
@@ -2431,8 +2641,11 @@ function initVisualAdminModule() {
           }
           WEDDING_CONFIG.images.gallery[idx] = newSrc;
         }
+        hasChanged = true;
+      }
 
-        showAdminToast('✓ Đã áp dụng ảnh mới! Nhớ bấm nút [💾 Lưu Thay Đổi] ở góc dưới để lưu vĩnh viễn.');
+      if (hasChanged) {
+        showAdminToast('✓ Đã áp dụng thay đổi! Nhớ bấm nút [💾 Lưu Thay Đổi] ở góc dưới để lưu vĩnh viễn.');
       }
       closeModal(imgModal);
     });
@@ -2987,6 +3200,27 @@ function initVisualAdminModule() {
     const qrBrideSrc = readImg('[data-img-bind="bank-qr-bride"]', baseConfig.images.bankQrBride);
     baseConfig.images.bankQrBride = qrBrideSrc;
     baseConfig.bankAccount.bride.qrCodeUrl = qrBrideSrc;
+
+    // Thu thập tỉ lệ zoom QR
+    const qrGroomEl = document.querySelector('[data-img-bind="bank-qr-groom"], [data-img-bind="bank-qr"]');
+    if (qrGroomEl && qrGroomEl.dataset.qrScale) {
+      baseConfig.bankAccount.groom.qrScale = parseFloat(qrGroomEl.dataset.qrScale) || 1.35;
+      baseConfig.bankAccount.qrScale = baseConfig.bankAccount.groom.qrScale;
+    } else if (baseConfig.bankAccount?.groom?.qrScale !== undefined) {
+      // Giữ nguyên giá trị
+    } else {
+      baseConfig.bankAccount.groom.qrScale = 1.35;
+      baseConfig.bankAccount.qrScale = 1.35;
+    }
+
+    const qrBrideEl = document.querySelector('[data-img-bind="bank-qr-bride"]');
+    if (qrBrideEl && qrBrideEl.dataset.qrScale) {
+      baseConfig.bankAccount.bride.qrScale = parseFloat(qrBrideEl.dataset.qrScale) || 1.35;
+    } else if (baseConfig.bankAccount?.bride?.qrScale !== undefined) {
+      // Giữ nguyên giá trị
+    } else {
+      baseConfig.bankAccount.bride.qrScale = 1.35;
+    }
 
     const galleryImgs = [];
     for (let i = 0; i < 6; i++) {
