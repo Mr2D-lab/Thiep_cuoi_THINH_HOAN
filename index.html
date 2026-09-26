@@ -901,18 +901,8 @@
         </div>
       </div>
 
-      <div class="admin-form-group">
-        <label class="admin-label">📁 Chọn ảnh từ điện thoại / máy tính:</label>
-        <input type="file" id="admin-image-file" class="admin-input" accept="image/*">
-      </div>
-
-      <div class="admin-form-group">
-        <label for="admin-image-url" class="admin-label">🔗 Hoặc dán link ảnh trực tiếp:</label>
-        <input type="text" id="admin-image-url" class="admin-input" placeholder="https://... hoặc images/ten-anh.jpg">
-      </div>
-
-      <!-- Khung tùy chỉnh tỉ lệ thu phóng & căn chỉnh vị trí mã QR (Chỉ hiện khi chỉnh ảnh QR) -->
-      <div id="admin-qr-zoom-group" class="admin-form-group" style="display:none;background:#FAF8F5;border:1px solid #EFEAE6;padding:12px;border-radius:12px;">
+      <!-- Khung tùy chỉnh tỉ lệ thu phóng & căn chỉnh vị trí mã QR (Nằm ngay trên để vừa chỉnh vừa nhìn trực quan) -->
+      <div id="admin-qr-zoom-group" class="admin-form-group" style="display:none;background:#FAF8F5;border:1px solid #EFEAE6;padding:12px;border-radius:12px;margin-bottom:16px;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
           <label for="admin-qr-zoom-range" class="admin-label" style="margin-bottom:0;font-weight:700;">🔍 Tỉ lệ thu phóng (Crop ẩn viền chữ):</label>
           <span id="admin-qr-zoom-val" style="font-weight:700;color:#8B263E;font-size:13px;">135%</span>
@@ -942,6 +932,16 @@
         <p class="admin-hint-text" style="margin-top:8px;margin-bottom:0;">
           💡 Kéo phóng to để ẩn viền chữ, sau đó kéo "Lên / Xuống" để căn trọn vẹn mã QR vào giữa khung.
         </p>
+      </div>
+
+      <div class="admin-form-group">
+        <label class="admin-label">📁 Chọn ảnh từ điện thoại / máy tính:</label>
+        <input type="file" id="admin-image-file" class="admin-input" accept="image/*">
+      </div>
+
+      <div class="admin-form-group">
+        <label for="admin-image-url" class="admin-label">🔗 Hoặc dán link ảnh trực tiếp:</label>
+        <input type="text" id="admin-image-url" class="admin-input" placeholder="https://... hoặc images/ten-anh.jpg">
       </div>
 
       <div class="admin-btn-row">
@@ -1087,8 +1087,8 @@
   </div>
 
   <!-- Scripts (Cache buster chống lưu đệm) -->
-  <script src="config.js?v=20260926_qr_preview_match"></script>
-  <script src="script.js?v=20260926_qr_preview_match"></script>
+  <script src="config.js?v=20260926_qr_layout_reorder"></script>
+  <script src="script.js?v=20260926_qr_layout_reorder"></script>
 </body>
 
 </html>
