@@ -1455,13 +1455,12 @@ body.admin-mode-active .bank-card-admin-badge {
 /* 2. Floating Admin Toolbar Container */
 #admin-toolbar-container {
   position: fixed;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
+  bottom: 24px;
+  right: 20px;
   z-index: 999999;
   display: flex;
-  flex-direction: column;
-  align-items: center;
+  flex-direction: column-reverse;
+  align-items: flex-end;
   gap: 10px;
 }
 
@@ -1488,7 +1487,7 @@ body.admin-mode-active .bank-card-admin-badge {
 }
 
 .admin-toggle-btn:hover {
-  transform: translateY(-2px);
+  transform: translateY(-1px);
   box-shadow: 0 8px 28px rgba(0, 0, 0, 0.2), 0 3px 8px rgba(139, 38, 62, 0.15);
   background: rgba(255, 255, 255, 1);
 }
@@ -1526,7 +1525,7 @@ body.admin-mode-active .bank-card-admin-badge {
 
 @keyframes adminSlideUp {
   from {
-    transform: translateY(20px);
+    transform: translateY(10px);
     opacity: 0;
   }
 
