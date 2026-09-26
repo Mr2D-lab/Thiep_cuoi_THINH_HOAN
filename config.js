@@ -1,5 +1,5 @@
 /* ==========================================================================
-   BẢNG CẤU HÌNH THIỆP CƯỚI 2026 (Cập nhật: 1790391868947)
+   BẢNG CẤU HÌNH THIỆP CƯỚI 2026 (Cập nhật: 1790391912112)
    ========================================================================== */
 
 const WEDDING_CONFIG = {
@@ -139,9 +139,9 @@ const WEDDING_CONFIG = {
       "note": ""
     },
     "rsvp": {
-      "subtitle": "PHẢN HỒI THAM DỰ",
+      "subtitle": "",
       "heading": "Xác Nhận Tham Dự",
-      "prompt": "Xin vui lòng xác nhận trước ngày 15/08/2026 để chúng tôi chu toàn đón tiếp",
+      "prompt": "",
       "nameField": {
         "label": "Họ và tên *",
         "placeholder": "Nhập họ và tên của bạn"
@@ -209,5 +209,5 @@ const WEDDING_CONFIG = {
 
 if (typeof window !== 'undefined') {
   window.WEDDING_CONFIG = WEDDING_CONFIG;
-  window._weddingConfigBuildTime = "1790391868947";
+  window._weddingConfigBuildTime = "1790391912112";
 }
