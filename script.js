@@ -159,6 +159,13 @@ function applyWeddingConfig() {
 
   if (typeof WEDDING_CONFIG === 'undefined') return;
 
+  // Đảm bảo subtitle màn hình mở đầu không bị dính chữ Quý khách / Cùng gia đình từ bản lưu cũ
+  if (window.WEDDING_CONFIG && window.WEDDING_CONFIG.openingScreen && window.WEDDING_CONFIG.openingScreen.subtitle) {
+    let cleanSub = String(window.WEDDING_CONFIG.openingScreen.subtitle).replace(/[:\s]*(quý khách|cùng gia đình).*$/i, '').trim();
+    if (!cleanSub) cleanSub = 'Trân trọng kính mời';
+    window.WEDDING_CONFIG.openingScreen.subtitle = cleanSub;
+  }
+
   const cfg = WEDDING_CONFIG;
   const weddingDate = parseLocalDate(cfg.weddingDate);
 
@@ -540,7 +547,9 @@ function applyWeddingConfig() {
     if (key === 'opening-subtitle') {
       const slotEl = el.querySelector('#opening-guest-slot');
       const curSlotText = slotEl ? slotEl.textContent : '';
-      const prefixText = val !== undefined && val !== null && String(val).trim() ? String(val).trim() : 'Trân trọng kính mời';
+      let prefixText = val !== undefined && val !== null && String(val).trim() ? String(val).trim() : 'Trân trọng kính mời';
+      prefixText = prefixText.replace(/[:\s]*(quý khách|cùng gia đình).*$/i, '').trim();
+      if (!prefixText) prefixText = 'Trân trọng kính mời';
       el.innerHTML = `<span class="admin-field-autogen-inline select-none">${prefixText}</span><span id="opening-guest-slot" class="admin-field-autogen-inline select-none font-semibold text-rose">${curSlotText}</span>`;
       return;
     }
@@ -1654,13 +1663,23 @@ function initPersonalizedGuestLink() {
     window._currentGuestPronoun = pronounVal || '';
 
     // 1. Màn hình mở đầu
-    const openingSlot = document.getElementById('opening-guest-slot');
-    if (openingSlot) {
-      openingSlot.textContent = dNameVal ? `: ${dNameVal}` : '';
-    } else {
-      const openingSub = document.querySelector('[data-bind="opening-subtitle"]');
-      if (openingSub && dNameVal) {
-        openingSub.textContent = `Trân trọng kính mời: ${dNameVal}`;
+    const openingSub = document.querySelector('[data-bind="opening-subtitle"]');
+    if (openingSub) {
+      let firstSpan = openingSub.querySelector('span:first-child');
+      let openingSlot = openingSub.querySelector('#opening-guest-slot');
+      if (!firstSpan || !openingSlot) {
+        openingSub.innerHTML = `<span class="admin-field-autogen-inline select-none">Trân trọng kính mời</span><span id="opening-guest-slot" class="admin-field-autogen-inline select-none font-semibold text-rose"></span>`;
+        firstSpan = openingSub.querySelector('span:first-child');
+        openingSlot = openingSub.querySelector('#opening-guest-slot');
+      }
+      let prefix = firstSpan ? firstSpan.textContent.replace(/[:\s]*(quý khách|cùng gia đình).*$/i, '').trim() : 'Trân trọng kính mời';
+      if (!prefix) prefix = 'Trân trọng kính mời';
+      firstSpan.textContent = prefix;
+
+      if (dNameVal) {
+        openingSlot.textContent = `: ${dNameVal}`;
+      } else {
+        openingSlot.textContent = window._isAdmin ? '' : ' Quý khách cùng gia đình';
       }
     }
 
@@ -1776,6 +1795,49 @@ function initPersonalizedGuestLink() {
   // 5. Điều hướng hiển thị thông tin QR Mừng Cưới theo đối tượng khách
   window._currentGuestOf = guestOf || '';
   applyQrGuestVisibility(guestOf);
+
+  // 6. Tải ngầm danh sách khách mời từ guests.json nếu máy khách mở link từ xa (chưa có trong localStorage)
+  if (slug && !matchedGuest && typeof fetch === 'function') {
+    fetch('guests.json')
+      .then(res => res.ok ? res.json() : [])
+      .then(list => {
+        if (Array.isArray(list) && list.length > 0) {
+          try {
+            localStorage.setItem('wedding_guest_list', JSON.stringify(list));
+          } catch (e) {}
+          const found = list.find(g => {
+            const gSlug = (g.slug || '').replace(/^\/+|\/+$/g, '').toLowerCase();
+            const currentSlug = slug.toLowerCase();
+            return gSlug === currentSlug || gSlug === currentSlug.replace(/^thiep_cuoi_gui_/, '');
+          });
+          if (found) {
+            const p = found.pronoun || extractGuestPronoun(found.displayName, found);
+            const d = found.displayName || '';
+            const f = found.fullName || d;
+            applyPronounUI(p, d);
+            applyQrGuestVisibility(found.guestOf || '');
+            const rsvpInput = document.querySelector('.vs-attendance-name');
+            if (rsvpInput) rsvpInput.value = f;
+            if (found.guestOf) {
+              const radio = document.querySelector(`input[name="guest_of"][value="${found.guestOf}"]`);
+              if (radio) {
+                radio.checked = true;
+                document.querySelectorAll('input[name="guest_of"]').forEach(r => {
+                  const opt = r.closest('.radio-option');
+                  if (opt) {
+                    if (r.checked) opt.classList.add('checked');
+                    else opt.classList.remove('checked');
+                  }
+                });
+              }
+            }
+          }
+        }
+      })
+      .catch(err => {
+        console.warn('Không thể tải ngầm guests.json:', err);
+      });
+  }
 }
 
 /**
@@ -3450,7 +3512,7 @@ function initVisualAdminModule() {
 
     // Màn hình mở đầu
     const opTitle = getText('opening-title'); if (opTitle !== null) baseConfig.openingScreen.title = opTitle;
-    const opSub = getText('opening-subtitle'); if (opSub !== null) baseConfig.openingScreen.subtitle = opSub;
+    baseConfig.openingScreen.subtitle = 'Trân trọng kính mời';
     const opBtn = getText('opening-button-text'); if (opBtn !== null) baseConfig.openingScreen.buttonText = opBtn;
     const opHint = getText('opening-hint-text'); if (opHint !== null) baseConfig.openingScreen.hintText = opHint;
 

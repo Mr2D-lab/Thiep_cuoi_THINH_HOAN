@@ -6,7 +6,7 @@ const WEDDING_CONFIG = {
   "openingScreen": {
     "enabled": true,
     "title": "WEDDING INVITATION",
-    "subtitle": "TRÂN TRỌNG KÍNH MỜI QUÝ KHÁCH CÙNG GIA ĐÌNH",
+    "subtitle": "Trân trọng kính mời",
     "coupleImage": "images/ảnh cô dâu chú rể xóa nền.png",
     "buttonText": "Mở Thiệp Cưới",
     "hintText": "Chạm để mở thiệp & lắng nghe giai điệu ♪"
