@@ -35,6 +35,61 @@ if (document.readyState === 'loading') {
 /* =====================================================
    0. Dynamic Wedding Configuration Binding
    ===================================================== */
+function parseLocalDate(dateStr) {
+  if (!dateStr) return null;
+  const parts = dateStr.split('-');
+  if (parts.length === 3) {
+    return new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+  }
+  return new Date(dateStr);
+}
+
+const dayNames = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
+
+function pad(num) {
+  return String(num).padStart(2, '0');
+}
+
+function formatDateDots(d) {
+  if (!d) return '';
+  return `${pad(d.getDate())} . ${pad(d.getMonth() + 1)} . ${d.getFullYear()}`;
+}
+
+function formatDateFull(d) {
+  if (!d) return '';
+  const dayOfWeek = dayNames[d.getDay()];
+  return `${dayOfWeek}, ngày ${pad(d.getDate())} tháng ${pad(d.getMonth() + 1)} năm ${d.getFullYear()}`;
+}
+
+function formatDateShort(d) {
+  if (!d) return '';
+  const dayOfWeek = dayNames[d.getDay()];
+  return `${dayOfWeek}, ${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()}`;
+}
+
+function formatMonthYear(d) {
+  if (!d) return '';
+  return `${pad(d.getMonth() + 1)} / ${d.getFullYear()}`;
+}
+
+function formatRsvpDeadline(d, daysBefore = 7) {
+  if (!d) return '';
+  const deadline = new Date(d.getTime());
+  deadline.setDate(deadline.getDate() - daysBefore);
+  return `${pad(deadline.getDate())}/${pad(deadline.getMonth() + 1)}/${deadline.getFullYear()}`;
+}
+
+function formatTimeText(timeStr) {
+  if (!timeStr) return '';
+  const parts = timeStr.split(':');
+  return `${parseInt(parts[0], 10)} giờ ${parts[1] || '00'}`;
+}
+
+function formatAccountNumber(numStr) {
+  if (!numStr) return '';
+  return numStr.replace(/\s+/g, '').replace(/(\d{4})(?=\d)/g, '$1 ');
+}
+
 function applyWeddingConfig() {
   // Nạp bản nháp đã lưu tại máy này (nếu có)
   try {
@@ -52,62 +107,7 @@ function applyWeddingConfig() {
   if (typeof WEDDING_CONFIG === 'undefined') return;
 
   const cfg = WEDDING_CONFIG;
-
-  function parseLocalDate(dateStr) {
-    if (!dateStr) return null;
-    const parts = dateStr.split('-');
-    if (parts.length === 3) {
-      return new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
-    }
-    return new Date(dateStr);
-  }
-
   const weddingDate = parseLocalDate(cfg.weddingDate);
-  const dayNames = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
-
-  function pad(num) {
-    return String(num).padStart(2, '0');
-  }
-
-  function formatDateDots(d) {
-    if (!d) return '';
-    return `${pad(d.getDate())} . ${pad(d.getMonth() + 1)} . ${d.getFullYear()}`;
-  }
-
-  function formatDateFull(d) {
-    if (!d) return '';
-    const dayOfWeek = dayNames[d.getDay()];
-    return `${dayOfWeek}, ngày ${pad(d.getDate())} tháng ${pad(d.getMonth() + 1)} năm ${d.getFullYear()}`;
-  }
-
-  function formatDateShort(d) {
-    if (!d) return '';
-    const dayOfWeek = dayNames[d.getDay()];
-    return `${dayOfWeek}, ${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()}`;
-  }
-
-  function formatMonthYear(d) {
-    if (!d) return '';
-    return `${pad(d.getMonth() + 1)} / ${d.getFullYear()}`;
-  }
-
-  function formatRsvpDeadline(d, daysBefore = 7) {
-    if (!d) return '';
-    const deadline = new Date(d.getTime());
-    deadline.setDate(deadline.getDate() - daysBefore);
-    return `${pad(deadline.getDate())}/${pad(deadline.getMonth() + 1)}/${deadline.getFullYear()}`;
-  }
-
-  function formatTimeText(timeStr) {
-    if (!timeStr) return '';
-    const parts = timeStr.split(':');
-    return `${parseInt(parts[0], 10)} giờ ${parts[1] || '00'}`;
-  }
-
-  function formatAccountNumber(numStr) {
-    if (!numStr) return '';
-    return numStr.replace(/\s+/g, '').replace(/(\d{4})(?=\d)/g, '$1 ');
-  }
 
   // Update Page Title
   if (cfg.bride?.name && cfg.groom?.name) {
@@ -1489,6 +1489,36 @@ function initPersonalizedGuestLink() {
    VISUAL ADMIN / DEVELOPER MODE MODULE (#admin)
    ===================================================== */
 function initVisualAdminModule() {
+  // Danh sách trường tự động sinh (không cho phép nhập con trỏ chuột)
+  const AUTO_GENERATED_BINDS = [
+    'couple-names-invite',
+    'couple-footer',
+    'wedding-date-dots',
+    'wedding-date-full',
+    'countdown-days-label',
+    'countdown-hours-label',
+    'countdown-minutes-label',
+    'countdown-seconds-label',
+    'event-ceremony-date',
+    'event-reception-date'
+  ];
+
+  // Bảng placeholder cho các trường rỗng khi bật Admin Mode
+  const EMPTY_FIELD_PLACEHOLDERS = {
+    'groom-father': 'Bố Chú Rể',
+    'groom-mother': 'Mẹ Chú Rể',
+    'groom-address': 'Địa chỉ Nhà Trai',
+    'bride-father': 'Bố Cô Dâu',
+    'bride-mother': 'Mẹ Cô Dâu',
+    'bride-address': 'Địa chỉ Nhà Gái',
+    'footer-thankyou': 'Lời cảm ơn chân trang',
+    'rsvp-subtitle': 'PHẢN HỒI THAM DỰ',
+    'rsvp-heading': 'Xác Nhận Tham Dự',
+    'rsvp-deadline-text': 'Xin vui lòng xác nhận trước ngày...',
+    'rsvp-attendance-label': 'Tiêu đề xác nhận tham gia',
+    'rsvp-guestof-label': 'Tiêu đề khách của ai'
+  };
+
   const loginModal = document.getElementById('admin-login-modal');
   const loginForm = document.getElementById('admin-login-form');
   const pwdInput = document.getElementById('admin-password-input');
@@ -1695,9 +1725,6 @@ function initVisualAdminModule() {
     }
   }
 
-  window.addEventListener('hashchange', handleRoute);
-  handleRoute();
-
   // 4. Xử lý Đăng Nhập
   if (cancelBtn) {
     cancelBtn.addEventListener('click', () => {
@@ -1888,11 +1915,11 @@ function initVisualAdminModule() {
       document.title = `${val} & ${WEDDING_CONFIG.groom?.name || ''} — Thiệp Cưới 2026`;
     }
 
-    // 3. Phân tích ngày cưới khi người dùng gõ
+    // 3. Phân tích ngày cưới khi người dùng gõ (Đồng bộ theo thời gian thực từ Thiệp Mời Chính)
     else if (key === 'wedding-date-day' || key === 'wedding-date-month' || key === 'wedding-date-year') {
-      const dEl = document.querySelector('[data-bind="wedding-date-day"]');
-      const mEl = document.querySelector('[data-bind="wedding-date-month"]');
-      const yEl = document.querySelector('[data-bind="wedding-date-year"]');
+      const dEl = document.querySelector('.wedding-date-row [data-bind="wedding-date-day"]') || document.querySelector('[data-bind="wedding-date-day"]');
+      const mEl = document.querySelector('.wedding-date-row [data-bind="wedding-date-month"]') || document.querySelector('[data-bind="wedding-date-month"]');
+      const yEl = document.querySelector('.wedding-date-row [data-bind="wedding-date-year"]') || document.querySelector('[data-bind="wedding-date-year"]');
       const d = dEl ? dEl.innerText.trim() : '';
       const m = mEl ? mEl.innerText.trim() : '';
       const y = yEl ? yEl.innerText.trim() : '';
@@ -1901,16 +1928,22 @@ function initVisualAdminModule() {
         WEDDING_CONFIG.weddingDate = iso;
         const testD = parseLocalDate(iso);
         if (testD && !isNaN(testD.getTime())) {
+          // Cập nhật dòng ngày đầy đủ
           const fullEl = document.querySelector('[data-bind="wedding-date-full"]');
           if (fullEl) fullEl.innerText = formatDateFull(testD);
-          document.querySelectorAll('[data-bind="wedding-date-day"]').forEach(other => { if (other !== dEl) other.innerText = pad(d); });
-          document.querySelectorAll('[data-bind="wedding-date-month"]').forEach(other => { if (other !== mEl) other.innerText = pad(m); });
-          document.querySelectorAll('[data-bind="wedding-date-year"]').forEach(other => { if (other !== yEl) other.innerText = String(y); });
-          document.querySelectorAll('[data-bind="wedding-date-dots"]').forEach(other => { other.innerText = formatDateDots(testD); });
+          // Cập nhật tất cả các vị trí hiển thị ngày dạng chấm (Opening, Hero, Footer)
+          document.querySelectorAll('[data-bind="wedding-date-dots"]').forEach(other => {
+            other.innerText = formatDateDots(testD);
+          });
+          // Cập nhật ngày cho Lễ Thành Hôn và Tiệc Cưới
           const cerDateEl = document.querySelector('[data-bind="event-ceremony-date"]');
           if (cerDateEl) cerDateEl.innerText = formatDateShort(testD);
           const recDateEl = document.querySelector('[data-bind="event-reception-date"]');
           if (recDateEl) recDateEl.innerText = formatDateShort(testD);
+          // Cập nhật đồng hồ đếm ngược theo thời gian thực
+          if (typeof initCountdown === 'function') {
+            initCountdown();
+          }
         }
       }
     }
@@ -1932,12 +1965,15 @@ function initVisualAdminModule() {
 
     // 4. Phân tích giờ cưới khi người dùng gõ
     else if (key === 'wedding-time-hour' || key === 'wedding-time-minute') {
-      const hEl = document.querySelector('[data-bind="wedding-time-hour"]');
-      const mEl = document.querySelector('[data-bind="wedding-time-minute"]');
+      const hEl = document.querySelector('.wedding-time-row [data-bind="wedding-time-hour"]') || document.querySelector('[data-bind="wedding-time-hour"]');
+      const mEl = document.querySelector('.wedding-time-row [data-bind="wedding-time-minute"]') || document.querySelector('[data-bind="wedding-time-minute"]');
       const h = hEl ? hEl.innerText.trim() : '';
       const m = mEl ? mEl.innerText.trim() : '';
       if (h !== '' && m !== '' && !isNaN(h) && !isNaN(m)) {
         WEDDING_CONFIG.weddingTime = `${pad(h)}:${pad(m)}`;
+        if (typeof initCountdown === 'function') {
+          initCountdown();
+        }
       }
     }
     else if (key === 'wedding-time-text') {
@@ -2026,35 +2062,6 @@ function initVisualAdminModule() {
     else if (key === 'bank-account-number') WEDDING_CONFIG.bankAccount.accountNumber = val.replace(/\s+/g, '');
   }
 
-  // Danh sách trường tự động sinh (không cho phép nhập con trỏ chuột)
-  const AUTO_GENERATED_BINDS = [
-    'couple-names-invite',
-    'couple-footer',
-    'wedding-date-full',
-    'countdown-days-label',
-    'countdown-hours-label',
-    'countdown-minutes-label',
-    'countdown-seconds-label',
-    'event-ceremony-date',
-    'event-reception-date'
-  ];
-
-  // Bảng placeholder cho các trường rỗng khi bật Admin Mode
-  const EMPTY_FIELD_PLACEHOLDERS = {
-    'groom-father': 'Bố Chú Rể',
-    'groom-mother': 'Mẹ Chú Rể',
-    'groom-address': 'Địa chỉ Nhà Trai',
-    'bride-father': 'Bố Cô Dâu',
-    'bride-mother': 'Mẹ Cô Dâu',
-    'bride-address': 'Địa chỉ Nhà Gái',
-    'footer-thankyou': 'Lời cảm ơn chân trang',
-    'rsvp-subtitle': 'PHẢN HỒI THAM DỰ',
-    'rsvp-heading': 'Xác Nhận Tham Dự',
-    'rsvp-deadline-text': 'Xin vui lòng xác nhận trước ngày...',
-    'rsvp-attendance-label': 'Tiêu đề xác nhận tham gia',
-    'rsvp-guestof-label': 'Tiêu đề khách của ai'
-  };
-
   function handleEmptyFieldFocus(e) {
     const el = e.currentTarget;
     const ph = el.getAttribute('data-empty-placeholder');
@@ -2106,7 +2113,11 @@ function initVisualAdminModule() {
         el.removeAttribute('contenteditable');
         el.setAttribute('contenteditable', 'false');
         el.classList.add('admin-field-autogen');
-        el.setAttribute('title', '🔒 Trường này được tự động tạo từ tên Cô dâu & Chú rể (chỉnh sửa tên Cô dâu / Chú rể để đổi)');
+        if (key.startsWith('wedding-date') || key.startsWith('event-')) {
+          el.setAttribute('title', '🔒 Trường này được tự động đồng bộ từ ngày cưới tại Mục Thiệp Mời Chính');
+        } else {
+          el.setAttribute('title', '🔒 Trường này được tự động tạo từ tên Cô dâu & Chú rể (chỉnh sửa tên Cô dâu / Chú rể để đổi)');
+        }
         return;
       }
 
@@ -2134,6 +2145,11 @@ function initVisualAdminModule() {
 
     // Mở màn hình mở đầu nếu đang bị khóa cuộn để admin dễ chỉnh sửa toàn trang
     document.body.classList.remove('opening-locked');
+    const openingOverlay = document.getElementById('opening-overlay');
+    if (openingOverlay) {
+      openingOverlay.classList.add('is-hidden');
+      openingOverlay.style.display = 'none';
+    }
 
     // Bắt sự kiện click vào ảnh để mở modal thay ảnh
     document.querySelectorAll('img').forEach(img => {
@@ -2537,9 +2553,12 @@ function initVisualAdminModule() {
     const bAddr = getText('bride-address'); if (bAddr !== null) baseConfig.bride.address = bAddr;
 
     // Ngày cưới & Giờ cưới (Tự động nhận diện chuỗi ngày giờ gõ tay)
-    const dVal = getText('wedding-date-day');
-    const mVal = getText('wedding-date-month');
-    const yVal = getText('wedding-date-year');
+    const dValEl = document.querySelector('.wedding-date-row [data-bind="wedding-date-day"]') || document.querySelector('[data-bind="wedding-date-day"]');
+    const mValEl = document.querySelector('.wedding-date-row [data-bind="wedding-date-month"]') || document.querySelector('[data-bind="wedding-date-month"]');
+    const yValEl = document.querySelector('.wedding-date-row [data-bind="wedding-date-year"]') || document.querySelector('[data-bind="wedding-date-year"]');
+    const dVal = dValEl ? dValEl.innerText.trim() : getText('wedding-date-day');
+    const mVal = mValEl ? mValEl.innerText.trim() : getText('wedding-date-month');
+    const yVal = yValEl ? yValEl.innerText.trim() : getText('wedding-date-year');
     if (dVal && mVal && yVal && !isNaN(dVal) && !isNaN(mVal) && !isNaN(yVal)) {
       baseConfig.weddingDate = `${yVal}-${pad(mVal)}-${pad(dVal)}`;
     } else {
@@ -2551,8 +2570,10 @@ function initVisualAdminModule() {
       }
     }
 
-    const hVal = getText('wedding-time-hour');
-    const minVal = getText('wedding-time-minute');
+    const hValEl = document.querySelector('.wedding-time-row [data-bind="wedding-time-hour"]') || document.querySelector('[data-bind="wedding-time-hour"]');
+    const minValEl = document.querySelector('.wedding-time-row [data-bind="wedding-time-minute"]') || document.querySelector('[data-bind="wedding-time-minute"]');
+    const hVal = hValEl ? hValEl.innerText.trim() : getText('wedding-time-hour');
+    const minVal = minValEl ? minValEl.innerText.trim() : getText('wedding-time-minute');
     if (hVal !== null && minVal !== null && hVal !== '' && minVal !== '' && !isNaN(hVal) && !isNaN(minVal)) {
       baseConfig.weddingTime = `${pad(hVal)}:${pad(minVal)}`;
     } else {
@@ -3582,6 +3603,10 @@ function initVisualAdminModule() {
       alert(msg);
     }
   }
+
+  // 12. Kích hoạt định tuyến & kiểm tra hash sau khi toàn bộ module đã sẵn sàng
+  window.addEventListener('hashchange', handleRoute);
+  handleRoute();
 }
 
 
