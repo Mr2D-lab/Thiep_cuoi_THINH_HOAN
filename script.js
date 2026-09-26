@@ -380,8 +380,15 @@ function applyWeddingConfig() {
           el.textContent = val;
         }
       } else {
-        // Nếu trường được cấu hình rõ ràng là rỗng "" -> Tự động ẩn phần tử
-        if (el.style) el.style.display = 'none';
+        // Nếu trường được cấu hình rõ ràng là rỗng "" -> Xóa nội dung trong DOM để không bị lưu đè text mặc định
+        el.textContent = '';
+        // Riêng các trường bố mẹ: không dùng display: none để giữ nguyên cấu trúc hàng ngang cân xứng
+        const isParentField = ['groom-father', 'groom-mother', 'bride-father', 'bride-mother'].includes(key);
+        if (el.style && !isParentField) {
+          el.style.display = 'none';
+        } else if (el.style && isParentField) {
+          el.style.display = '';
+        }
       }
     }
   });
@@ -395,19 +402,23 @@ function applyWeddingConfig() {
     }
   });
 
-  // Xử lý ẩn khối Nhà Trai / Nhà Gái nếu không có cả bố lẫn mẹ
-  const groomHasParents = Boolean((cfg.groom?.father && cfg.groom.father.trim()) || (cfg.groom?.mother && cfg.groom.mother.trim()));
-  const brideHasParents = Boolean((cfg.bride?.father && cfg.bride.father.trim()) || (cfg.bride?.mother && cfg.bride.mother.trim()));
+  // Xử lý ẩn/hiện hàng Bố - Mẹ chuẩn xác (luôn cùng hàng)
+  const hasGroomFather = Boolean(cfg.groom?.father && cfg.groom.father.trim());
+  const hasBrideFather = Boolean(cfg.bride?.father && cfg.bride.father.trim());
+  const hasGroomMother = Boolean(cfg.groom?.mother && cfg.groom.mother.trim());
+  const hasBrideMother = Boolean(cfg.bride?.mother && cfg.bride.mother.trim());
 
-  const groomCol = document.querySelector('[data-bind="groom-father"]')?.closest?.('.flex-1');
-  const brideCol = document.querySelector('[data-bind="bride-father"]')?.closest?.('.flex-1');
-  const parentsRow = groomCol?.parentElement;
+  const hasAnyFather = hasGroomFather || hasBrideFather;
+  const hasAnyMother = hasGroomMother || hasBrideMother;
+  const hasAnyParents = hasAnyFather || hasAnyMother;
 
-  if (groomCol) groomCol.style.display = groomHasParents ? '' : 'none';
-  if (brideCol) brideCol.style.display = brideHasParents ? '' : 'none';
-  if (parentsRow && !groomHasParents && !brideHasParents) {
-    parentsRow.style.display = 'none';
-  }
+  const rowFathers = document.querySelector('.parents-row-fathers');
+  const rowMothers = document.querySelector('.parents-row-mothers');
+  const parentsContainer = document.querySelector('.parents-container');
+
+  if (rowFathers) rowFathers.style.display = hasAnyFather ? '' : 'none';
+  if (rowMothers) rowMothers.style.display = hasAnyMother ? '' : 'none';
+  if (parentsContainer) parentsContainer.style.display = hasAnyParents ? '' : 'none';
 
   // Special attribute bindings (QR & Bank)
   if (cfg.bankAccount) {
@@ -1981,13 +1992,16 @@ function initVisualAdminModule() {
 
   // Bảng placeholder cho các trường rỗng khi bật Admin Mode
   const EMPTY_FIELD_PLACEHOLDERS = {
-    'groom-father': 'Bố Chú Rể (để trống nếu không có)',
-    'groom-mother': 'Mẹ Chú Rể (để trống nếu không có)',
+    'groom-father': 'Bố Chú Rể',
+    'groom-mother': 'Mẹ Chú Rể',
     'groom-address': 'Địa chỉ Nhà Trai',
-    'bride-father': 'Bố Cô Dâu (để trống nếu không có)',
-    'bride-mother': 'Mẹ Cô Dâu (để trống nếu không có)',
+    'bride-father': 'Bố Cô Dâu',
+    'bride-mother': 'Mẹ Cô Dâu',
     'bride-address': 'Địa chỉ Nhà Gái',
-    'footer-thankyou': 'Lời cảm ơn chân trang (để trống nếu không có)',
+    'footer-thankyou': 'Lời cảm ơn chân trang',
+    'rsvp-subtitle': 'PHẢN HỒI THAM DỰ',
+    'rsvp-heading': 'Xác Nhận Tham Dự',
+    'rsvp-deadline-text': 'Xin vui lòng xác nhận trước ngày...',
     'rsvp-attendance-label': 'Tiêu đề xác nhận tham gia',
     'rsvp-guestof-label': 'Tiêu đề khách của ai'
   };
@@ -2002,10 +2016,17 @@ function initVisualAdminModule() {
 
   function handleEmptyFieldBlur(e) {
     const el = e.currentTarget;
-    const ph = el.getAttribute('data-empty-placeholder');
-    if (ph && !el.innerText.trim()) {
-      el.innerText = ph;
-      el.classList.add('admin-empty-field');
+    let ph = el.getAttribute('data-empty-placeholder');
+    const key = el.getAttribute('data-bind');
+    if (!el.innerText.trim()) {
+      if (!ph && key) {
+        ph = EMPTY_FIELD_PLACEHOLDERS[key] || `[Nhấp để nhập ${key}]`;
+        el.setAttribute('data-empty-placeholder', ph);
+      }
+      if (ph) {
+        el.innerText = ph;
+        el.classList.add('admin-empty-field');
+      }
     } else if (el.innerText.trim()) {
       el.classList.remove('admin-empty-field');
     }
@@ -2020,12 +2041,12 @@ function initVisualAdminModule() {
     if (toolbar) toolbar.style.display = 'flex';
 
     // Đảm bảo hiển thị cả hai cột bố mẹ để admin có thể thêm/sửa
-    const groomCol = document.querySelector('[data-bind="groom-father"]')?.closest?.('.flex-1');
-    const brideCol = document.querySelector('[data-bind="bride-father"]')?.closest?.('.flex-1');
-    const parentsRow = groomCol?.parentElement;
-    if (groomCol) groomCol.style.display = '';
-    if (brideCol) brideCol.style.display = '';
-    if (parentsRow) parentsRow.style.display = '';
+    const rowFathers = document.querySelector('.parents-row-fathers');
+    const rowMothers = document.querySelector('.parents-row-mothers');
+    const parentsContainer = document.querySelector('.parents-container');
+    if (rowFathers) rowFathers.style.display = '';
+    if (rowMothers) rowMothers.style.display = '';
+    if (parentsContainer) parentsContainer.style.display = '';
 
     // Cho phép sửa trực tiếp mọi văn bản có data-bind & gắn lắng nghe đồng bộ theo thời gian thực
     document.querySelectorAll('[data-bind]').forEach(el => {

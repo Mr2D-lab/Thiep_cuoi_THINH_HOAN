@@ -139,9 +139,9 @@ const WEDDING_CONFIG = {
       "note": ""
     },
     "rsvp": {
-      "subtitle": "PHẢN HỒI THAM DỰ",
+      "subtitle": "",
       "heading": "Xác Nhận Tham Dự",
-      "prompt": "Xin vui lòng xác nhận trước ngày 15/08/2026 để chúng tôi chu toàn đón tiếp",
+      "prompt": "",
       "nameField": {
         "label": "Họ và tên *",
         "placeholder": "Nhập họ và tên của bạn"

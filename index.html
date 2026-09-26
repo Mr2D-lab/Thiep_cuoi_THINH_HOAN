@@ -193,24 +193,28 @@
         <div class="dot-accent mx-auto mb-6"></div>
 
         <!-- Parents -->
-        <div class="flex justify-center gap-6 mb-6">
-          <!-- Nhà Trai -->
-          <div class="flex-1 text-center">
-            <p class="font-sans text-rose text-[11px] tracking-[0.3em] uppercase font-bold mb-2.5"
-              data-bind="invitation-groom-family-title">Nhà Trai</p>
-            <p class="font-script text-dark text-base leading-relaxed italic" data-bind="groom-father" style="display:none;"></p>
-            <p class="font-script text-dark text-base leading-relaxed italic" data-bind="groom-mother">Bà Đặng Thị Tuyết
-            </p>
-            <p class="font-sans text-muted text-[11px] mt-1.5 leading-tight" data-bind="groom-address">Xóm Đại Đồng, xã Bạch Hà, tỉnh Nghệ An (xóm 2, Đại Sơn, Đô Lương cũ)</p>
+        <div class="parents-container mb-6 max-w-md mx-auto">
+          <!-- Hàng 1: Tiêu đề Nhà Trai / Nhà Gái -->
+          <div class="flex justify-center gap-6 mb-2">
+            <div class="flex-1 text-center font-sans text-rose text-[11px] tracking-[0.3em] uppercase font-bold"
+              data-bind="invitation-groom-family-title">Nhà Trai</div>
+            <div class="flex-1 text-center font-sans text-rose text-[11px] tracking-[0.3em] uppercase font-bold"
+              data-bind="invitation-bride-family-title">Nhà Gái</div>
           </div>
-          <!-- Nhà Gái -->
-          <div class="flex-1 text-center">
-            <p class="font-sans text-rose text-[11px] tracking-[0.3em] uppercase font-bold mb-2.5"
-              data-bind="invitation-bride-family-title">Nhà Gái</p>
-            <p class="font-script text-dark text-base leading-relaxed italic" data-bind="bride-father">Ông Nguyễn Mỹ Thưởng
-            </p>
-            <p class="font-script text-dark text-base leading-relaxed italic" data-bind="bride-mother">Bà Nguyễn Thị Nhàn</p>
-            <p class="font-sans text-muted text-[11px] mt-1.5 leading-tight" data-bind="bride-address">Xóm Văn Tân, xã Thuần Trung, tỉnh Nghệ An (xóm văn Tân, Nhân Sơn, Đô Lương cũ)</p>
+          <!-- Hàng 2: Bố (Cùng hàng) -->
+          <div class="flex justify-center gap-6 parents-row-fathers">
+            <div class="flex-1 text-center font-script text-dark text-base leading-relaxed italic" data-bind="groom-father"></div>
+            <div class="flex-1 text-center font-script text-dark text-base leading-relaxed italic" data-bind="bride-father">Ông Nguyễn Mỹ Thưởng</div>
+          </div>
+          <!-- Hàng 3: Mẹ (Cùng hàng) -->
+          <div class="flex justify-center gap-6 parents-row-mothers">
+            <div class="flex-1 text-center font-script text-dark text-base leading-relaxed italic" data-bind="groom-mother">Bà Đặng Thị Tuyết</div>
+            <div class="flex-1 text-center font-script text-dark text-base leading-relaxed italic" data-bind="bride-mother">Bà Nguyễn Thị Nhàn</div>
+          </div>
+          <!-- Hàng 4: Địa chỉ (Cùng hàng) -->
+          <div class="flex justify-center gap-6 parents-row-addresses mt-1.5">
+            <div class="flex-1 text-center font-sans text-muted text-[11px] leading-tight" data-bind="groom-address">Xóm Đại Đồng, xã Bạch Hà, tỉnh Nghệ An (xóm 2, Đại Sơn, Đô Lương cũ)</div>
+            <div class="flex-1 text-center font-sans text-muted text-[11px] leading-tight" data-bind="bride-address">Xóm Văn Tân, xã Thuần Trung, tỉnh Nghệ An (xóm văn Tân, Nhân Sơn, Đô Lương cũ)</div>
           </div>
         </div>
 
@@ -992,8 +996,8 @@
   </div>
 
   <!-- Scripts (Cache buster chống lưu đệm) -->
-  <script src="config.js?v=20260926_fix_edit"></script>
-  <script src="script.js?v=20260926_fix_edit"></script>
+  <script src="config.js?v=20260926_parents_align"></script>
+  <script src="script.js?v=20260926_parents_align"></script>
 </body>
 
 </html>
