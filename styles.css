@@ -1206,6 +1206,50 @@ body.admin-mode-active [data-bind]:focus {
   background-color: rgba(139, 38, 62, 0.09);
 }
 
+/* Các trường tự động sinh ra: khóa con trỏ chuột, không cho phép nhập text */
+body.admin-mode-active [data-bind].admin-field-autogen,
+body.admin-mode-active .admin-field-autogen {
+  cursor: not-allowed !important;
+  outline: 1.5px dashed rgba(156, 163, 175, 0.5) !important;
+  background-color: rgba(0, 0, 0, 0.02) !important;
+  user-select: none !important;
+  pointer-events: auto !important;
+}
+
+body.admin-mode-active [data-bind].admin-field-autogen:hover {
+  outline-color: #6B7280 !important;
+  background-color: rgba(0, 0, 0, 0.04) !important;
+}
+
+/* Trường đếm ngược số: không cho phép nhập chuột */
+body.admin-mode-active .vs-time-days,
+body.admin-mode-active .vs-time-hours,
+body.admin-mode-active .vs-time-minutes,
+body.admin-mode-active .vs-time-seconds {
+  cursor: default !important;
+  user-select: none !important;
+}
+
+/* Các trường rỗng hiển thị placeholder trong Admin Mode */
+body.admin-mode-active [data-bind].admin-empty-field {
+  display: block !important;
+  min-height: 1.5em;
+  min-width: 60px;
+  color: #9CA3AF !important;
+  font-style: italic !important;
+  outline: 1.5px dashed #F87171 !important;
+  background-color: rgba(254, 226, 226, 0.35) !important;
+  border-radius: 4px;
+  padding: 1px 6px;
+}
+
+body.admin-mode-active [data-bind].admin-empty-field:focus {
+  color: inherit !important;
+  font-style: normal !important;
+  outline: 2px solid #8B263E !important;
+  background-color: rgba(139, 38, 62, 0.09) !important;
+}
+
 body.admin-mode-active img {
   cursor: pointer !important;
   position: relative;

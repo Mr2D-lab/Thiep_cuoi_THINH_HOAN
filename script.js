@@ -150,10 +150,12 @@ function applyWeddingConfig() {
   // 1. Địa chỉ trên Thiệp Mời Chính (Section 2)
   if (cfg.venues?.invitation) {
     const inv = cfg.venues.invitation;
-    if (inv.location && inv.address) {
-      bindings['invitation-venue'] = `${inv.location}:<br>${inv.address.replace(/\n/g, '<br>')}`;
+    const invLoc = (inv.location || '').replace(/[:\s]+$/, '').trim();
+    const invAddr = (inv.address || '').trim();
+    if (invLoc && invAddr) {
+      bindings['invitation-venue'] = `${invLoc}:<br>${invAddr.replace(/\n/g, '<br>')}`;
     } else {
-      bindings['invitation-venue'] = (inv.location || inv.address || '').replace(/\n/g, '<br>');
+      bindings['invitation-venue'] = (invLoc || invAddr).replace(/\n/g, '<br>');
     }
   } else if (cfg.invitationVenue) {
     bindings['invitation-venue'] = cfg.invitationVenue.replace(/\n/g, '<br>');
@@ -168,10 +170,12 @@ function applyWeddingConfig() {
     bindings['event-ceremony-date'] = ceremonyData.dateText || formatDateShort(cerDate);
 
     let cerAddrHtml = '';
-    if (ceremonyData.locationName && ceremonyData.address) {
-      cerAddrHtml = `${ceremonyData.locationName},<br>${ceremonyData.address.replace(/\n/g, '<br>')}`;
+    const cerLoc = (ceremonyData.locationName || '').replace(/[,:\s]+$/, '').trim();
+    const cerAddr = (ceremonyData.address || '').trim();
+    if (cerLoc && cerAddr) {
+      cerAddrHtml = `${cerLoc}<br>${cerAddr.replace(/\n/g, '<br>')}`;
     } else {
-      cerAddrHtml = (ceremonyData.locationName || ceremonyData.address || '').replace(/\n/g, '<br>');
+      cerAddrHtml = (cerLoc || cerAddr).replace(/\n/g, '<br>');
     }
     bindings['event-ceremony-address'] = cerAddrHtml;
 
@@ -196,10 +200,12 @@ function applyWeddingConfig() {
     bindings['event-reception-date'] = receptionData.dateText || formatDateShort(recDate);
 
     let recAddrHtml = '';
-    if (receptionData.locationName && receptionData.address) {
-      recAddrHtml = `${receptionData.locationName},<br>${receptionData.address.replace(/\n/g, '<br>')}`;
+    const recLoc = (receptionData.locationName || '').replace(/[,:\s]+$/, '').trim();
+    const recAddr = (receptionData.address || '').trim();
+    if (recLoc && recAddr) {
+      recAddrHtml = `${recLoc}<br>${recAddr.replace(/\n/g, '<br>')}`;
     } else {
-      recAddrHtml = (receptionData.locationName || receptionData.address || '').replace(/\n/g, '<br>');
+      recAddrHtml = (recLoc || recAddr).replace(/\n/g, '<br>');
     }
     bindings['event-reception-address'] = recAddrHtml;
 
@@ -1867,7 +1873,16 @@ function initVisualAdminModule() {
     }
 
     // 3. Phân tích ngày cưới khi người dùng gõ
-    else if (key === 'wedding-date-dots' || key === 'wedding-date-full') {
+    else if (key === 'wedding-date-dots') {
+      document.querySelectorAll('[data-bind="wedding-date-dots"]').forEach(other => {
+        if (other !== el) other.innerText = val;
+      });
+      const parsedDate = parseUserDateString(val);
+      if (parsedDate) {
+        WEDDING_CONFIG.weddingDate = parsedDate;
+      }
+    }
+    else if (key === 'wedding-date-full') {
       const parsedDate = parseUserDateString(val);
       if (parsedDate) {
         WEDDING_CONFIG.weddingDate = parsedDate;
@@ -1880,6 +1895,11 @@ function initVisualAdminModule() {
       if (parsedTime) {
         WEDDING_CONFIG.weddingTime = parsedTime;
       }
+      const match = val.match(/^(.*?)(?:vào lúc|\d{1,2}\s*(?:giờ|h|:))/i);
+      if (match && match[1] && match[1].trim()) {
+        if (!WEDDING_CONFIG.texts.invitation) WEDDING_CONFIG.texts.invitation = {};
+        WEDDING_CONFIG.texts.invitation.timePrefix = match[1].trim();
+      }
     }
 
     // 5. Ngày âm lịch
@@ -1889,12 +1909,14 @@ function initVisualAdminModule() {
 
     // 6. Địa chỉ thiệp mời chính
     else if (key === 'invitation-venue') {
-      if (val.includes(':')) {
-        const parts = val.split(':');
+      const clean = val.replace(/<br\s*\/?>/gi, ' ').trim();
+      if (clean.includes(':')) {
+        const parts = clean.split(':');
         WEDDING_CONFIG.venues.invitation.location = parts[0].trim();
         WEDDING_CONFIG.venues.invitation.address = parts.slice(1).join(':').trim();
       } else {
-        WEDDING_CONFIG.venues.invitation.address = val;
+        WEDDING_CONFIG.venues.invitation.location = '';
+        WEDDING_CONFIG.venues.invitation.address = clean;
       }
     }
 
@@ -1906,22 +1928,87 @@ function initVisualAdminModule() {
     else if (key === 'bride-mother') WEDDING_CONFIG.bride.mother = val;
     else if (key === 'bride-address') WEDDING_CONFIG.bride.address = val;
 
-    // 8. Sự kiện Lễ Vu Quy
+    // 8. Tiêu đề Nhà Trai / Nhà Gái
+    else if (key === 'invitation-groom-family-title') {
+      if (!WEDDING_CONFIG.texts.invitation) WEDDING_CONFIG.texts.invitation = {};
+      WEDDING_CONFIG.texts.invitation.groomFamilyTitle = val;
+    }
+    else if (key === 'invitation-bride-family-title') {
+      if (!WEDDING_CONFIG.texts.invitation) WEDDING_CONFIG.texts.invitation = {};
+      WEDDING_CONFIG.texts.invitation.brideFamilyTitle = val;
+    }
+
+    // 9. Sự kiện Lễ Vu Quy
     else if (key === 'event-ceremony-title') WEDDING_CONFIG.venues.ceremony.title = val;
     else if (key === 'event-ceremony-time') WEDDING_CONFIG.venues.ceremony.time = val;
     else if (key === 'event-ceremony-date') WEDDING_CONFIG.venues.ceremony.dateText = val;
-    else if (key === 'event-ceremony-address') WEDDING_CONFIG.venues.ceremony.address = val;
+    else if (key === 'event-ceremony-address') {
+      const clean = val.replace(/<br\s*\/?>/gi, '\n').trim();
+      if (clean.includes('\n')) {
+        const lines = clean.split('\n').map(s => s.trim().replace(/^[,:\s]+|[,:\s]+$/g, '')).filter(Boolean);
+        WEDDING_CONFIG.venues.ceremony.locationName = lines[0] || '';
+        WEDDING_CONFIG.venues.ceremony.address = lines.slice(1).join(', ') || '';
+      } else {
+        WEDDING_CONFIG.venues.ceremony.locationName = '';
+        WEDDING_CONFIG.venues.ceremony.address = clean.replace(/^[,:\s]+|[,:\s]+$/g, '');
+      }
+    }
 
-    // 9. Sự kiện Tiệc Cưới
+    // 10. Sự kiện Tiệc Cưới
     else if (key === 'event-reception-title') WEDDING_CONFIG.venues.reception.title = val;
     else if (key === 'event-reception-time') WEDDING_CONFIG.venues.reception.time = val;
     else if (key === 'event-reception-date') WEDDING_CONFIG.venues.reception.dateText = val;
-    else if (key === 'event-reception-address') WEDDING_CONFIG.venues.reception.address = val;
+    else if (key === 'event-reception-address') {
+      const clean = val.replace(/<br\s*\/?>/gi, '\n').trim();
+      if (clean.includes('\n')) {
+        const lines = clean.split('\n').map(s => s.trim().replace(/^[,:\s]+|[,:\s]+$/g, '')).filter(Boolean);
+        WEDDING_CONFIG.venues.reception.locationName = lines[0] || '';
+        WEDDING_CONFIG.venues.reception.address = lines.slice(1).join(', ') || '';
+      } else {
+        WEDDING_CONFIG.venues.reception.locationName = '';
+        WEDDING_CONFIG.venues.reception.address = clean.replace(/^[,:\s]+|[,:\s]+$/g, '');
+      }
+    }
 
-    // 10. Ngân hàng & Mừng cưới
+    // 11. Ngân hàng & Mừng cưới
     else if (key === 'bank-account-holder') WEDDING_CONFIG.bankAccount.accountHolder = val;
     else if (key === 'bank-name') WEDDING_CONFIG.bankAccount.bankName = val;
     else if (key === 'bank-account-number') WEDDING_CONFIG.bankAccount.accountNumber = val.replace(/\s+/g, '');
+  }
+
+  // Danh sách trường tự động sinh (không cho phép nhập con trỏ chuột)
+  const AUTO_GENERATED_BINDS = ['couple-names-invite', 'couple-footer'];
+
+  // Bảng placeholder cho các trường rỗng khi bật Admin Mode
+  const EMPTY_FIELD_PLACEHOLDERS = {
+    'groom-father': 'Bố Chú Rể (để trống nếu không có)',
+    'groom-mother': 'Mẹ Chú Rể (để trống nếu không có)',
+    'groom-address': 'Địa chỉ Nhà Trai',
+    'bride-father': 'Bố Cô Dâu (để trống nếu không có)',
+    'bride-mother': 'Mẹ Cô Dâu (để trống nếu không có)',
+    'bride-address': 'Địa chỉ Nhà Gái',
+    'footer-thankyou': 'Lời cảm ơn chân trang (để trống nếu không có)',
+    'rsvp-attendance-label': 'Tiêu đề xác nhận tham gia',
+    'rsvp-guestof-label': 'Tiêu đề khách của ai'
+  };
+
+  function handleEmptyFieldFocus(e) {
+    const el = e.currentTarget;
+    const ph = el.getAttribute('data-empty-placeholder');
+    if (ph && el.innerText.trim() === ph) {
+      el.innerText = '';
+    }
+  }
+
+  function handleEmptyFieldBlur(e) {
+    const el = e.currentTarget;
+    const ph = el.getAttribute('data-empty-placeholder');
+    if (ph && !el.innerText.trim()) {
+      el.innerText = ph;
+      el.classList.add('admin-empty-field');
+    } else if (el.innerText.trim()) {
+      el.classList.remove('admin-empty-field');
+    }
   }
 
   // 5. Kích Hoạt Chế Độ Nhà Phát Triển (Visual Click-to-Edit)
@@ -1932,12 +2019,47 @@ function initVisualAdminModule() {
     document.body.classList.add('admin-mode-active');
     if (toolbar) toolbar.style.display = 'flex';
 
+    // Đảm bảo hiển thị cả hai cột bố mẹ để admin có thể thêm/sửa
+    const groomCol = document.querySelector('[data-bind="groom-father"]')?.closest?.('.flex-1');
+    const brideCol = document.querySelector('[data-bind="bride-father"]')?.closest?.('.flex-1');
+    const parentsRow = groomCol?.parentElement;
+    if (groomCol) groomCol.style.display = '';
+    if (brideCol) brideCol.style.display = '';
+    if (parentsRow) parentsRow.style.display = '';
+
     // Cho phép sửa trực tiếp mọi văn bản có data-bind & gắn lắng nghe đồng bộ theo thời gian thực
     document.querySelectorAll('[data-bind]').forEach(el => {
+      const key = el.getAttribute('data-bind');
+
+      // Khóa con trỏ chuột tại các trường tự động sinh ra
+      if (AUTO_GENERATED_BINDS.includes(key)) {
+        el.removeAttribute('contenteditable');
+        el.setAttribute('contenteditable', 'false');
+        el.classList.add('admin-field-autogen');
+        el.setAttribute('title', '🔒 Trường này được tự động tạo từ tên Cô dâu & Chú rể (chỉnh sửa tên Cô dâu / Chú rể để đổi)');
+        return;
+      }
+
+      // Xử lý các trường rỗng: hiển thị khung placeholder để admin có thể nhấp chuột vào sửa
+      if (el.style.display === 'none' || !el.innerText.trim()) {
+        el.style.display = '';
+        el.classList.add('admin-empty-field');
+        const ph = EMPTY_FIELD_PLACEHOLDERS[key] || `[Nhấp để nhập ${key}]`;
+        if (!el.innerText.trim()) {
+          el.setAttribute('data-empty-placeholder', ph);
+          el.innerText = ph;
+        }
+      }
+
       el.setAttribute('contenteditable', 'true');
       el.setAttribute('spellcheck', 'false');
+      el.classList.remove('admin-field-autogen');
       el.removeEventListener('input', handleDataBindInput);
       el.addEventListener('input', handleDataBindInput);
+      el.removeEventListener('focus', handleEmptyFieldFocus);
+      el.addEventListener('focus', handleEmptyFieldFocus);
+      el.removeEventListener('blur', handleEmptyFieldBlur);
+      el.addEventListener('blur', handleEmptyFieldBlur);
     });
 
     // Mở màn hình mở đầu nếu đang bị khóa cuộn để admin dễ chỉnh sửa toàn trang
@@ -2058,7 +2180,17 @@ function initVisualAdminModule() {
       if (toolbar) toolbar.style.display = 'none';
       document.querySelectorAll('[data-bind]').forEach(el => {
         el.removeAttribute('contenteditable');
+        el.classList.remove('admin-field-autogen');
+        el.classList.remove('admin-empty-field');
+        const ph = el.getAttribute('data-empty-placeholder');
+        if (ph && el.innerText.trim() === ph) {
+          el.innerText = '';
+        }
+        if (!el.innerText.trim()) {
+          el.style.display = 'none';
+        }
       });
+      applyWeddingConfig();
       history.replaceState(null, null, window.location.pathname + window.location.search);
       showAdminToast('Đã thoát Chế độ Nhà Phát Triển.');
     });
@@ -2304,7 +2436,11 @@ function initVisualAdminModule() {
 
     function getText(bindKey) {
       const el = document.querySelector(`[data-bind="${bindKey}"]`);
-      return el ? el.innerText.trim() : null;
+      if (!el) return null;
+      const ph = el.getAttribute('data-empty-placeholder');
+      const txt = el.innerText.trim();
+      if (ph && txt === ph) return '';
+      return txt;
     }
 
     // Cô dâu & Chú rể (Quét đa điểm: Hero, Couple section,...)
@@ -2339,9 +2475,16 @@ function initVisualAdminModule() {
     }
 
     const timeText = getText('wedding-time-text');
-    const parsedTime = parseUserTimeString(timeText);
-    if (parsedTime) {
-      baseConfig.weddingTime = parsedTime;
+    if (timeText !== null) {
+      const parsedTime = parseUserTimeString(timeText);
+      if (parsedTime) {
+        baseConfig.weddingTime = parsedTime;
+      }
+      const match = timeText.match(/^(.*?)(?:vào lúc|\d{1,2}\s*(?:giờ|h|:))/i);
+      if (match && match[1] && match[1].trim()) {
+        if (!baseConfig.texts.invitation) baseConfig.texts.invitation = {};
+        baseConfig.texts.invitation.timePrefix = match[1].trim();
+      }
     }
 
     // Ngày âm lịch
@@ -2351,14 +2494,21 @@ function initVisualAdminModule() {
     // Địa chỉ thiệp mời chính
     const invVenue = getText('invitation-venue');
     if (invVenue !== null) {
-      if (invVenue.includes(':')) {
-        const parts = invVenue.split(':');
+      const cleanInv = invVenue.replace(/<br\s*\/?>/gi, ' ').trim();
+      if (cleanInv.includes(':')) {
+        const parts = cleanInv.split(':');
         baseConfig.venues.invitation.location = parts[0].trim();
         baseConfig.venues.invitation.address = parts.slice(1).join(':').trim();
       } else {
-        baseConfig.venues.invitation.address = invVenue.trim();
+        baseConfig.venues.invitation.location = '';
+        baseConfig.venues.invitation.address = cleanInv;
       }
     }
+
+    // Tiêu đề Nhà Trai / Nhà Gái
+    if (!baseConfig.texts.invitation) baseConfig.texts.invitation = {};
+    const gFam = getText('invitation-groom-family-title'); if (gFam !== null) baseConfig.texts.invitation.groomFamilyTitle = gFam;
+    const bFam = getText('invitation-bride-family-title'); if (bFam !== null) baseConfig.texts.invitation.brideFamilyTitle = bFam;
 
     // Sự kiện 1: Lễ Vu Quy
     if (!baseConfig.venues.ceremony) baseConfig.venues.ceremony = {};
@@ -2369,11 +2519,12 @@ function initVisualAdminModule() {
     if (cerAddr !== null) {
       const cleanCer = cerAddr.replace(/<br\s*\/?>/gi, '\n').trim();
       if (cleanCer.includes('\n')) {
-        const lines = cleanCer.split('\n').map(s => s.trim()).filter(Boolean);
-        baseConfig.venues.ceremony.locationName = lines[0];
-        baseConfig.venues.ceremony.address = lines.slice(1).join(', ');
+        const lines = cleanCer.split('\n').map(s => s.trim().replace(/^[,:\s]+|[,:\s]+$/g, '')).filter(Boolean);
+        baseConfig.venues.ceremony.locationName = lines[0] || '';
+        baseConfig.venues.ceremony.address = lines.slice(1).join(', ') || '';
       } else {
-        baseConfig.venues.ceremony.address = cleanCer;
+        baseConfig.venues.ceremony.locationName = '';
+        baseConfig.venues.ceremony.address = cleanCer.replace(/^[,:\s]+|[,:\s]+$/g, '');
       }
     }
 
@@ -2386,11 +2537,12 @@ function initVisualAdminModule() {
     if (recAddr !== null) {
       const cleanRec = recAddr.replace(/<br\s*\/?>/gi, '\n').trim();
       if (cleanRec.includes('\n')) {
-        const lines = cleanRec.split('\n').map(s => s.trim()).filter(Boolean);
-        baseConfig.venues.reception.locationName = lines[0];
-        baseConfig.venues.reception.address = lines.slice(1).join(', ');
+        const lines = cleanRec.split('\n').map(s => s.trim().replace(/^[,:\s]+|[,:\s]+$/g, '')).filter(Boolean);
+        baseConfig.venues.reception.locationName = lines[0] || '';
+        baseConfig.venues.reception.address = lines.slice(1).join(', ') || '';
       } else {
-        baseConfig.venues.reception.address = cleanRec;
+        baseConfig.venues.reception.locationName = '';
+        baseConfig.venues.reception.address = cleanRec.replace(/^[,:\s]+|[,:\s]+$/g, '');
       }
     }
 
@@ -2398,7 +2550,6 @@ function initVisualAdminModule() {
     if (!baseConfig.texts.hero) baseConfig.texts.hero = {};
     const heroSub = getText('hero-subtitle'); if (heroSub !== null) baseConfig.texts.hero.subtitle = heroSub;
 
-    if (!baseConfig.texts.invitation) baseConfig.texts.invitation = {};
     const invHeading = getText('invitation-heading'); if (invHeading !== null) baseConfig.texts.invitation.heading = invHeading;
     const invGuest = getText('invitation-guest-label'); if (invGuest !== null) baseConfig.texts.invitation.guestLabel = invGuest;
     const invSub = getText('invitation-subheading'); if (invSub !== null) baseConfig.texts.invitation.subheading = invSub;
@@ -2425,6 +2576,10 @@ function initVisualAdminModule() {
     if (!baseConfig.texts.countdown) baseConfig.texts.countdown = {};
     const cdSub = getText('countdown-subtitle'); if (cdSub !== null) baseConfig.texts.countdown.subtitle = cdSub;
     const cdHead = getText('countdown-heading'); if (cdHead !== null) baseConfig.texts.countdown.heading = cdHead;
+    const cdDays = getText('countdown-days-label'); if (cdDays !== null) baseConfig.texts.countdown.daysLabel = cdDays;
+    const cdHours = getText('countdown-hours-label'); if (cdHours !== null) baseConfig.texts.countdown.hoursLabel = cdHours;
+    const cdMins = getText('countdown-minutes-label'); if (cdMins !== null) baseConfig.texts.countdown.minutesLabel = cdMins;
+    const cdSecs = getText('countdown-seconds-label'); if (cdSecs !== null) baseConfig.texts.countdown.secondsLabel = cdSecs;
 
     // Events header
     if (!baseConfig.texts.eventsHeader) baseConfig.texts.eventsHeader = {};
@@ -2456,13 +2611,39 @@ function initVisualAdminModule() {
     const rsvpBtn = getText('rsvp-btn-text'); if (rsvpBtn !== null) baseConfig.texts.rsvp.buttonText = rsvpBtn;
     const rsvpDead = getText('rsvp-deadline-text'); if (rsvpDead !== null) baseConfig.texts.rsvp.prompt = rsvpDead;
 
+    const rsvpNameLbl = getText('rsvp-name-label');
+    if (rsvpNameLbl !== null) {
+      if (!baseConfig.texts.rsvp.nameField) baseConfig.texts.rsvp.nameField = {};
+      baseConfig.texts.rsvp.nameField.label = rsvpNameLbl;
+    }
+
     if (!baseConfig.texts.rsvp.attendanceField) baseConfig.texts.rsvp.attendanceField = {};
+    const rsvpAttLbl = getText('rsvp-attendance-label');
+    if (rsvpAttLbl !== null) {
+      baseConfig.texts.rsvp.attendanceField.label = rsvpAttLbl;
+    }
     const attYes = getText('rsvp-attendance-yes'); if (attYes !== null) baseConfig.texts.rsvp.attendanceField.yesOption = attYes;
     const attNo = getText('rsvp-attendance-no'); if (attNo !== null) baseConfig.texts.rsvp.attendanceField.noOption = attNo;
 
     if (!baseConfig.texts.rsvp.guestOfField) baseConfig.texts.rsvp.guestOfField = {};
+    const rsvpGuestOfLbl = getText('rsvp-guestof-label');
+    if (rsvpGuestOfLbl !== null) {
+      baseConfig.texts.rsvp.guestOfField.label = rsvpGuestOfLbl;
+    }
     const gBride = getText('rsvp-guestof-bride'); if (gBride !== null) baseConfig.texts.rsvp.guestOfField.brideOption = gBride;
     const gGroom = getText('rsvp-guestof-groom'); if (gGroom !== null) baseConfig.texts.rsvp.guestOfField.groomOption = gGroom;
+
+    const rsvpAccLbl = getText('rsvp-accompany-label');
+    if (rsvpAccLbl !== null) {
+      if (!baseConfig.texts.rsvp.accompanyField) baseConfig.texts.rsvp.accompanyField = {};
+      baseConfig.texts.rsvp.accompanyField.label = rsvpAccLbl;
+    }
+
+    const rsvpMsgLbl = getText('rsvp-message-label');
+    if (rsvpMsgLbl !== null) {
+      if (!baseConfig.texts.rsvp.messageField) baseConfig.texts.rsvp.messageField = {};
+      baseConfig.texts.rsvp.messageField.label = rsvpMsgLbl;
+    }
 
     // Footer
     if (!baseConfig.texts.footer) baseConfig.texts.footer = {};
