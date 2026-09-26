@@ -1546,13 +1546,23 @@ function applyQrGuestVisibility(guestOf) {
   const cardGroom = document.getElementById('bank-card-groom');
   const cardBride = document.getElementById('bank-card-bride');
   const grid = document.getElementById('bank-cards-grid');
+  const qrContent = document.querySelector('.vs-qr-content');
   if (!cardGroom || !cardBride) return;
 
   // Nếu đang ở Chế độ Nhà phát triển (#admin), luôn hiển thị cả 2 thẻ để chỉnh sửa
   if (document.body.classList.contains('admin-mode-active')) {
     cardGroom.style.display = '';
     cardBride.style.display = '';
-    if (grid) grid.style.gridTemplateColumns = '';
+    if (grid) {
+      grid.className = 'grid grid-cols-1 md:grid-cols-2 gap-6 justify-center items-start w-full';
+      grid.style.display = '';
+      grid.style.justifyContent = '';
+      grid.style.gridTemplateColumns = '';
+    }
+    if (qrContent) {
+      qrContent.classList.remove('max-w-sm', 'max-w-xs');
+      qrContent.classList.add('max-w-2xl');
+    }
     return;
   }
 
@@ -1560,16 +1570,43 @@ function applyQrGuestVisibility(guestOf) {
   if (normalized === 'groom') {
     cardGroom.style.display = '';
     cardBride.style.display = 'none';
-    if (grid) grid.style.gridTemplateColumns = '1fr';
+    if (grid) {
+      grid.className = 'flex justify-center items-center w-full';
+      grid.style.display = 'flex';
+      grid.style.justifyContent = 'center';
+      grid.style.gridTemplateColumns = '';
+    }
+    if (qrContent) {
+      qrContent.classList.remove('max-w-2xl');
+      qrContent.classList.add('max-w-sm');
+    }
   } else if (normalized === 'bride') {
     cardGroom.style.display = 'none';
     cardBride.style.display = '';
-    if (grid) grid.style.gridTemplateColumns = '1fr';
+    if (grid) {
+      grid.className = 'flex justify-center items-center w-full';
+      grid.style.display = 'flex';
+      grid.style.justifyContent = 'center';
+      grid.style.gridTemplateColumns = '';
+    }
+    if (qrContent) {
+      qrContent.classList.remove('max-w-2xl');
+      qrContent.classList.add('max-w-sm');
+    }
   } else {
     // Không xác định (link gốc): hiển thị cả 2 thẻ
     cardGroom.style.display = '';
     cardBride.style.display = '';
-    if (grid) grid.style.gridTemplateColumns = '';
+    if (grid) {
+      grid.className = 'grid grid-cols-1 md:grid-cols-2 gap-6 justify-center items-start w-full';
+      grid.style.display = '';
+      grid.style.justifyContent = '';
+      grid.style.gridTemplateColumns = '';
+    }
+    if (qrContent) {
+      qrContent.classList.remove('max-w-sm', 'max-w-xs');
+      qrContent.classList.add('max-w-2xl');
+    }
   }
 }
 

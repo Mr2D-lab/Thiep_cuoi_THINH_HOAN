@@ -1268,6 +1268,15 @@ body.admin-mode-active img:hover {
   box-shadow: 0 0 0 3px #8B263E;
 }
 
+/* Badge định danh thẻ ngân hàng mừng cưới - Chỉ hiển thị trong Chế độ Admin */
+.bank-card-admin-badge {
+  display: none !important;
+}
+
+body.admin-mode-active .bank-card-admin-badge {
+  display: inline-block !important;
+}
+
 /* 2. Floating Admin Toolbar */
 .admin-toolbar {
   position: fixed;

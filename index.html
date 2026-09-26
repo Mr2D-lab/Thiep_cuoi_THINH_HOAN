@@ -28,7 +28,16 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
 
   <!-- Custom Styles (Cache buster chống lưu đệm cũ) -->
-  <link rel="stylesheet" href="styles.css?v=20260926_fix_edit">
+  <link rel="stylesheet" href="styles.css?v=20260926_badge_center_fix">
+  <style>
+    /* Badge định danh thẻ ngân hàng mừng cưới - Chỉ hiển thị trong Chế độ Admin */
+    .bank-card-admin-badge {
+      display: none !important;
+    }
+    body.admin-mode-active .bank-card-admin-badge {
+      display: inline-block !important;
+    }
+  </style>
 </head>
 
 <body>
@@ -622,11 +631,11 @@
 
           <!-- Revealed Bank & QR Modal Card -->
           <div class="vs-qr-content vs-hidden max-w-2xl mx-auto">
-            <div id="bank-cards-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div id="bank-cards-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6 justify-center items-start w-full">
               <!-- Thẻ Chú Rể -->
-              <div id="bank-card-groom" class="bg-white border border-[#EEEEEE] rounded-2xl p-6 shadow-md relative">
-                <span class="inline-block px-3 py-1 bg-rose/10 text-rose text-[11px] font-bold rounded-full mb-3 tracking-wider uppercase">🤵 Mừng Cưới Chú Rể</span>
-                <div class="p-2 bg-gray-50 rounded-xl mb-4 inline-block border border-gray-100">
+              <div id="bank-card-groom" class="bg-white border border-[#EEEEEE] rounded-2xl p-6 shadow-md relative text-center w-full max-w-sm mx-auto">
+                <span class="bank-card-admin-badge inline-block px-3 py-1 bg-rose/10 text-rose text-[11px] font-bold rounded-full mb-3 tracking-wider uppercase">🤵 Mừng Cưới Chú Rể</span>
+                <div class="p-2 bg-gray-50 rounded-xl mb-4 inline-block border border-gray-100 mx-auto">
                   <img
                     src="images/qr LEDANGTHINH.jpg"
                     alt="VietQR Mừng Cưới Chú Rể" loading="lazy" decoding="async" class="w-36 h-36 mx-auto rounded-lg cursor-pointer" data-bind-src="bank-qr-groom-img" data-img-bind="bank-qr-groom" title="Nhấp vào ảnh để thay đổi mã QR Chú rể">
@@ -647,9 +656,9 @@
               </div>
 
               <!-- Thẻ Cô Dâu -->
-              <div id="bank-card-bride" class="bg-white border border-[#EEEEEE] rounded-2xl p-6 shadow-md relative">
-                <span class="inline-block px-3 py-1 bg-rose/10 text-rose text-[11px] font-bold rounded-full mb-3 tracking-wider uppercase">👰 Mừng Cưới Cô Dâu</span>
-                <div class="p-2 bg-gray-50 rounded-xl mb-4 inline-block border border-gray-100">
+              <div id="bank-card-bride" class="bg-white border border-[#EEEEEE] rounded-2xl p-6 shadow-md relative text-center w-full max-w-sm mx-auto">
+                <span class="bank-card-admin-badge inline-block px-3 py-1 bg-rose/10 text-rose text-[11px] font-bold rounded-full mb-3 tracking-wider uppercase">👰 Mừng Cưới Cô Dâu</span>
+                <div class="p-2 bg-gray-50 rounded-xl mb-4 inline-block border border-gray-100 mx-auto">
                   <img
                     src="images/qr LEDANGTHINH.jpg"
                     alt="VietQR Mừng Cưới Cô Dâu" loading="lazy" decoding="async" class="w-36 h-36 mx-auto rounded-lg cursor-pointer" data-bind-src="bank-qr-bride-img" data-img-bind="bank-qr-bride" title="Nhấp vào ảnh để thay đổi mã QR Cô dâu">
@@ -1014,8 +1023,8 @@
   </div>
 
   <!-- Scripts (Cache buster chống lưu đệm) -->
-  <script src="config.js?v=20260926_dual_qr_and_image_preview_fix"></script>
-  <script src="script.js?v=20260926_dual_qr_and_image_preview_fix"></script>
+  <script src="config.js?v=20260926_badge_center_fix"></script>
+  <script src="script.js?v=20260926_badge_center_fix"></script>
 </body>
 
 </html>
