@@ -4492,48 +4492,70 @@ function initVisualAdminModule() {
       try {
         localStorage.removeItem('wedding_config_local_draft');
         localStorage.removeItem('wedding_config_draft_time');
+        sessionStorage.removeItem('wedding_config_sha'); // Xóa SHA cache để tránh lỗi 409 khi lưu sau
       } catch (e) {}
 
       const ghSettings = loadGitHubSettings();
-      showAdminToast('⏳ Đang khôi phục dữ liệu gần nhất...');
+
+      // Fallback: chưa cài GitHub token → reload trang để lấy config.js gốc từ server
+      if (!ghSettings.repo || !ghSettings.token) {
+        showAdminToast('⚠️ Chưa cài GitHub Token — Đang tải lại trang để khôi phục...');
+        setTimeout(() => window.location.reload(), 1500);
+        return;
+      }
+
+      showAdminToast('⏳ Đang khôi phục dữ liệu gần nhất từ GitHub...');
 
       try {
         let loadedConfig = null;
-        if (ghSettings.repo && ghSettings.token) {
-          const branch = ghSettings.branch || 'main';
-          const apiUrl = `https://api.github.com/repos/${ghSettings.repo}/contents/config.js?ref=${encodeURIComponent(branch)}`;
-          const res = await fetch(apiUrl, {
-            headers: {
-              'Authorization': `Bearer ${ghSettings.token}`,
-              'Accept': 'application/vnd.github+json'
-            }
-          });
-          if (res.ok) {
-            const data = await res.json();
-            const decodedCode = decodeURIComponent(escape(atob(data.content)));
-            const fn = new Function(decodedCode + '; return typeof WEDDING_CONFIG !== "undefined" ? WEDDING_CONFIG : null;');
-            loadedConfig = fn();
+        const branch = ghSettings.branch || 'main';
+        const apiUrl = `https://api.github.com/repos/${ghSettings.repo}/contents/config.js?ref=${encodeURIComponent(branch)}`;
+        const res = await fetch(apiUrl, {
+          headers: {
+            'Authorization': `Bearer ${ghSettings.token}`,
+            'Accept': 'application/vnd.github+json'
           }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          const decodedCode = decodeURIComponent(escape(atob(data.content)));
+          const fn = new Function(decodedCode + '; return typeof WEDDING_CONFIG !== "undefined" ? WEDDING_CONFIG : null;');
+          loadedConfig = fn();
         }
 
         if (loadedConfig) {
           window.WEDDING_CONFIG = loadedConfig;
         }
 
+        // FIX: Tắt contenteditable trước để applyWeddingConfig() có thể ghi vào DOM
+        // (applyWeddingConfig() bỏ qua các field đang contenteditable="true")
+        document.querySelectorAll('[data-bind]').forEach(el => {
+          el.removeAttribute('contenteditable');
+        });
+
         if (typeof applyWeddingConfig === 'function') {
           applyWeddingConfig();
         }
 
+        // Bật lại contenteditable đúng cách — bỏ qua auto-generated fields
         document.querySelectorAll('[data-bind]').forEach(el => {
-          el.setAttribute('contenteditable', 'true');
-          el.setAttribute('spellcheck', 'false');
+          const key = el.getAttribute('data-bind');
+          if (typeof AUTO_GENERATED_BINDS !== 'undefined' && AUTO_GENERATED_BINDS.includes(key)) {
+            el.setAttribute('contenteditable', 'false');
+            el.classList.add('admin-field-autogen');
+          } else {
+            el.setAttribute('contenteditable', 'true');
+            el.setAttribute('spellcheck', 'false');
+          }
         });
 
-        showAdminToast('🔄 Đã khôi phục lại dữ liệu gốc từ GitHub thành công!');
+        showAdminToast(loadedConfig
+          ? '🔄 Đã khôi phục lại dữ liệu gốc từ GitHub thành công!'
+          : '⚠️ Không tìm thấy config trên GitHub — Đã khôi phục từ bộ nhớ hiện tại.');
       } catch (err) {
         console.error('Lỗi khi khôi phục:', err);
-        alert('Không thể tải từ GitHub: ' + err.message + '\nĐang nạp lại từ bộ nhớ trình duyệt...');
-        if (typeof applyWeddingConfig === 'function') applyWeddingConfig();
+        showAdminToast('❌ Lỗi: ' + err.message + ' — Đang tải lại trang...');
+        setTimeout(() => window.location.reload(), 2000);
       }
     });
   }
