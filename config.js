@@ -1,5 +1,5 @@
 /* ==========================================================================
-   BẢNG CẤU HÌNH THIỆP CƯỚI 2026 (Cập nhật: 1790518291866)
+   BẢNG CẤU HÌNH THIỆP CƯỚI 2026 (Cập nhật: 1790518637222)
    ========================================================================== */
 
 const WEDDING_CONFIG = {
@@ -80,7 +80,7 @@ const WEDDING_CONFIG = {
       "brideFamilyTitle": "NHÀ GÁI",
       "heading": "TRÂN TRỌNG KÍNH MỜI",
       "guestLabel": "Quý khách cùng gia đình",
-      "guestSuffix": "cùng gia đình",
+      "guestSuffix": "",
       "subheading": "(Tới dự Lễ Thành Hôn của chúng tôi)",
       "timePrefix": "Tổ chức",
       "blessing": "\"Sự hiện diện của Quý khách là niềm vinh hạnh lớn lao của gia đình chúng tôi!\""
@@ -232,5 +232,5 @@ const WEDDING_CONFIG = {
 
 if (typeof window !== 'undefined') {
   window.WEDDING_CONFIG = WEDDING_CONFIG;
-  window._weddingConfigBuildTime = "1790518291866";
+  window._weddingConfigBuildTime = "1790518637222";
 }
