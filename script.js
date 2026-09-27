@@ -238,7 +238,9 @@ function applyWeddingConfig() {
     const cerDate = ceremonyData.date ? parseLocalDate(ceremonyData.date) : weddingDate;
     bindings['event-ceremony-title'] = ceremonyData.title || 'Lễ Vu Quy';
     bindings['event-ceremony-time'] = ceremonyData.time || '08:00';
-    bindings['event-ceremony-date'] = ceremonyData.dateText || formatDateShort(cerDate);
+    const computedCerDateText = cerDate ? formatDateShort(cerDate) : (ceremonyData.dateText || '');
+    bindings['event-ceremony-date'] = computedCerDateText;
+    ceremonyData.dateText = computedCerDateText;
 
     let cerAddrHtml = '';
     const cerLoc = (ceremonyData.locationName || '').replace(/[,:\s]+$/, '').trim();
@@ -273,7 +275,9 @@ function applyWeddingConfig() {
     const recDate = receptionData.date ? parseLocalDate(receptionData.date) : weddingDate;
     bindings['event-reception-title'] = receptionData.title || 'Tiệc Cưới';
     bindings['event-reception-time'] = receptionData.time || '17:30';
-    bindings['event-reception-date'] = receptionData.dateText || formatDateShort(recDate);
+    const computedRecDateText = recDate ? formatDateShort(recDate) : (receptionData.dateText || '');
+    bindings['event-reception-date'] = computedRecDateText;
+    receptionData.dateText = computedRecDateText;
 
     let recAddrHtml = '';
     const recLoc = (receptionData.locationName || '').replace(/[,:\s]+$/, '').trim();
@@ -2337,6 +2341,79 @@ function initVisualAdminModule() {
     return null;
   }
 
+  // Đồng bộ toàn bộ thông tin ngày cưới trên mọi thành phần (Hero, Thiệp mời, Lễ Vu Quy, Tiệc Cưới, Cấu hình)
+  function syncWeddingDateEverywhere(testD, sourceKey) {
+    if (!testD || isNaN(testD.getTime())) return;
+    const iso = `${testD.getFullYear()}-${pad(testD.getMonth() + 1)}-${pad(testD.getDate())}`;
+    WEDDING_CONFIG.weddingDate = iso;
+
+    const shortText = formatDateShort(testD);
+    const fullText = formatDateFull(testD);
+    const dotsText = formatDateDots(testD);
+
+    // 1. Cập nhật các ô ngày, tháng, năm trên dòng master (trừ ô đang trực tiếp gõ)
+    if (sourceKey !== 'wedding-date-day') {
+      document.querySelectorAll('[data-bind="wedding-date-day"]').forEach(other => {
+        other.innerText = pad(testD.getDate());
+      });
+    }
+    if (sourceKey !== 'wedding-date-month') {
+      document.querySelectorAll('[data-bind="wedding-date-month"]').forEach(other => {
+        other.innerText = pad(testD.getMonth() + 1);
+      });
+    }
+    if (sourceKey !== 'wedding-date-year') {
+      document.querySelectorAll('[data-bind="wedding-date-year"]').forEach(other => {
+        other.innerText = String(testD.getFullYear());
+      });
+    }
+
+    // 2. Cập nhật dòng ngày đầy đủ
+    if (sourceKey !== 'wedding-date-full') {
+      document.querySelectorAll('[data-bind="wedding-date-full"]').forEach(other => {
+        other.innerText = fullText;
+      });
+    }
+
+    // 3. Cập nhật tất cả các vị trí hiển thị ngày dạng chấm (Opening, Hero, Footer)
+    if (sourceKey !== 'wedding-date-dots') {
+      document.querySelectorAll('[data-bind="wedding-date-dots"]').forEach(other => {
+        other.innerText = dotsText;
+      });
+    }
+
+    // 4. Cập nhật ngày cho Lễ Vu Quy và Tiệc Cưới trên giao diện
+    document.querySelectorAll('[data-bind="event-ceremony-date"]').forEach(cerEl => {
+      cerEl.innerText = shortText;
+    });
+    document.querySelectorAll('[data-bind="event-reception-date"]').forEach(recEl => {
+      recEl.innerText = shortText;
+    });
+
+    // 5. Cập nhật vào đối tượng WEDDING_CONFIG trong bộ nhớ
+    if (!WEDDING_CONFIG.venues) WEDDING_CONFIG.venues = {};
+    if (!WEDDING_CONFIG.venues.ceremony) WEDDING_CONFIG.venues.ceremony = {};
+    if (!WEDDING_CONFIG.venues.reception) WEDDING_CONFIG.venues.reception = {};
+    WEDDING_CONFIG.venues.ceremony.dateText = shortText;
+    WEDDING_CONFIG.venues.reception.dateText = shortText;
+    WEDDING_CONFIG.venues.ceremony.date = iso;
+    WEDDING_CONFIG.venues.reception.date = iso;
+
+    // 6. Cập nhật ngày câu chuyện và deadline RSVP nếu có
+    const storyDateEl = document.querySelector('[data-bind="story-wedding-date"]');
+    if (storyDateEl) storyDateEl.innerText = formatMonthYear(testD);
+    const rsvpEl = document.querySelector('[data-bind="rsvp-deadline-text"]');
+    if (rsvpEl) {
+      const daysBefore = WEDDING_CONFIG.rsvpDaysBefore || 7;
+      rsvpEl.innerText = `Xin vui lòng xác nhận trước ngày ${formatRsvpDeadline(testD, daysBefore)} để chúng tôi chu toàn đón tiếp`;
+    }
+
+    // 7. Cập nhật đồng hồ đếm ngược theo thời gian thực
+    if (typeof initCountdown === 'function') {
+      initCountdown();
+    }
+  }
+
   function handleDataBindInput(e) {
     const el = e.currentTarget;
     const key = el.getAttribute('data-bind');
@@ -2388,25 +2465,9 @@ function initVisualAdminModule() {
       const y = yEl ? yEl.innerText.trim() : '';
       if (d && m && y && !isNaN(d) && !isNaN(m) && !isNaN(y)) {
         const iso = `${y}-${pad(m)}-${pad(d)}`;
-        WEDDING_CONFIG.weddingDate = iso;
         const testD = parseLocalDate(iso);
         if (testD && !isNaN(testD.getTime())) {
-          // Cập nhật dòng ngày đầy đủ
-          const fullEl = document.querySelector('[data-bind="wedding-date-full"]');
-          if (fullEl) fullEl.innerText = formatDateFull(testD);
-          // Cập nhật tất cả các vị trí hiển thị ngày dạng chấm (Opening, Hero, Footer)
-          document.querySelectorAll('[data-bind="wedding-date-dots"]').forEach(other => {
-            other.innerText = formatDateDots(testD);
-          });
-          // Cập nhật ngày cho Lễ Thành Hôn và Tiệc Cưới
-          const cerDateEl = document.querySelector('[data-bind="event-ceremony-date"]');
-          if (cerDateEl) cerDateEl.innerText = formatDateShort(testD);
-          const recDateEl = document.querySelector('[data-bind="event-reception-date"]');
-          if (recDateEl) recDateEl.innerText = formatDateShort(testD);
-          // Cập nhật đồng hồ đếm ngược theo thời gian thực
-          if (typeof initCountdown === 'function') {
-            initCountdown();
-          }
+          syncWeddingDateEverywhere(testD, key);
         }
       }
     }
@@ -2416,13 +2477,19 @@ function initVisualAdminModule() {
       });
       const parsedDate = parseUserDateString(val);
       if (parsedDate) {
-        WEDDING_CONFIG.weddingDate = parsedDate;
+        const testD = parseLocalDate(parsedDate);
+        if (testD && !isNaN(testD.getTime())) {
+          syncWeddingDateEverywhere(testD, 'wedding-date-dots');
+        }
       }
     }
     else if (key === 'wedding-date-full') {
       const parsedDate = parseUserDateString(val);
       if (parsedDate) {
-        WEDDING_CONFIG.weddingDate = parsedDate;
+        const testD = parseLocalDate(parsedDate);
+        if (testD && !isNaN(testD.getTime())) {
+          syncWeddingDateEverywhere(testD, 'wedding-date-full');
+        }
       }
     }
 
@@ -3464,7 +3531,18 @@ function initVisualAdminModule() {
     if (!baseConfig.venues.ceremony) baseConfig.venues.ceremony = {};
     const cerTitle = getText('event-ceremony-title'); if (cerTitle !== null) baseConfig.venues.ceremony.title = cerTitle;
     const cerTime = getText('event-ceremony-time'); if (cerTime !== null) baseConfig.venues.ceremony.time = cerTime;
-    const cerDate = getText('event-ceremony-date'); if (cerDate !== null) baseConfig.venues.ceremony.dateText = cerDate;
+    const cerDate = getText('event-ceremony-date');
+    if (cerDate !== null) {
+      baseConfig.venues.ceremony.dateText = cerDate;
+    } else if (baseConfig.weddingDate) {
+      baseConfig.venues.ceremony.dateText = formatDateShort(parseLocalDate(baseConfig.weddingDate));
+    }
+    if (baseConfig.weddingDate) {
+      baseConfig.venues.ceremony.date = baseConfig.weddingDate;
+      if (!baseConfig.venues.ceremony.dateText || baseConfig.venues.ceremony.dateText.includes('22/08/2026')) {
+        baseConfig.venues.ceremony.dateText = formatDateShort(parseLocalDate(baseConfig.weddingDate));
+      }
+    }
     const cerAddr = getText('event-ceremony-address');
     if (cerAddr !== null) {
       const cleanCer = cerAddr.replace(/<br\s*\/?>/gi, '\n').trim();
@@ -3487,7 +3565,18 @@ function initVisualAdminModule() {
     if (!baseConfig.venues.reception) baseConfig.venues.reception = {};
     const recTitle = getText('event-reception-title'); if (recTitle !== null) baseConfig.venues.reception.title = recTitle;
     const recTime = getText('event-reception-time'); if (recTime !== null) baseConfig.venues.reception.time = recTime;
-    const recDate = getText('event-reception-date'); if (recDate !== null) baseConfig.venues.reception.dateText = recDate;
+    const recDate = getText('event-reception-date');
+    if (recDate !== null) {
+      baseConfig.venues.reception.dateText = recDate;
+    } else if (baseConfig.weddingDate) {
+      baseConfig.venues.reception.dateText = formatDateShort(parseLocalDate(baseConfig.weddingDate));
+    }
+    if (baseConfig.weddingDate) {
+      baseConfig.venues.reception.date = baseConfig.weddingDate;
+      if (!baseConfig.venues.reception.dateText || baseConfig.venues.reception.dateText.includes('22/08/2026')) {
+        baseConfig.venues.reception.dateText = formatDateShort(parseLocalDate(baseConfig.weddingDate));
+      }
+    }
     const recAddr = getText('event-reception-address');
     if (recAddr !== null) {
       const cleanRec = recAddr.replace(/<br\s*\/?>/gi, '\n').trim();
