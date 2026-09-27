@@ -1001,10 +1001,16 @@ function initMusicPlayer() {
   const audio = new Audio(audioUrl);
   audio.loop = true;
 
-  // Kiểm tra xem có đang ở chế độ chỉnh sửa / admin hay không
+  // Kiểm tra xem có đang ở chế độ chỉnh sửa / admin / cấu hình GitHub hay không
   function isEditingMode() {
+    const hash = (window.location.hash || '').toLowerCase();
+    const isGhRoute = hash === '#github' || window.location.pathname.endsWith('/github');
+    const isAdminRoute = hash === '#admin';
+    const isGhModalOpen = document.getElementById('admin-github-modal')?.style.display === 'flex';
     return document.body.classList.contains('admin-mode-active')
-      || window.location.hash === '#admin'
+      || isAdminRoute
+      || isGhRoute
+      || isGhModalOpen
       || sessionStorage.getItem('wedding_admin_auth') === 'true';
   }
 
@@ -1517,9 +1523,12 @@ function initOpeningScreen() {
     const centerY = rect.top + rect.height / 2;
     triggerConfettiBurst(centerX, centerY);
 
-    // 3. Tự động phát nhạc nền đám cưới qua cử chỉ tương tác (chỉ áp dụng cho khách, không bật khi ở chế độ sửa)
+    // 3. Tự động phát nhạc nền đám cưới qua cử chỉ tương tác (chỉ áp dụng cho khách, không bật khi ở chế độ sửa / github)
+    const hash = (window.location.hash || '').toLowerCase();
     const isEditingMode = document.body.classList.contains('admin-mode-active')
-      || window.location.hash === '#admin'
+      || hash === '#admin'
+      || hash === '#github'
+      || window.location.pathname.endsWith('/github')
       || sessionStorage.getItem('wedding_admin_auth') === 'true';
 
     if (!isEditingMode && musicBtn && !musicBtn.classList.contains('is-playing')) {
@@ -2154,6 +2163,10 @@ function initVisualAdminModule() {
       if (typeof window.__stopWeddingMusic === 'function') {
         window.__stopWeddingMusic();
       }
+      // Tạm ẩn nút nhạc khi đang ở chế độ admin hoặc github
+      const musicBtn = document.getElementById('music-control');
+      if (musicBtn) musicBtn.style.display = 'none';
+
       const isAuthed = sessionStorage.getItem('wedding_admin_auth') === 'true';
       if (isAuthed) {
         if (isGithubRoute) {
@@ -2175,6 +2188,10 @@ function initVisualAdminModule() {
   if (cancelBtn) {
     cancelBtn.addEventListener('click', () => {
       closeModal(loginModal);
+      const musicBtn = document.getElementById('music-control');
+      if (musicBtn && !document.body.classList.contains('admin-mode-active')) {
+        musicBtn.style.display = 'flex';
+      }
       const hash = window.location.hash.toLowerCase();
       if (hash === '#admin' || hash === '#github') {
         history.replaceState(null, null, window.location.pathname + window.location.search);
@@ -3136,6 +3153,21 @@ function initVisualAdminModule() {
   }
 
   function openGitHubSettingsModal() {
+    if (typeof window.__stopWeddingMusic === 'function') {
+      window.__stopWeddingMusic();
+    }
+    // Ẩn nút phát nhạc khi đang cấu hình GitHub để tránh bấm nhầm
+    const musicBtn = document.getElementById('music-control');
+    if (musicBtn) musicBtn.style.display = 'none';
+
+    // Ẩn màn hình mở đầu nếu đang bị che
+    document.body.classList.remove('opening-locked');
+    const openingOverlay = document.getElementById('opening-overlay');
+    if (openingOverlay) {
+      openingOverlay.classList.add('is-hidden');
+      openingOverlay.style.display = 'none';
+    }
+
     loadGitHubSettings();
     hideGhAlert();
     openModal(ghModal);
@@ -3162,6 +3194,10 @@ function initVisualAdminModule() {
   if (ghCloseBtn) {
     ghCloseBtn.addEventListener('click', () => {
       closeModal(ghModal);
+      const musicBtn = document.getElementById('music-control');
+      if (musicBtn && !document.body.classList.contains('admin-mode-active')) {
+        musicBtn.style.display = 'flex';
+      }
       const hash = window.location.hash.toLowerCase();
       if (hash === '#github') {
         history.replaceState(null, null, window.location.pathname + window.location.search);
