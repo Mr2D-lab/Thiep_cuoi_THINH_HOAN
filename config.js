@@ -1,5 +1,5 @@
 /* ==========================================================================
-   BẢNG CẤU HÌNH THIỆP CƯỚI 2026 (Cập nhật: 1790518197780)
+   BẢNG CẤU HÌNH THIỆP CƯỚI 2026 (Cập nhật: 1790518203037)
    ========================================================================== */
 
 const WEDDING_CONFIG = {
@@ -59,7 +59,7 @@ const WEDDING_CONFIG = {
       "address": "Xóm Văn Tân, xã Thuần Trung, tỉnh Nghệ An (xóm văn Tân, Nhân Sơn, Đô Lương cũ)",
       "title": "LỄ VU QUY",
       "time": "09:00",
-      "dateText": "Thứ Tư, 25/11/2026",
+      "dateText": "Thứ Bảy, 10/10/2026",
       "mapUrl": ""
     },
     "reception": {
@@ -67,7 +67,7 @@ const WEDDING_CONFIG = {
       "address": "Xóm Đại Đồng, xã Bạch Hà, tỉnh Nghệ An (xóm 2, Đại Sơn, Đô Lương cũ)",
       "title": "TIỆC CƯỚI",
       "time": "11:00",
-      "dateText": "Thứ Tư, 25/11/2026",
+      "dateText": "Thứ Bảy, 10/10/2026",
       "mapUrl": ""
     }
   },
@@ -232,5 +232,5 @@ const WEDDING_CONFIG = {
 
 if (typeof window !== 'undefined') {
   window.WEDDING_CONFIG = WEDDING_CONFIG;
-  window._weddingConfigBuildTime = "1790518197780";
+  window._weddingConfigBuildTime = "1790518203037";
 }
