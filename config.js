@@ -1,5 +1,5 @@
 /* ==========================================================================
-   BẢNG CẤU HÌNH THIỆP CƯỚI 2026 (Cập nhật: 1790436651869)
+   BẢNG CẤU HÌNH THIỆP CƯỚI 2026 (Cập nhật: 1790477294071)
    ========================================================================== */
 
 const WEDDING_CONFIG = {
@@ -222,15 +222,15 @@ const WEDDING_CONFIG = {
   "githubSync": {
     "enabled": true,
     "encrypted": {
-      "salt": "w8oISBUKnpkQyT8LVjzTrQ==",
-      "iv": "ImTQTl6pk7QrWrlo",
-      "ciphertext": "vuL6jH9ROQWBpxQ6jiUs1/LyvdXAZZD5L0LJDkt6rzKaFCghrAI5GqcJS3/W8YSGdqeQYfIZbE9giCxBpPY4hBiyY+YhmuGW4vYRYhzo/q7l9Oq17VoHT/ixBh/fx08wShUVmaiIPLDfzYe5TGRHdyIZBobmBVHOdwmMvQ=="
+      "salt": "FXsJnHjknDvPjNNqu+iDqw==",
+      "iv": "yePP1t2Wqwokbmo3",
+      "ciphertext": "CbqGAKUrUuadcZ5D/v8JRMoZZ670eS0PGaWNbRFSutJZY5rCQLrGMZn77xEgtIgwGSH4QmygbEWGxsGL1CgKKn8S4lKnfJg3bBoahxOMTLj7W3Yfl+jDyy+E9P9NrfZAxNT3r8ZGVU0RingyPsZEJiK9ryBhmmbhB7RJpw=="
     },
-    "updatedAt": "21:24:10 24/9/2026"
+    "updatedAt": "09:46:29 27/9/2026"
   }
 };
 
 if (typeof window !== 'undefined') {
   window.WEDDING_CONFIG = WEDDING_CONFIG;
-  window._weddingConfigBuildTime = "1790436651869";
+  window._weddingConfigBuildTime = "1790477294071";
 }
