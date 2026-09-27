@@ -1,52 +1,22 @@
 [
   {
-    "id": "g_1790428832913",
-    "pronoun": "Chị",
-    "fullName": "nguyễn thị ab",
-    "displayName": "Chị ab",
-    "guestOf": "bride",
-    "slug": "Thiep_cuoi_gui_nguyen_thi_ab_2",
-    "fullUrl": "https://thiep-cuoi-thinh-hoan.vercel.app/Thiep_cuoi_gui_nguyen_thi_ab_2",
-    "createdAt": "20:20:32 26/9/2026"
-  },
-  {
-    "id": "g_1790428155855",
-    "pronoun": "Chị",
-    "fullName": "nguyễn thị ab",
-    "displayName": "Chị ab",
-    "guestOf": "bride",
-    "slug": "Thiep_cuoi_gui_nguyen_thi_ab",
-    "fullUrl": "https://thiep-cuoi-thinh-hoan.vercel.app/Thiep_cuoi_gui_nguyen_thi_ab",
-    "createdAt": "20:09:15 26/9/2026"
-  },
-  {
-    "id": "g_1790426617186",
-    "pronoun": "Em",
-    "fullName": "đức siêu cấp vip pro",
-    "displayName": "Em đức siêu cấp vip pro",
-    "guestOf": "bride",
-    "slug": "Thiep_cuoi_gui_em_duc_sieu_cap_vip_pro_2",
-    "fullUrl": "https://thiep-cuoi-thinh-hoan.vercel.app/Thiep_cuoi_gui_em_duc_sieu_cap_vip_pro_2",
-    "createdAt": "19:43:37 26/9/2026"
-  },
-  {
-    "id": "g_1790424922198",
-    "pronoun": "Em",
-    "fullName": "đức siêu cấp vip pro",
-    "displayName": "Em đức siêu cấp vip pro",
-    "guestOf": "bride",
-    "slug": "Thiep_cuoi_gui_em_duc_sieu_cap_vip_pro",
-    "fullUrl": "https://thiep-cuoi-thinh-hoan.vercel.app/Thiep_cuoi_gui_em_duc_sieu_cap_vip_pro",
-    "createdAt": "19:15:22 26/9/2026"
-  },
-  {
-    "id": "g_1790400238887",
+    "id": "g_1790518369548",
     "pronoun": "Bạn",
-    "fullName": "A",
-    "displayName": "Bạn A",
-    "guestOf": "groom",
-    "slug": "Thiep_cuoi_gui_ban_a",
-    "fullUrl": "https://thiep-cuoi-thinh-hoan.vercel.app/Thiep_cuoi_gui_ban_a",
-    "createdAt": "12:23:58 26/9/2026"
+    "fullName": "Hạnh + nt",
+    "displayName": "Bạn nt",
+    "guestOf": "bride",
+    "slug": "Thiep_cuoi_gui_hanh_nt_2",
+    "fullUrl": "https://thiep-cuoi-thinh-hoan.vercel.app/Thiep_cuoi_gui_hanh_nt_2",
+    "createdAt": "21:12:49 27/9/2026"
+  },
+  {
+    "id": "g_1790518359052",
+    "pronoun": "Bạn",
+    "fullName": "Hạnh + nt",
+    "displayName": "Bạn nt",
+    "guestOf": "bride",
+    "slug": "Thiep_cuoi_gui_hanh_nt",
+    "fullUrl": "https://thiep-cuoi-thinh-hoan.vercel.app/Thiep_cuoi_gui_hanh_nt",
+    "createdAt": "21:12:39 27/9/2026"
   }
 ]
