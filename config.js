@@ -1,5 +1,5 @@
 /* ==========================================================================
-   BẢNG CẤU HÌNH THIỆP CƯỚI 2026 (Cập nhật: 1793420642783)
+   BẢNG CẤU HÌNH THIỆP CƯỚI 2026 (Cập nhật: 1793420797883)
    ========================================================================== */
 
 const WEDDING_CONFIG = {
@@ -30,8 +30,8 @@ const WEDDING_CONFIG = {
     ]
   },
   "groom": {
-    "name": "HoànNguyễn",
-    "shortName": "HoànNguyễn",
+    "name": "Hoàn Nguyễn",
+    "shortName": "Nguyễn",
     "father": "",
     "mother": "Bà Đặng Thị Tuyết",
     "address": "Xóm Đại Đồng, xã Bạch Hà, tỉnh Nghệ An (xóm 2, Đại Sơn, Đô Lương cũ)",
@@ -234,5 +234,5 @@ const WEDDING_CONFIG = {
 
 if (typeof window !== 'undefined') {
   window.WEDDING_CONFIG = WEDDING_CONFIG;
-  window._weddingConfigBuildTime = "1793420642783";
+  window._weddingConfigBuildTime = "1793420797883";
 }
