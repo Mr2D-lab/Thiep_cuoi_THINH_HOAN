@@ -1,5 +1,5 @@
 /* ==========================================================================
-   BẢNG CẤU HÌNH THIỆP CƯỚI 2026 (Cập nhật: 1793421436358)
+   BẢNG CẤU HÌNH THIỆP CƯỚI 2026 (Cập nhật: 1793448625229)
    ========================================================================== */
 
 const WEDDING_CONFIG = {
@@ -234,5 +234,5 @@ const WEDDING_CONFIG = {
 
 if (typeof window !== 'undefined') {
   window.WEDDING_CONFIG = WEDDING_CONFIG;
-  window._weddingConfigBuildTime = "1793421436358";
+  window._weddingConfigBuildTime = "1793448625229";
 }
