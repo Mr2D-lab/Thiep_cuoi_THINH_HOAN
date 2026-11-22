@@ -614,61 +614,8 @@
         <h2 class="font-display text-2xl text-dark mb-8" data-bind="gift-heading">Mừng Cưới</h2>
 
         <div class="mb-4">
-          <!-- Animated Red Envelope Button -->
-          <div class="vs-qr-btn cursor-pointer inline-block">
-            <div class="vs-envelope-shake"
-              style="position:relative;display:inline-block;width:180px;height:240px;margin:0 auto;">
-              <svg viewBox="0 0 180 240" style="width:180px;height:240px;display:block;"
-                xmlns="http://www.w3.org/2000/svg">
-                <rect x="10" y="10" width="160" height="220" rx="14" fill="#c0392b"></rect>
-                <rect x="10" y="85" width="160" height="70" fill="#a93226"></rect>
-                <pattern id="vs-diamonds" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
-                  <rect width="20" height="20" fill="none"></rect>
-                  <polygon points="10,2 18,10 10,18 2,10" fill="#c0392b" opacity="0.5"></polygon>
-                </pattern>
-                <rect x="10" y="85" width="160" height="70" fill="url(#vs-diamonds)"></rect>
-                <line x1="10" y1="85" x2="170" y2="85" stroke="#f1c40f" stroke-width="1.5"></line>
-                <line x1="10" y1="155" x2="170" y2="155" stroke="#f1c40f" stroke-width="1.5"></line>
-                <path d="M10,10 L40,10 L10,40 Z" fill="#f1c40f" opacity="0.25"></path>
-                <path d="M170,10 L140,10 L170,40 Z" fill="#f1c40f" opacity="0.25"></path>
-                <path d="M10,230 L40,230 L10,200 Z" fill="#f1c40f" opacity="0.25"></path>
-                <path d="M170,230 L140,230 L170,200 Z" fill="#f1c40f" opacity="0.25"></path>
-                <!-- Traditional Double Happiness 囍 -->
-                <text x="90" y="132" text-anchor="middle" dominant-baseline="central"
-                  style="font-size:42px;font-weight:bold;fill:#f1c40f;font-family:serif;">囍</text>
-                <text x="90" y="55" text-anchor="middle"
-                  style="font-size:11px;fill:#f8d98b;font-family:sans-serif;letter-spacing:2px;font-weight:600;">MỪNG
-                  CƯỚI</text>
-                <line x1="55" y1="185" x2="125" y2="185" stroke="#f1c40f" stroke-width="0.8" opacity="0.5"></line>
-                <circle cx="90" cy="185" r="3" fill="#f1c40f" opacity="0.4"></circle>
-                <circle cx="55" cy="185" r="2" fill="#f1c40f" opacity="0.3"></circle>
-                <circle cx="125" cy="185" r="2" fill="#f1c40f" opacity="0.3"></circle>
-              </svg>
-
-              <!-- Floating Sparkles & Coins -->
-              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"
-                style="position:absolute;top:-8px;left:10px;width:22px;height:22px;opacity:0.8;" class="vs-coin-anim">
-                <path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8z" fill="#f1c40f"></path>
-              </svg>
-              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"
-                style="position:absolute;top:0px;right:5px;width:18px;height:18px;opacity:0.7;animation-delay:0.5s;"
-                class="vs-coin-anim">
-                <path
-                  d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
-                  fill="#f1c40f"></path>
-              </svg>
-              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"
-                style="position:absolute;bottom:20px;left:0px;width:16px;height:16px;opacity:0.6;animation-delay:1s;"
-                class="vs-coin-anim">
-                <path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8z" fill="#f1c40f"></path>
-              </svg>
-            </div>
-            <p class="text-muted text-xs tracking-wider mt-3" data-bind="gift-envelope-note">Nhấn vào phong bao để mở
-              thông tin mừng cưới</p>
-          </div>
-
-          <!-- Revealed Bank & QR Modal Card -->
-          <div class="vs-qr-content vs-hidden max-w-2xl mx-auto">
+          <!-- Revealed Bank & QR Card -->
+          <div class="vs-qr-content max-w-2xl mx-auto">
             <div id="bank-cards-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6 justify-center items-start w-full">
               <!-- Thẻ Chú Rể -->
               <div id="bank-card-groom"
@@ -761,13 +708,6 @@
                 <p class="text-[11px] text-muted italic mt-3" data-bind="gift-qr-instruction">Quét mã QR bằng ứng dụng
                   ngân hàng bất kỳ</p>
               </div>
-            </div>
-
-            <div class="mt-4 text-center">
-              <button type="button"
-                class="vs-qr-close px-6 py-2 rounded-full text-[11px] font-semibold tracking-wider uppercase bg-gray-200 text-gray-700 hover:bg-gray-300 transition-all border-0 cursor-pointer">
-                Đóng
-              </button>
             </div>
           </div>
         </div>

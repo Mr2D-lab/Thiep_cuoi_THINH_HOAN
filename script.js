@@ -756,7 +756,7 @@ function applyWeddingConfig() {
   configureFieldGroup('rsvp-message-group', hasMessageField);
 
   // [8] Hộp Mừng Cưới & QR Code (Section 12 - Gift): Xóa số tài khoản hoặc tiêu đề -> Tự ẩn
-  const hasGift = hasText(cfg.bankAccount?.accountNumber) && hasText(txt.gift?.heading);
+  const hasGift = hasText(cfg.bankAccount?.groom?.accountNumber || cfg.bankAccount?.bride?.accountNumber || cfg.bankAccount?.accountNumber) && hasText(txt.gift?.heading);
   setSectionVisible('#section-gift', hasGift);
 
   // [9] Album Ảnh Cưới (Section 6): Xóa tiêu đề -> Tự ẩn
@@ -1077,31 +1077,9 @@ function initMusicPlayer() {
 }
 
 /* =====================================================
-   4. Red Envelope (Mừng Cưới) & Copy Bank Account
+   4. Mừng Cưới & Copy Bank Account
    ===================================================== */
 function initEnvelopeGift() {
-  const envelopeBtn = document.querySelector('.vs-qr-btn');
-  const qrContent = document.querySelector('.vs-qr-content');
-  const qrClose = document.querySelector('.vs-qr-close');
-  const copyBtn = document.getElementById('copy-bank-btn');
-
-  if (envelopeBtn && qrContent) {
-    envelopeBtn.addEventListener('click', () => {
-      envelopeBtn.style.display = 'none';
-      qrContent.classList.remove('vs-hidden');
-      qrContent.classList.add('vs-reveal');
-      qrContent.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    });
-  }
-
-  if (qrClose && envelopeBtn && qrContent) {
-    qrClose.addEventListener('click', () => {
-      qrContent.classList.add('vs-hidden');
-      qrContent.classList.remove('vs-reveal');
-      envelopeBtn.style.display = 'block';
-    });
-  }
-
   function handleCopyAccount(btn, fallbackAcc) {
     if (!btn) return;
     btn.addEventListener('click', (e) => {
@@ -1840,10 +1818,8 @@ function initPersonalizedGuestLink() {
 }
 
 /**
- * Điều hướng hiển thị thông tin QR Mừng Cưới theo đối tượng khách:
- * - 'groom': chỉ hiển thị thẻ tài khoản & QR Chú rể
- * - 'bride': chỉ hiển thị thẻ tài khoản & QR Cô dâu
- * - rỗng / admin: hiển thị cả 2 thẻ tài khoản & QR Chú rể và Cô dâu
+ * Luôn hiển thị đầy đủ cả 2 thẻ tài khoản & QR Chú rể và Cô dâu
+ * trên tất cả các loại thiệp (link gốc, khách bên Chú rể, khách bên Cô dâu, Admin).
  */
 function applyQrGuestVisibility(guestOf) {
   const cardGroom = document.getElementById('bank-card-groom');
@@ -1852,64 +1828,17 @@ function applyQrGuestVisibility(guestOf) {
   const qrContent = document.querySelector('.vs-qr-content');
   if (!cardGroom || !cardBride) return;
 
-  // Nếu đang ở Chế độ Nhà phát triển (#admin), luôn hiển thị cả 2 thẻ để chỉnh sửa
-  if (document.body.classList.contains('admin-mode-active')) {
-    cardGroom.style.display = '';
-    cardBride.style.display = '';
-    if (grid) {
-      grid.className = 'grid grid-cols-1 md:grid-cols-2 gap-6 justify-center items-start w-full';
-      grid.style.display = '';
-      grid.style.justifyContent = '';
-      grid.style.gridTemplateColumns = '';
-    }
-    if (qrContent) {
-      qrContent.classList.remove('max-w-sm', 'max-w-xs');
-      qrContent.classList.add('max-w-2xl');
-    }
-    return;
+  cardGroom.style.display = '';
+  cardBride.style.display = '';
+  if (grid) {
+    grid.className = 'grid grid-cols-1 md:grid-cols-2 gap-6 justify-center items-start w-full';
+    grid.style.display = '';
+    grid.style.justifyContent = '';
+    grid.style.gridTemplateColumns = '';
   }
-
-  const normalized = (guestOf || '').trim().toLowerCase();
-  if (normalized === 'groom') {
-    cardGroom.style.display = '';
-    cardBride.style.display = 'none';
-    if (grid) {
-      grid.className = 'flex justify-center items-center w-full';
-      grid.style.display = 'flex';
-      grid.style.justifyContent = 'center';
-      grid.style.gridTemplateColumns = '';
-    }
-    if (qrContent) {
-      qrContent.classList.remove('max-w-2xl');
-      qrContent.classList.add('max-w-sm');
-    }
-  } else if (normalized === 'bride') {
-    cardGroom.style.display = 'none';
-    cardBride.style.display = '';
-    if (grid) {
-      grid.className = 'flex justify-center items-center w-full';
-      grid.style.display = 'flex';
-      grid.style.justifyContent = 'center';
-      grid.style.gridTemplateColumns = '';
-    }
-    if (qrContent) {
-      qrContent.classList.remove('max-w-2xl');
-      qrContent.classList.add('max-w-sm');
-    }
-  } else {
-    // Không xác định (link gốc): hiển thị cả 2 thẻ
-    cardGroom.style.display = '';
-    cardBride.style.display = '';
-    if (grid) {
-      grid.className = 'grid grid-cols-1 md:grid-cols-2 gap-6 justify-center items-start w-full';
-      grid.style.display = '';
-      grid.style.justifyContent = '';
-      grid.style.gridTemplateColumns = '';
-    }
-    if (qrContent) {
-      qrContent.classList.remove('max-w-sm', 'max-w-xs');
-      qrContent.classList.add('max-w-2xl');
-    }
+  if (qrContent) {
+    qrContent.classList.remove('max-w-sm', 'max-w-xs');
+    qrContent.classList.add('max-w-2xl');
   }
 }
 
